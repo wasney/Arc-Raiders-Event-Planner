@@ -12,7 +12,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); padding-bottom: 4rem; }
         
-        /* NAV */
         header { background-color: rgba(15, 16, 18, 0.95); border-bottom: 1px solid var(--border-color); padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); text-transform: uppercase; }
         nav ul { display: flex; gap: 20px; }
@@ -20,18 +19,13 @@
         nav a:hover, nav a.active { color: var(--accent-color); }
         .nav-external { color: #4cd1ff !important; }
 
-        /* LAYOUT */
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
         .hidden { display: none !important; }
         .hero { text-align: center; padding: 4rem 1rem; }
-        .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; font-weight: 800; }
-
-        /* CARDS */
         .card { background: var(--card-bg); padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 2rem; }
         .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-top: 2rem; }
-        .member-card, .event-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 10px; position: relative; }
         
-        /* EVENT STYLES */
+        .member-card, .event-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 10px; position: relative; }
         .event-date { color: var(--accent-color); font-weight: bold; font-size: 0.9rem; text-transform: uppercase; }
         .event-title { font-size: 1.4rem; font-weight: 800; margin: 5px 0; }
         .attendees-list { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; font-size: 0.9rem; margin-top: 10px; }
@@ -39,12 +33,10 @@
         .delete-event-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.2rem; }
         .delete-event-btn:hover { color: var(--danger-color); }
 
-        /* FORMS */
         .form-group { margin-bottom: 1rem; }
         label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-dim); }
         input, select, textarea { width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-main); }
 
-        /* BUTTONS */
         .btn-primary { background: var(--accent-color); color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; width: 100%; }
         .btn-secondary { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 16px; border-radius: 4px; cursor: pointer; }
         .btn-discord { background: #5865F2; color: white; padding: 12px 24px; border-radius: 4px; font-weight: 600; cursor: pointer; border: none; }
@@ -52,7 +44,6 @@
         .btn-join { background: var(--success-color); color: #0f1012; }
         .btn-leave { background: var(--card-bg); border: 1px solid var(--danger-color); color: var(--danger-color); }
 
-        /* SCHEDULE UI */
         .day-section { background: var(--bg-color); padding: 10px; border-radius: 4px; margin-bottom: 10px; border: 1px solid var(--border-color); }
         .day-header { display: flex; justify-content: space-between; align-items: center; }
         .day-title-group { display: flex; gap: 10px; align-items: center; }
@@ -63,12 +54,9 @@
         .remove-slot-btn { background: none; border: none; color: var(--danger-color); font-weight: bold; cursor: pointer; font-size: 1.2rem; }
         .disabled-day { opacity: 0.5; }
 
-        /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
         .modal-content { background: var(--modal-bg); width: 95%; max-width: 500px; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-
-        @media (max-width: 768px) { header { flex-direction: column; gap: 10px; } .grid-view { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -80,7 +68,6 @@
                 <li><a id="nav-home">Profile</a></li>
                 <li><a id="nav-roster">Roster</a></li>
                 <li><a id="nav-board">Raid Board</a></li>
-                <li><a href="https://first-wave-bp-share.netlify.app/" target="_blank" class="nav-external">Blueprints ↗</a></li>
             </ul>
         </nav>
     </header>
@@ -90,13 +77,14 @@
             <h1>Coordinate. Survive. Extract.</h1>
             <p>Connect with your guild to manage raid availability.</p>
             <button id="loginBtn" class="btn-discord">Login with Discord</button>
+            <p id="loading-msg" style="color:var(--accent-color); margin-top:20px; display:none;">Establishing Uplink...</p>
         </section>
 
         <section id="onboarding-section" class="card hidden">
             <h2>Operator Registration</h2>
             <form id="profileForm">
-                <div class="form-group"><label>Playstyle</label><select id="p-style"><option value="PvP">PvP</option><option value="PvE">PvE</option><option value="Hybrid">Hybrid</option></select></div>
-                <div class="form-group"><label>Region</label><select id="p-region"><option value="NA">North America</option><option value="EU">Europe</option><option value="ASIA">Asia</option></select></div>
+                <div class="form-group"><label>Playstyle</label><select id="p-style"><option>PvP</option><option>PvE</option><option>Hybrid</option></select></div>
+                <div class="form-group"><label>Region</label><select id="p-region"><option>NA</option><option>EU</option><option>ASIA</option></select></div>
                 <button type="submit" class="btn-primary">Initialize Profile</button>
             </form>
         </section>
@@ -111,115 +99,94 @@
             </div>
         </section>
 
-        <section id="roster-section" class="hidden">
-            <h2>Guild Roster</h2>
-            <div id="rosterGrid" class="grid-view"></div>
-        </section>
+        <section id="roster-section" class="hidden"><h2>Guild Roster</h2><div id="rosterGrid" class="grid-view"></div></section>
 
         <section id="board-section" class="hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; padding-bottom:1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h2>Mission Board</h2><button id="openEventModalBtn" class="btn-primary" style="width:auto">+ Create Mission</button>
             </div>
             <div id="eventsGrid" class="grid-view"></div>
         </section>
     </main>
 
-    <footer style="text-align:center; padding:20px; font-size:0.8rem; color:#444; margin-top:50px;">
-        &copy; 2026 Arc Raiders Tool. <a href="#" id="emergencyReset" style="color:#666; text-decoration:underline;">Reset App Data</a>
+    <footer style="text-align:center; margin-top:50px;">
+        <button id="resetAppBtn" style="background:none; border:none; color:#444; text-decoration:underline; cursor:pointer;">Reset Connection</button>
     </footer>
 
     <div id="scheduleModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-header"><h3>Weekly Availability</h3><button class="close-modal">&times;</button></div>
-            <form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">Save Routine</button></form>
-        </div>
+        <div class="modal-content"><div class="modal-header"><h3>Weekly Availability</h3><button class="close-modal">&times;</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary">Save Routine</button></form></div>
     </div>
-
     <div id="eventModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-header"><h3>New Mission</h3><button class="close-modal">&times;</button></div>
-            <form id="eventForm">
-                <div class="form-group"><label>Mission Title</label><input id="e-title" required></div>
-                <div class="form-group"><label>Description</label><textarea id="e-desc" rows="3"></textarea></div>
-                <div class="form-group"><label>Start Time</label><input id="e-time" type="datetime-local" required></div>
-                <div class="form-group"><label>Region</label><select id="e-region"><option>NA</option><option>EU</option></select></div>
-                <button type="submit" class="btn-primary">Post Mission</button>
-            </form>
-        </div>
+        <div class="modal-content"><div class="modal-header"><h3>New Mission</h3><button class="close-modal">&times;</button></div><form id="eventForm"><div class="form-group"><input id="e-title" required placeholder="Title"></div><div class="form-group"><input id="e-time" type="datetime-local" required></div><div class="form-group"><select id="e-region"><option>NA</option><option>EU</option></select></div><button type="submit" class="btn-primary">Post Mission</button></form></div>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
+            console.log("🚀 System Initializing...");
+
             const CONFIG = {
                 url: 'https://olmaoftlbrookqwxvlvx.supabase.co',
                 key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo'
             };
             const supabaseClient = supabase.createClient(CONFIG.url, CONFIG.key);
-
             let currentUser = null;
             let profilesMap = {};
 
-            // --- EMERGENCY RESET ---
-            document.getElementById('emergencyReset').onclick = () => {
-                if(confirm("This will clear your login session. Continue?")) {
-                    localStorage.clear();
-                    window.location.reload();
-                }
-            };
-
-            // --- NAV ---
-            const pages = ['login', 'onboarding', 'dashboard', 'roster', 'board'];
+            // NAV
             function navTo(pageId) {
-                pages.forEach(p => {
-                    const el = document.getElementById(p+'-section');
-                    if(el) el.classList.add('hidden');
-                });
+                console.log(`🧭 Navigating to: ${pageId}`);
+                ['login','onboarding','dashboard','roster','board'].forEach(p => document.getElementById(p+'-section').classList.add('hidden'));
                 document.getElementById(pageId+'-section').classList.remove('hidden');
-                
-                document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-                const navLink = document.getElementById('nav-'+(pageId === 'dashboard' ? 'home' : pageId));
-                if(navLink) navLink.classList.add('active');
-
                 if(pageId === 'roster') loadRoster();
                 if(pageId === 'board') loadBoard();
             }
-
             document.getElementById('nav-home').onclick = () => navTo('dashboard');
             document.getElementById('nav-roster').onclick = () => navTo('roster');
             document.getElementById('nav-board').onclick = () => navTo('board');
+            document.getElementById('resetAppBtn').onclick = () => { localStorage.clear(); window.location.reload(); };
 
-            // --- AUTH ---
-            if (window.location.hash) window.history.replaceState(null, null, window.location.pathname);
-
-            supabaseClient.auth.onAuthStateChange(async (e, session) => {
-                if(session) {
-                    currentUser = session.user;
-                    await checkProfile();
-                } else {
-                    // Force login section visible if not logged in
-                    navTo('login');
-                }
-            });
+            // AUTH & INIT
+            // Explicitly check session on load
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (session) {
+                console.log("✅ Session Found on Load:", session.user.id);
+                currentUser = session.user;
+                await checkProfile();
+            } else {
+                console.log("⚠️ No Session Found. Waiting for Login.");
+                // Listen for auth changes (like the redirect completing)
+                supabaseClient.auth.onAuthStateChange(async (e, session) => {
+                    console.log("🔔 Auth Event:", e);
+                    if (session) {
+                        currentUser = session.user;
+                        await checkProfile();
+                    }
+                });
+            }
 
             document.getElementById('loginBtn').onclick = async () => {
-                const cleanURL = window.location.origin + window.location.pathname;
-                await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: cleanURL } });
+                document.getElementById('loading-msg').style.display = 'block';
+                // DO NOT clean URL here. Let Supabase handle the redirect naturally.
+                await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.href } });
             };
             document.getElementById('logoutBtn').onclick = async () => {
-                await supabaseClient.auth.signOut();
-                window.location.reload();
+                await supabaseClient.auth.signOut(); window.location.reload();
             };
 
-            // --- PROFILE ---
+            // PROFILE
             async function loadProfilesCache() {
                 const { data } = await supabaseClient.from('profiles').select('id, discord_name');
                 if(data) data.forEach(p => profilesMap[p.id] = p.discord_name);
             }
 
             async function checkProfile() {
+                console.log("🔍 Checking Profile...");
                 await loadProfilesCache();
-                const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
-                if(data) {
+                const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
+                
+                if (data) {
+                    console.log("👤 Profile Found:", data.discord_name);
                     document.getElementById('u-name').textContent = data.discord_name;
                     document.getElementById('u-avatar').src = data.avatar_url || 'https://placehold.co/50';
                     document.getElementById('u-playstyle').textContent = data.play_style;
@@ -228,6 +195,7 @@
                     else populateScheduleModal(null);
                     navTo('dashboard');
                 } else {
+                    console.log("⚠️ No Profile Found (or Error):", error);
                     navTo('onboarding');
                 }
             }
@@ -235,139 +203,113 @@
             document.getElementById('profileForm').onsubmit = async (e) => {
                 e.preventDefault();
                 const { error } = await supabaseClient.from('profiles').upsert({
-                    id: currentUser.id,
-                    discord_name: currentUser.user_metadata.full_name || "Raider",
+                    id: currentUser.id, discord_name: currentUser.user_metadata.full_name || "Raider",
                     avatar_url: currentUser.user_metadata.avatar_url,
-                    play_style: document.getElementById('p-style').value,
-                    region: document.getElementById('p-region').value
+                    play_style: document.getElementById('p-style').value, region: document.getElementById('p-region').value
                 });
                 if(!error) checkProfile();
             };
 
-            // --- ROSTER ---
+            // ROSTER
             async function loadRoster() {
-                const grid = document.getElementById('rosterGrid');
-                grid.innerHTML = '<p>Loading signals...</p>';
+                const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Loading...';
                 const { data: profiles } = await supabaseClient.from('profiles').select('*');
                 if(!profiles) return;
                 grid.innerHTML = '';
                 const today = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"][new Date().getDay()];
-
                 profiles.forEach(p => {
                     let status = '<span style="color:#666">Offline Today</span>';
-                    if(p.availability_json && p.availability_json[today]) {
-                        const dayData = p.availability_json[today];
-                        if(dayData.active) {
-                            const slots = Array.isArray(dayData.slots) ? dayData.slots : [{start:dayData.start, end:dayData.end}];
-                            const times = slots.map(s => `${s.start}-${s.end}`).join(', ');
-                            status = `<span style="color:var(--success-color)">Online: ${times}</span>`;
-                        }
+                    if(p.availability_json && p.availability_json[today] && p.availability_json[today].active) {
+                        const slots = Array.isArray(p.availability_json[today].slots) ? p.availability_json[today].slots : [];
+                        const times = slots.map(s => `${s.start}-${s.end}`).join(', ');
+                        status = `<span style="color:var(--success-color)">Online: ${times}</span>`;
                     }
+                    grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url}" style="width:50px;height:50px;border-radius:50%"><div><h3>${p.discord_name}</h3><div>${p.play_style}</div></div></div><div style="margin-top:10px">${status}</div></div>`;
+                });
+            }
+
+            // BOARD
+            async function loadBoard() {
+                const grid = document.getElementById('eventsGrid'); grid.innerHTML = 'Scanning...';
+                const { data: events } = await supabaseClient.from('events').select('*').order('start_time', {ascending: true});
+                const { data: signups } = await supabaseClient.from('event_signups').select('*');
+                grid.innerHTML = '';
+                if(!events || events.length === 0) { grid.innerHTML = '<p>No active missions.</p>'; return; }
+                
+                events.forEach(ev => {
+                    const host = profilesMap[ev.host_id] || 'Unknown';
+                    const attending = signups.filter(s => s.event_id === ev.id);
+                    const isSignedUp = attending.some(s => s.user_id === currentUser.id);
+                    const isHost = ev.host_id === currentUser.id;
+                    
                     grid.innerHTML += `
-                        <div class="member-card">
-                            <div class="member-header">
-                                <img src="${p.avatar_url}" class="member-avatar">
-                                <div><h3>${p.discord_name}</h3><div style="color:#aaa; font-size:0.8rem">${p.play_style} • ${p.region}</div></div>
-                            </div>
-                            <div style="margin-top:10px; font-weight:bold; font-size:0.9rem">${status}</div>
+                        <div class="event-card">
+                            ${isHost ? `<button class="delete-event-btn" onclick="window.deleteEvent('${ev.id}')">&times;</button>` : ''}
+                            <div class="event-date">${new Date(ev.start_time).toLocaleString()}</div>
+                            <div class="event-title">${ev.title}</div>
+                            <div>Host: ${host} (${ev.region})</div>
+                            <div class="attendees-list">Roster (${attending.length}): ${attending.map(s => `<span class="attendee-pill">${profilesMap[s.user_id]||'...'}</span>`).join('')}</div>
+                            ${isSignedUp ? `<button class="btn-action btn-leave" onclick="window.leaveEvent('${ev.id}')">Withdraw</button>` : `<button class="btn-action btn-join" onclick="window.joinEvent('${ev.id}')">Sign Up</button>`}
                         </div>`;
                 });
             }
 
-            // --- BOARD ---
-            async function loadBoard() {
-                const grid = document.getElementById('eventsGrid');
-                grid.innerHTML = '<p>Scanning missions...</p>';
-                const { data: events } = await supabaseClient.from('events').select('*').order('start_time', {ascending: true});
-                const { data: signups } = await supabaseClient.from('event_signups').select('*');
-                grid.innerHTML = '';
-                if(!events || events.length === 0) { grid.innerHTML = '<p style="text-align:center; width:100%;">No missions.</p>'; return; }
-
-                events.forEach(ev => {
-                    const hostName = profilesMap[ev.host_id] || 'Unknown';
-                    const evSignups = signups.filter(s => s.event_id === ev.id);
-                    const amISignedUp = evSignups.some(s => s.user_id === currentUser.id);
-                    const isHost = ev.host_id === currentUser.id;
-                    const card = document.createElement('div');
-                    card.className = 'event-card';
-                    card.innerHTML = `
-                        ${isHost ? `<button class="delete-event-btn" onclick="window.deleteEvent('${ev.id}')">&times;</button>` : ''}
-                        <div class="event-date">${new Date(ev.start_time).toLocaleString()}</div>
-                        <div class="event-title">${ev.title}</div>
-                        <div style="color:#aaa; font-size:0.9rem">Host: ${hostName} (${ev.region})</div>
-                        <p style="color:#ccc; font-size:0.9rem; margin-bottom:10px;">${ev.description || ''}</p>
-                        <div class="attendees-list"><strong>Roster (${evSignups.length}):</strong><br>${evSignups.map(s => `<span class="attendee-pill">${profilesMap[s.user_id] || '...'}</span>`).join('')}</div>
-                        ${amISignedUp ? `<button class="btn-action btn-leave" onclick="window.leaveEvent('${ev.id}')">Withdraw</button>` : `<button class="btn-action btn-join" onclick="window.joinEvent('${ev.id}')">Sign Up</button>`}
-                    `;
-                    grid.appendChild(card);
-                });
-            }
-
-            // Global actions
             window.joinEvent = async (id) => { await supabaseClient.from('event_signups').insert({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.leaveEvent = async (id) => { await supabaseClient.from('event_signups').delete().match({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.deleteEvent = async (id) => { if(confirm('Delete?')) { await supabaseClient.from('events').delete().eq('id', id); loadBoard(); } };
 
-            // --- MODALS ---
+            // MODALS
             const sModal = document.getElementById('scheduleModal');
             const eModal = document.getElementById('eventModal');
             document.getElementById('openScheduleBtn').onclick = () => sModal.classList.remove('hidden');
             document.getElementById('openEventModalBtn').onclick = () => eModal.classList.remove('hidden');
             document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => { sModal.classList.add('hidden'); eModal.classList.add('hidden'); });
 
-            document.getElementById('eventForm').onsubmit = async (e) => {
-                e.preventDefault();
-                const { error } = await supabaseClient.from('events').insert({
-                    title: document.getElementById('e-title').value,
-                    description: document.getElementById('e-desc').value,
-                    start_time: document.getElementById('e-time').value,
-                    region: document.getElementById('e-region').value,
-                    host_id: currentUser.id
-                });
-                if(!error) { eModal.classList.add('hidden'); loadBoard(); }
-            };
-
-            // --- SCHEDULE LOGIC ---
+            // SCHEDULE EDITOR
             function populateScheduleModal(json) {
                 const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
-                const cont = document.getElementById('daysContainer');
-                cont.innerHTML = '';
+                const cont = document.getElementById('daysContainer'); cont.innerHTML = '';
                 days.forEach(d => {
                     const data = json ? json[d] : {};
                     const active = data.active || false;
-                    let slots = Array.isArray(data.slots) ? data.slots : (data.start ? [{start:data.start, end:data.end}] : []);
-                    
-                    const dayDiv = document.createElement('div');
-                    dayDiv.className = `day-section ${active?'':'disabled-day'}`;
-                    dayDiv.innerHTML = `<div class="day-header"><div class="day-title-group"><input type="checkbox" class="d-check" data-day="${d}" ${active?'checked':''}><strong style="text-transform:capitalize">${d}</strong></div><button type="button" class="add-slot-btn" ${active?'':'disabled'}>+</button></div><div class="slots-container ${active?'':'hidden'}"></div>`;
-                    
-                    const slotCont = dayDiv.querySelector('.slots-container');
-                    slots.forEach(s => addSlotUI(slotCont, s.start, s.end));
-                    dayDiv.querySelector('.d-check').onchange = (e) => { dayDiv.classList.toggle('disabled-day', !e.target.checked); slotCont.classList.toggle('hidden', !e.target.checked); dayDiv.querySelector('.add-slot-btn').disabled = !e.target.checked; if(e.target.checked && slotCont.children.length === 0) addSlotUI(slotCont); };
-                    dayDiv.querySelector('.add-slot-btn').onclick = () => addSlotUI(slotCont);
-                    cont.appendChild(dayDiv);
+                    const slots = Array.isArray(data.slots) ? data.slots : (data.start ? [{start:data.start, end:data.end}] : []);
+                    const div = document.createElement('div');
+                    div.className = `day-section ${active?'':'disabled-day'}`;
+                    div.innerHTML = `<div class="day-header"><div class="day-title-group"><input type="checkbox" class="d-check" data-day="${d}" ${active?'checked':''}><strong style="text-transform:capitalize">${d}</strong></div><button type="button" class="add-slot-btn" ${active?'':'disabled'}>+</button></div><div class="slots-container ${active?'':'hidden'}"></div>`;
+                    const sCont = div.querySelector('.slots-container');
+                    slots.forEach(s => addSlotUI(sCont, s.start, s.end));
+                    div.querySelector('.d-check').onchange = (e) => { div.classList.toggle('disabled-day', !e.target.checked); sCont.classList.toggle('hidden', !e.target.checked); div.querySelector('.add-slot-btn').disabled = !e.target.checked; if(e.target.checked && sCont.children.length===0) addSlotUI(sCont); };
+                    div.querySelector('.add-slot-btn').onclick = () => addSlotUI(sCont);
+                    cont.appendChild(div);
                 });
             }
-
             function addSlotUI(cont, start="18:00", end="22:00") {
-                const div = document.createElement('div');
-                div.className = 'time-slot';
-                div.innerHTML = `<input type="time" class="t-start" value="${start}"> - <input type="time" class="t-end" value="${end}"> <button type="button" class="remove-slot-btn">&times;</button>`;
-                div.querySelector('.remove-slot-btn').onclick = () => div.remove();
-                cont.appendChild(div);
+                const d = document.createElement('div'); d.className='time-slot';
+                d.innerHTML = `<input type="time" class="t-start" value="${start}"> - <input type="time" class="t-end" value="${end}"> <button type="button" class="remove-slot-btn">&times;</button>`;
+                d.querySelector('.remove-slot-btn').onclick = () => d.remove(); cont.appendChild(d);
             }
-
             document.getElementById('scheduleForm').onsubmit = async (e) => {
                 e.preventDefault();
                 const res = {};
                 document.querySelectorAll('.d-check').forEach(c => {
-                    const dayDiv = c.closest('.day-section');
+                    const div = c.closest('.day-section');
                     const slots = [];
-                    if(c.checked) dayDiv.querySelectorAll('.time-slot').forEach(s => slots.push({start: s.querySelector('.t-start').value, end: s.querySelector('.t-end').value}));
-                    res[c.dataset.day] = { active: c.checked, slots: slots };
+                    if(c.checked) div.querySelectorAll('.time-slot').forEach(s => slots.push({start:s.querySelector('.t-start').value, end:s.querySelector('.t-end').value}));
+                    res[c.dataset.day] = {active: c.checked, slots};
                 });
-                const { error } = await supabaseClient.from('profiles').update({availability_json: res}).eq('id', currentUser.id);
-                if(!error) { sModal.classList.add('hidden'); checkProfile(); }
+                await supabaseClient.from('profiles').update({availability_json: res}).eq('id', currentUser.id);
+                sModal.classList.add('hidden'); checkProfile();
+            };
+            
+            document.getElementById('eventForm').onsubmit = async (e) => {
+                e.preventDefault();
+                await supabaseClient.from('events').insert({
+                    title: document.getElementById('e-title').value,
+                    start_time: document.getElementById('e-time').value,
+                    region: document.getElementById('e-region').value,
+                    host_id: currentUser.id
+                });
+                eModal.classList.add('hidden'); loadBoard();
             };
         });
     </script>
