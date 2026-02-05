@@ -4,125 +4,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arc Raiders Guild Tool</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root { --bg-color: #0f1012; --card-bg: #1a1c20; --modal-bg: #22252b; --accent-color: #ff4c29; --text-main: #e0e0e0; --text-dim: #a0a0a0; --border-color: #333; --success-color: #2ecc71; --danger-color: #e74c3c; --input-bg: #25282e; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); padding-bottom: 4rem; }
-        
-        header { background-color: rgba(15, 16, 18, 0.95); border-bottom: 1px solid var(--border-color); padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); text-transform: uppercase; }
-        nav ul { display: flex; gap: 20px; }
-        nav a { font-size: 0.9rem; font-weight: 600; color: var(--text-dim); cursor: pointer; transition: color 0.3s; }
-        nav a:hover, nav a.active { color: var(--accent-color); }
-        .nav-external { color: #4cd1ff !important; }
+        /* --- ARC PALETTE --- */
+        :root {
+            --bg-color: #050505;       /* Deep Void Black */
+            --card-bg: #111111;        /* Terminal Black */
+            --accent-color: #ff5500;   /* Signal Orange */
+            --text-main: #eeeeee;      /* Phosphor White */
+            --text-dim: #666666;       /* Deactivated Gray */
+            --border-color: #333333;   /* Structure Gray */
+            --success-color: #00ff41;  /* Terminal Green */
+            --danger-color: #ff3333;   /* Critical Red */
+            --input-bg: #0a0a0a;
+            --scanline-color: rgba(0, 0, 0, 0.5);
+        }
 
+        /* --- GLOBAL --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Share Tech Mono', monospace; /* TACTICAL FONT */
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 4rem;
+            overflow-x: hidden;
+        }
+
+        /* --- CRT SCANLINE OVERLAY --- */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none; z-index: 9999;
+            opacity: 0.6;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background-color: rgba(5, 5, 5, 0.95);
+            border-bottom: 2px solid var(--accent-color); /* Hard Orange Line */
+            padding: 1rem 2rem; position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { 
+            font-size: 1.8rem; letter-spacing: 2px; color: var(--accent-color); 
+            text-transform: uppercase; text-shadow: 0 0 10px rgba(255, 85, 0, 0.5);
+        }
+        nav ul { display: flex; gap: 30px; }
+        nav a { 
+            font-size: 1rem; color: var(--text-dim); cursor: pointer; 
+            transition: 0.2s; text-transform: uppercase; letter-spacing: 1px;
+        }
+        nav a:hover, nav a.active { 
+            color: var(--text-main); text-shadow: 0 0 8px var(--text-main); 
+            border-bottom: 1px solid var(--accent-color);
+        }
+
+        /* --- LAYOUT --- */
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
         .hidden { display: none !important; }
-        .hero { text-align: center; padding: 4rem 1rem; }
-        .card { background: var(--card-bg); padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 2rem; }
-        .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-top: 2rem; }
         
-        .member-card, .event-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 10px; position: relative; }
-        .event-date { color: var(--accent-color); font-weight: bold; font-size: 0.9rem; text-transform: uppercase; }
-        .event-title { font-size: 1.4rem; font-weight: 800; margin: 5px 0; }
-        .attendees-list { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; font-size: 0.9rem; margin-top: 10px; }
-        .attendee-pill { display: inline-block; background: #333; padding: 2px 8px; border-radius: 12px; margin: 2px; font-size: 0.8rem; }
-        .delete-event-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.2rem; }
-        .delete-event-btn:hover { color: var(--danger-color); }
+        .hero { text-align: center; padding: 6rem 1rem; }
+        .hero h1 { 
+            font-size: 3rem; margin-bottom: 1rem; color: var(--text-main);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
 
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-dim); }
-        input, select, textarea { width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-main); }
+        /* --- CARDS (Tactical Readouts) --- */
+        .card, .member-card, .event-card {
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--border-color); /* Tech accent on left */
+            padding: 2rem; margin-top: 2rem;
+            position: relative;
+        }
+        
+        /* Grid Layouts */
+        .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-top: 2rem; }
 
-        .btn-primary { background: var(--accent-color); color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; width: 100%; }
-        .btn-secondary { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 16px; border-radius: 4px; cursor: pointer; }
-        .btn-discord { background: #5865F2; color: white; padding: 12px 24px; border-radius: 4px; font-weight: 600; cursor: pointer; border: none; }
-        .btn-action { width: 100%; margin-top: 10px; padding: 10px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-join { background: var(--success-color); color: #0f1012; }
-        .btn-leave { background: var(--card-bg); border: 1px solid var(--danger-color); color: var(--danger-color); }
+        /* --- BUTTONS (Hard Edges) --- */
+        button {
+            font-family: 'Share Tech Mono', monospace; text-transform: uppercase; letter-spacing: 1px;
+            transition: all 0.2s; cursor: pointer; border: 1px solid transparent;
+        }
+        .btn-primary {
+            background: var(--accent-color); color: #000;
+            padding: 12px 24px; font-weight: bold; width: 100%;
+        }
+        .btn-primary:hover {
+            background: #fff; color: var(--accent-color); box-shadow: 0 0 15px var(--accent-color);
+        }
+        .btn-discord {
+            background: #5865F2; color: white; padding: 12px 30px; border: none; font-size: 1.1rem;
+        }
+        .btn-discord:hover { background: #fff; color: #5865F2; }
+        
+        .btn-secondary {
+            background: transparent; border: 1px solid var(--text-dim); color: var(--text-dim);
+            padding: 8px 16px; margin-top: 1rem;
+        }
+        .btn-secondary:hover { border-color: var(--text-main); color: var(--text-main); }
+        
+        .btn-join { background: transparent; border: 1px solid var(--success-color); color: var(--success-color); width: 100%; padding: 10px; margin-top:10px; }
+        .btn-join:hover { background: var(--success-color); color: #000; }
+        
+        .btn-leave { background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); width: 100%; padding: 10px; margin-top:10px; }
+        .btn-leave:hover { background: var(--danger-color); color: #000; }
 
-        .day-section { background: var(--bg-color); padding: 10px; border-radius: 4px; margin-bottom: 10px; border: 1px solid var(--border-color); }
-        .day-header { display: flex; justify-content: space-between; align-items: center; }
-        .day-title-group { display: flex; gap: 10px; align-items: center; }
-        .day-check { width: 20px; height: 20px; cursor: pointer; }
-        .slots-container { padding-left: 30px; margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
-        .time-slot { display: flex; gap: 5px; align-items: center; }
-        .add-slot-btn { background: var(--card-bg); border: 1px solid var(--success-color); color: var(--success-color); border-radius: 50%; width: 24px; height: 24px; cursor: pointer; }
-        .remove-slot-btn { background: none; border: none; color: var(--danger-color); font-weight: bold; cursor: pointer; font-size: 1.2rem; }
-        .disabled-day { opacity: 0.5; }
+        /* --- INPUTS --- */
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; color: var(--accent-color); font-size: 0.9rem; }
+        input, select, textarea {
+            width: 100%; padding: 12px; background: var(--input-bg);
+            border: 1px solid var(--border-color); color: var(--text-main);
+            font-family: 'Share Tech Mono', monospace;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: var(--accent-color); box-shadow: 0 0 10px rgba(255, 85, 0, 0.2);
+        }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
-        .modal-content { background: var(--modal-bg); width: 95%; max-width: 500px; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        /* --- SPECIFIC ELEMENTS --- */
+        .member-header { display: flex; align-items: center; gap: 15px; border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; }
+        .member-avatar { width: 60px; height: 60px; border: 2px solid var(--text-dim); }
+        
+        .event-date { color: var(--accent-color); border: 1px solid var(--accent-color); display: inline-block; padding: 2px 6px; font-size: 0.8rem; margin-bottom: 5px; }
+        .event-title { font-size: 1.5rem; color: var(--text-main); margin: 10px 0; }
+        .attendees-list { background: #0a0a0a; padding: 10px; border: 1px solid var(--border-color); margin-top: 15px; font-size: 0.85rem; }
+        .attendee-pill { color: var(--text-dim); }
+        .attendee-pill::after { content: ", "; }
+        .attendee-pill:last-child::after { content: ""; }
+
+        /* --- SCHEDULE --- */
+        .day-section { border: 1px solid var(--border-color); padding: 10px; margin-bottom: 10px; background: #080808; }
+        .day-title-group { display: flex; align-items: center; gap: 10px; }
+        .day-check { accent-color: var(--accent-color); width: 18px; height: 18px; }
+        .time-slot { margin-top: 5px; padding-left: 28px; display: flex; gap: 10px; align-items: center; }
+        .disabled-day { opacity: 0.3; }
+
+        /* --- MODALS --- */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); z-index: 200; 
+            display: flex; justify-content: center; align-items: center; 
+        }
+        .modal-content { 
+            background: #000; width: 95%; max-width: 500px; padding: 2rem; 
+            border: 2px solid var(--accent-color); 
+            box-shadow: 0 0 30px rgba(255, 85, 0, 0.2);
+        }
+
+        @media (max-width: 768px) { header { flex-direction: column; gap: 15px; } .grid-view { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
+
+    <div class="scanlines"></div>
 
     <header>
         <div class="logo">RAIDER // SIGNAL</div>
         <nav>
             <ul>
-                <li><a id="nav-home">Profile</a></li>
+                <li><a id="nav-home">ID Card</a></li>
                 <li><a id="nav-roster">Roster</a></li>
-                <li><a id="nav-board">Raid Board</a></li>
+                <li><a id="nav-board">Missions</a></li>
             </ul>
         </nav>
     </header>
 
     <main class="container">
         <section id="login-section" class="hero">
-            <h1>Coordinate. Survive. Extract.</h1>
-            <p>Connect with your guild to manage raid availability.</p>
-            <button id="loginBtn" class="btn-discord">Login with Discord</button>
-            <p id="loading-msg" style="color:var(--accent-color); margin-top:20px; display:none;">Establishing Uplink...</p>
+            <h1>COORDINATE // SURVIVE</h1>
+            <p style="color:var(--text-dim); margin-bottom: 2rem;">SECURE UPLINK REQUIRED FOR GUILD ACCESS</p>
+            <button id="loginBtn" class="btn-discord">:: INITIALIZE UPLINK (DISCORD) ::</button>
+            <p id="loading-msg" style="color:var(--accent-color); margin-top:20px; display:none;">> ESTABLISHING CONNECTION...</p>
         </section>
 
         <section id="onboarding-section" class="card hidden">
-            <h2>Operator Registration</h2>
+            <h2 style="color:var(--accent-color); margin-bottom:1rem;">// OPERATOR REGISTRATION</h2>
             <form id="profileForm">
-                <div class="form-group"><label>Playstyle</label><select id="p-style"><option>PvP</option><option>PvE</option><option>Hybrid</option></select></div>
-                <div class="form-group"><label>Region</label><select id="p-region"><option>NA</option><option>EU</option><option>ASIA</option></select></div>
-                <button type="submit" class="btn-primary">Initialize Profile</button>
+                <div class="form-group"><label>COMBAT PREFERENCE</label><select id="p-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div>
+                <div class="form-group"><label>DEPLOYMENT REGION</label><select id="p-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option></select></div>
+                <button type="submit" class="btn-primary">CREATE ID CARD</button>
             </form>
         </section>
 
-        <section id="dashboard-section" class="card hidden">
-            <div style="text-align:center">
-                <img id="u-avatar" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--accent-color);">
-                <h2 id="u-name">Welcome</h2>
-                <p>Playstyle: <strong id="u-playstyle">-</strong> | Region: <strong id="u-region">-</strong></p>
-                <button id="openScheduleBtn" class="btn-secondary" style="margin-top:1rem">Edit Weekly Schedule</button>
-                <button id="logoutBtn" class="btn-secondary" style="margin-top:1rem; border-color:#333; color:#aaa">Logout</button>
+        <section id="dashboard-section" class="card hidden" style="text-align:center;">
+            <div style="border: 2px solid var(--accent-color); display:inline-block; padding:5px; border-radius:50%;">
+                <img id="u-avatar" style="width:80px; height:80px; border-radius:50%; display:block;">
             </div>
+            <h2 id="u-name" style="font-size:2rem; margin-top:10px;">UNKNOWN</h2>
+            <div style="color:var(--text-dim); margin-bottom:20px;">
+                STYLE: <strong id="u-playstyle" style="color:var(--text-main)">-</strong> // 
+                REGION: <strong id="u-region" style="color:var(--text-main)">-</strong>
+            </div>
+            <button id="openScheduleBtn" class="btn-secondary">EDIT AVAILABILITY</button>
+            <button id="logoutBtn" class="btn-secondary" style="border-color:var(--danger-color); color:var(--danger-color);">TERMINATE LINK</button>
         </section>
 
-        <section id="roster-section" class="hidden"><h2>Guild Roster</h2><div id="rosterGrid" class="grid-view"></div></section>
+        <section id="roster-section" class="hidden">
+            <h2 style="border-bottom:1px solid var(--border-color); padding-bottom:10px;">// ACTIVE AGENTS</h2>
+            <div id="rosterGrid" class="grid-view"></div>
+        </section>
 
         <section id="board-section" class="hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>Mission Board</h2><button id="openEventModalBtn" class="btn-primary" style="width:auto">+ Create Mission</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:1rem;">
+                <h2>// MISSION PARAMETERS</h2><button id="openEventModalBtn" class="btn-primary" style="width:auto">+ NEW OP</button>
             </div>
             <div id="eventsGrid" class="grid-view"></div>
         </section>
     </main>
 
-    <footer style="text-align:center; margin-top:50px;">
-        <button id="resetAppBtn" style="background:none; border:none; color:#444; text-decoration:underline; cursor:pointer;">Reset Connection</button>
+    <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.8rem;">
+        SYSTEM VERSION 9.0 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer;">FORCE RESET</button>
     </footer>
 
     <div id="scheduleModal" class="modal-overlay hidden">
-        <div class="modal-content"><div class="modal-header"><h3>Weekly Availability</h3><button class="close-modal">&times;</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary">Save Routine</button></form></div>
+        <div class="modal-content">
+            <div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal" style="background:none; border:none; color:var(--accent-color); font-size:1.5rem;">[X]</button></div>
+            <form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form>
+        </div>
     </div>
     <div id="eventModal" class="modal-overlay hidden">
-        <div class="modal-content"><div class="modal-header"><h3>New Mission</h3><button class="close-modal">&times;</button></div><form id="eventForm"><div class="form-group"><input id="e-title" required placeholder="Title"></div><div class="form-group"><input id="e-time" type="datetime-local" required></div><div class="form-group"><select id="e-region"><option>NA</option><option>EU</option></select></div><button type="submit" class="btn-primary">Post Mission</button></form></div>
+        <div class="modal-content">
+            <div class="modal-header"><h3>MISSION BRIEFING</h3><button class="close-modal" style="background:none; border:none; color:var(--accent-color); font-size:1.5rem;">[X]</button></div>
+            <form id="eventForm">
+                <div class="form-group"><label>OPERATION NAME</label><input id="e-title" required></div>
+                <div class="form-group"><label>DETAILS</label><textarea id="e-desc" rows="3"></textarea></div>
+                <div class="form-group"><label>T-MINUS (TIME)</label><input id="e-time" type="datetime-local" required></div>
+                <div class="form-group"><label>THEATER</label><select id="e-region"><option>NA</option><option>EU</option></select></div>
+                <button type="submit" class="btn-primary">INITIATE MISSION</button>
+            </form>
+        </div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 System Initializing...");
+            console.log("🚀 ARC SYSTEM v9.0 ONLINE...");
 
             const CONFIG = {
                 url: 'https://olmaoftlbrookqwxvlvx.supabase.co',
@@ -134,7 +254,7 @@
 
             // NAV
             function navTo(pageId) {
-                console.log(`🧭 Navigating to: ${pageId}`);
+                console.log(`🧭 SECTOR: ${pageId}`);
                 ['login','onboarding','dashboard','roster','board'].forEach(p => document.getElementById(p+'-section').classList.add('hidden'));
                 document.getElementById(pageId+'-section').classList.remove('hidden');
                 if(pageId === 'roster') loadRoster();
@@ -145,48 +265,26 @@
             document.getElementById('nav-board').onclick = () => navTo('board');
             document.getElementById('resetAppBtn').onclick = () => { localStorage.clear(); window.location.reload(); };
 
-            // AUTH & INIT
-            // Explicitly check session on load
+            // AUTH
             const { data: { session } } = await supabaseClient.auth.getSession();
-            
-            if (session) {
-                console.log("✅ Session Found on Load:", session.user.id);
-                currentUser = session.user;
-                await checkProfile();
-            } else {
-                console.log("⚠️ No Session Found. Waiting for Login.");
-                // Listen for auth changes (like the redirect completing)
-                supabaseClient.auth.onAuthStateChange(async (e, session) => {
-                    console.log("🔔 Auth Event:", e);
-                    if (session) {
-                        currentUser = session.user;
-                        await checkProfile();
-                    }
-                });
-            }
+            if (session) { currentUser = session.user; await checkProfile(); }
+            else { supabaseClient.auth.onAuthStateChange(async (e, session) => { if (session) { currentUser = session.user; await checkProfile(); } }); }
 
             document.getElementById('loginBtn').onclick = async () => {
                 document.getElementById('loading-msg').style.display = 'block';
-                // DO NOT clean URL here. Let Supabase handle the redirect naturally.
                 await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.href } });
             };
-            document.getElementById('logoutBtn').onclick = async () => {
-                await supabaseClient.auth.signOut(); window.location.reload();
-            };
+            document.getElementById('logoutBtn').onclick = async () => { await supabaseClient.auth.signOut(); window.location.reload(); };
 
-            // PROFILE
+            // DATA
             async function loadProfilesCache() {
                 const { data } = await supabaseClient.from('profiles').select('id, discord_name');
                 if(data) data.forEach(p => profilesMap[p.id] = p.discord_name);
             }
-
             async function checkProfile() {
-                console.log("🔍 Checking Profile...");
                 await loadProfilesCache();
-                const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
-                
+                const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
                 if (data) {
-                    console.log("👤 Profile Found:", data.discord_name);
                     document.getElementById('u-name').textContent = data.discord_name;
                     document.getElementById('u-avatar').src = data.avatar_url || 'https://placehold.co/50';
                     document.getElementById('u-playstyle').textContent = data.play_style;
@@ -194,12 +292,8 @@
                     if(data.availability_json) populateScheduleModal(data.availability_json);
                     else populateScheduleModal(null);
                     navTo('dashboard');
-                } else {
-                    console.log("⚠️ No Profile Found (or Error):", error);
-                    navTo('onboarding');
-                }
+                } else { navTo('onboarding'); }
             }
-
             document.getElementById('profileForm').onsubmit = async (e) => {
                 e.preventDefault();
                 const { error } = await supabaseClient.from('profiles').upsert({
@@ -212,19 +306,18 @@
 
             // ROSTER
             async function loadRoster() {
-                const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Loading...';
+                const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Scanning...';
                 const { data: profiles } = await supabaseClient.from('profiles').select('*');
-                if(!profiles) return;
-                grid.innerHTML = '';
+                if(!profiles) return; grid.innerHTML = '';
                 const today = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"][new Date().getDay()];
                 profiles.forEach(p => {
-                    let status = '<span style="color:#666">Offline Today</span>';
+                    let status = '<span style="color:var(--text-dim)">OFFLINE</span>';
                     if(p.availability_json && p.availability_json[today] && p.availability_json[today].active) {
                         const slots = Array.isArray(p.availability_json[today].slots) ? p.availability_json[today].slots : [];
-                        const times = slots.map(s => `${s.start}-${s.end}`).join(', ');
-                        status = `<span style="color:var(--success-color)">Online: ${times}</span>`;
+                        const times = slots.map(s => `${s.start}-${s.end}`).join(' // ');
+                        status = `<span style="color:var(--success-color)">ACTIVE: ${times}</span>`;
                     }
-                    grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url}" style="width:50px;height:50px;border-radius:50%"><div><h3>${p.discord_name}</h3><div>${p.play_style}</div></div></div><div style="margin-top:10px">${status}</div></div>`;
+                    grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url}" class="member-avatar"><div><h3>${p.discord_name}</h3><div style="font-size:0.8rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div></div></div><div style="margin-top:15px; border-top:1px dashed #333; padding-top:10px; font-size:0.85rem;">${status}</div></div>`;
                 });
             }
 
@@ -234,29 +327,28 @@
                 const { data: events } = await supabaseClient.from('events').select('*').order('start_time', {ascending: true});
                 const { data: signups } = await supabaseClient.from('event_signups').select('*');
                 grid.innerHTML = '';
-                if(!events || events.length === 0) { grid.innerHTML = '<p>No active missions.</p>'; return; }
-                
+                if(!events || events.length === 0) { grid.innerHTML = '<p style="color:var(--text-dim)">NO OPERATIONS FOUND.</p>'; return; }
                 events.forEach(ev => {
-                    const host = profilesMap[ev.host_id] || 'Unknown';
+                    const host = profilesMap[ev.host_id] || 'UNKNOWN';
                     const attending = signups.filter(s => s.event_id === ev.id);
                     const isSignedUp = attending.some(s => s.user_id === currentUser.id);
                     const isHost = ev.host_id === currentUser.id;
-                    
                     grid.innerHTML += `
                         <div class="event-card">
-                            ${isHost ? `<button class="delete-event-btn" onclick="window.deleteEvent('${ev.id}')">&times;</button>` : ''}
-                            <div class="event-date">${new Date(ev.start_time).toLocaleString()}</div>
+                            ${isHost ? `<button class="delete-event-btn" onclick="window.deleteEvent('${ev.id}')">[TERMINATE]</button>` : ''}
+                            <div class="event-date">T-MINUS: ${new Date(ev.start_time).toLocaleString()}</div>
                             <div class="event-title">${ev.title}</div>
-                            <div>Host: ${host} (${ev.region})</div>
-                            <div class="attendees-list">Roster (${attending.length}): ${attending.map(s => `<span class="attendee-pill">${profilesMap[s.user_id]||'...'}</span>`).join('')}</div>
-                            ${isSignedUp ? `<button class="btn-action btn-leave" onclick="window.leaveEvent('${ev.id}')">Withdraw</button>` : `<button class="btn-action btn-join" onclick="window.joinEvent('${ev.id}')">Sign Up</button>`}
+                            <div style="font-size:0.85rem; color:var(--accent-color)">LEADER: ${host} // THEATER: ${ev.region}</div>
+                            <p style="color:var(--text-dim); margin-bottom:10px; font-size:0.9rem;">${ev.description || 'NO INTEL PROVIDED.'}</p>
+                            <div class="attendees-list">SQUAD [${attending.length}]: ${attending.map(s => `<span class="attendee-pill">${profilesMap[s.user_id]||'???'}</span>`).join('')}</div>
+                            ${isSignedUp ? `<button class="btn-leave" onclick="window.leaveEvent('${ev.id}')">ABORT MISSION</button>` : `<button class="btn-join" onclick="window.joinEvent('${ev.id}')">JOIN SQUAD</button>`}
                         </div>`;
                 });
             }
 
             window.joinEvent = async (id) => { await supabaseClient.from('event_signups').insert({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.leaveEvent = async (id) => { await supabaseClient.from('event_signups').delete().match({event_id: id, user_id: currentUser.id}); loadBoard(); };
-            window.deleteEvent = async (id) => { if(confirm('Delete?')) { await supabaseClient.from('events').delete().eq('id', id); loadBoard(); } };
+            window.deleteEvent = async (id) => { if(confirm('TERMINATE MISSION?')) { await supabaseClient.from('events').delete().eq('id', id); loadBoard(); } };
 
             // MODALS
             const sModal = document.getElementById('scheduleModal');
@@ -265,7 +357,7 @@
             document.getElementById('openEventModalBtn').onclick = () => eModal.classList.remove('hidden');
             document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => { sModal.classList.add('hidden'); eModal.classList.add('hidden'); });
 
-            // SCHEDULE EDITOR
+            // LOGIC
             function populateScheduleModal(json) {
                 const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
                 const cont = document.getElementById('daysContainer'); cont.innerHTML = '';
@@ -273,9 +365,8 @@
                     const data = json ? json[d] : {};
                     const active = data.active || false;
                     const slots = Array.isArray(data.slots) ? data.slots : (data.start ? [{start:data.start, end:data.end}] : []);
-                    const div = document.createElement('div');
-                    div.className = `day-section ${active?'':'disabled-day'}`;
-                    div.innerHTML = `<div class="day-header"><div class="day-title-group"><input type="checkbox" class="d-check" data-day="${d}" ${active?'checked':''}><strong style="text-transform:capitalize">${d}</strong></div><button type="button" class="add-slot-btn" ${active?'':'disabled'}>+</button></div><div class="slots-container ${active?'':'hidden'}"></div>`;
+                    const div = document.createElement('div'); div.className = `day-section ${active?'':'disabled-day'}`;
+                    div.innerHTML = `<div class="day-header"><div class="day-title-group"><input type="checkbox" class="d-check" data-day="${d}" ${active?'checked':''}><strong style="text-transform:uppercase">${d}</strong></div><button type="button" class="add-slot-btn" ${active?'':'disabled'}>+</button></div><div class="slots-container ${active?'':'hidden'}"></div>`;
                     const sCont = div.querySelector('.slots-container');
                     slots.forEach(s => addSlotUI(sCont, s.start, s.end));
                     div.querySelector('.d-check').onchange = (e) => { div.classList.toggle('disabled-day', !e.target.checked); sCont.classList.toggle('hidden', !e.target.checked); div.querySelector('.add-slot-btn').disabled = !e.target.checked; if(e.target.checked && sCont.children.length===0) addSlotUI(sCont); };
@@ -285,7 +376,7 @@
             }
             function addSlotUI(cont, start="18:00", end="22:00") {
                 const d = document.createElement('div'); d.className='time-slot';
-                d.innerHTML = `<input type="time" class="t-start" value="${start}"> - <input type="time" class="t-end" value="${end}"> <button type="button" class="remove-slot-btn">&times;</button>`;
+                d.innerHTML = `<input type="time" class="t-start" value="${start}"> > <input type="time" class="t-end" value="${end}"> <button type="button" class="remove-slot-btn">[x]</button>`;
                 d.querySelector('.remove-slot-btn').onclick = () => d.remove(); cont.appendChild(d);
             }
             document.getElementById('scheduleForm').onsubmit = async (e) => {
@@ -300,11 +391,11 @@
                 await supabaseClient.from('profiles').update({availability_json: res}).eq('id', currentUser.id);
                 sModal.classList.add('hidden'); checkProfile();
             };
-            
             document.getElementById('eventForm').onsubmit = async (e) => {
                 e.preventDefault();
                 await supabaseClient.from('events').insert({
                     title: document.getElementById('e-title').value,
+                    description: document.getElementById('e-desc').value,
                     start_time: document.getElementById('e-time').value,
                     region: document.getElementById('e-region').value,
                     host_id: currentUser.id
