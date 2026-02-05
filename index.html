@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arc Raiders Guild Tool</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     
     <meta property="og:title" content="RAIDER // SIGNAL">
     <meta property="og:description" content="Tactical Coordination Tool. Secure Uplink Required.">
@@ -807,6 +811,15 @@
                 if(!error) { eModal.classList.add('hidden'); loadBoard(); } else { alert(error.message); }
             };
         });
+    </script>
+<script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Error:', err));
+            });
+        }
     </script>
 </body>
 </html>
