@@ -153,7 +153,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v15.5 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v15.6 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="scheduleModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal">[X]</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form></div></div>
@@ -162,7 +162,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v15.5 [ROSTER HARDENING] ONLINE...");
+            console.log("🚀 ARC SYSTEM v15.6 [DIAGNOSTIC] ONLINE...");
             const REQUIRED_GUILD_ID = "1465694444484427903"; 
             
             dayjs.extend(window.dayjs_plugin_utc);
@@ -184,19 +184,8 @@
 
             function navTo(pageId) {
                 ['login','onboarding','dashboard','roster','board', 'locked'].forEach(p => document.getElementById(p+'-section').classList.add('hidden'));
-                
-                if (pageId === 'onboarding') {
-                    document.getElementById(pageId+'-section').classList.remove('hidden');
-                    document.getElementById('main-nav').style.display = 'none';
-                    return;
-                }
-
-                if (!isVerified && pageId !== 'login' && pageId !== 'locked') {
-                    document.getElementById('locked-section').classList.remove('hidden');
-                    document.getElementById('main-nav').style.display = 'none';
-                    return;
-                }
-                
+                if (pageId === 'onboarding') { document.getElementById(pageId+'-section').classList.remove('hidden'); document.getElementById('main-nav').style.display = 'none'; return; }
+                if (!isVerified && pageId !== 'login' && pageId !== 'locked') { document.getElementById('locked-section').classList.remove('hidden'); document.getElementById('main-nav').style.display = 'none'; return; }
                 document.getElementById('main-nav').style.display = 'flex';
                 document.getElementById(pageId+'-section').classList.remove('hidden');
                 if(pageId === 'roster') loadRoster();
@@ -204,72 +193,32 @@
             }
 
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) { 
-                currentSession = session;
-                currentUser = session.user;
-                if(session.provider_token) { await performGuildCheck(); }
-                await checkProfile(); 
-            }
-            else { 
-                supabaseClient.auth.onAuthStateChange(async (e, session) => { 
-                    if (session) { 
-                        currentSession = session;
-                        currentUser = session.user;
-                        if(session.provider_token) await performGuildCheck();
-                        await checkProfile(); 
-                    } 
-                }); 
-            }
+            if (session) { currentSession = session; currentUser = session.user; if(session.provider_token) { await performGuildCheck(); } await checkProfile(); }
+            else { supabaseClient.auth.onAuthStateChange(async (e, session) => { if (session) { currentSession = session; currentUser = session.user; if(session.provider_token) await performGuildCheck(); await checkProfile(); } }); }
 
             async function performGuildCheck() {
                 const statusEl = document.getElementById('locked-reason');
                 const progressEl = document.getElementById('scan-progress');
                 if(!currentSession || !currentSession.provider_token) return;
-
                 statusEl.textContent = "INITIATING GUILD SCAN...";
                 progressEl.style.display = "block";
-
                 try {
-                    const response = await fetch('https://discord.com/api/users/@me/guilds', {
-                        headers: { Authorization: `Bearer ${currentSession.provider_token}` }
-                    });
+                    const response = await fetch('https://discord.com/api/users/@me/guilds', { headers: { Authorization: `Bearer ${currentSession.provider_token}` } });
                     if (!response.ok) throw new Error("Discord API Error");
                     const guilds = await response.json();
                     const isInGuild = guilds.some(g => g.id === REQUIRED_GUILD_ID);
-
                     if (isInGuild) {
                         statusEl.textContent = "IDENTITY CONFIRMED. UPDATING DATABASE...";
                         progressEl.style.color = "var(--success-color)";
                         await supabaseClient.from('profiles').update({ status: 'verified' }).eq('id', currentUser.id);
-                        isVerified = true;
-                        checkProfile();
-                    } else {
-                        statusEl.textContent = "ACCESS DENIED: NOT A MEMBER OF TARGET SERVER.";
-                        statusEl.style.color = "var(--danger-color)";
-                        progressEl.style.display = "none";
-                    }
-                } catch (err) {
-                    console.error(err);
-                    statusEl.textContent = "SCAN FAILED: " + err.message;
-                }
+                        isVerified = true; checkProfile();
+                    } else { statusEl.textContent = "ACCESS DENIED: NOT A MEMBER OF TARGET SERVER."; statusEl.style.color = "var(--danger-color)"; progressEl.style.display = "none"; }
+                } catch (err) { console.error(err); statusEl.textContent = "SCAN FAILED: " + err.message; }
             }
 
             const getCleanURL = () => window.location.origin + window.location.pathname;
-
-            document.getElementById('loginBtn').onclick = async () => {
-                document.getElementById('loading-msg').style.display = 'block';
-                await supabaseClient.auth.signInWithOAuth({ 
-                    provider: 'discord', 
-                    options: { redirectTo: getCleanURL(), scopes: 'guilds' } 
-                });
-            };
-            document.getElementById('retryScanBtn').onclick = async () => {
-                await supabaseClient.auth.signInWithOAuth({ 
-                    provider: 'discord', 
-                    options: { redirectTo: getCleanURL(), scopes: 'guilds' } 
-                });
-            };
-            
+            document.getElementById('loginBtn').onclick = async () => { document.getElementById('loading-msg').style.display = 'block'; await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: getCleanURL(), scopes: 'guilds' } }); };
+            document.getElementById('retryScanBtn').onclick = async () => { await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: getCleanURL(), scopes: 'guilds' } }); };
             document.getElementById('logoutBtn').onclick = async () => { await supabaseClient.auth.signOut(); window.location.reload(); };
             document.getElementById('lockedLogoutBtn').onclick = async () => { await supabaseClient.auth.signOut(); window.location.reload(); };
             document.getElementById('resetAppBtn').onclick = () => { localStorage.clear(); window.location.reload(); };
@@ -277,115 +226,61 @@
             document.getElementById('nav-roster').onclick = () => navTo('roster');
             document.getElementById('nav-board').onclick = () => navTo('board');
 
-            async function loadProfilesCache() {
-                const { data } = await supabaseClient.from('profiles').select('id, discord_name');
-                if(data) data.forEach(p => profilesMap[p.id] = p.discord_name);
-            }
-
+            async function loadProfilesCache() { const { data } = await supabaseClient.from('profiles').select('id, discord_name'); if(data) data.forEach(p => profilesMap[p.id] = p.discord_name); }
             async function checkProfile() {
                 const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
                 if (data) {
-                    if (!data.discord_name) {
-                        navTo('onboarding'); 
-                        return;
-                    }
+                    if (!data.discord_name) { navTo('onboarding'); return; }
                     isAdmin = data.is_admin || false;
                     isVerified = (data.status === 'verified') || isAdmin;
-
                     document.getElementById('u-name').textContent = data.discord_name;
                     document.getElementById('u-avatar').src = data.avatar_url || 'https://placehold.co/50';
                     document.getElementById('u-playstyle').textContent = data.play_style;
                     document.getElementById('u-region').textContent = data.region;
                     document.getElementById('u-timezone').textContent = data.timezone || userTimezone;
                     if(isAdmin) document.getElementById('admin-badge').style.display = 'inline-block';
-                    
                     userTimezone = data.timezone || dayjs.tz.guess();
                     if(data.availability_json) populateScheduleModal(data.availability_json); else populateScheduleModal(null);
-
-                    if (!isVerified) navTo('locked');
-                    else {
-                        await loadProfilesCache();
-                        navTo('dashboard');
-                    }
+                    if (!isVerified) navTo('locked'); else { await loadProfilesCache(); navTo('dashboard'); }
                 } else { navTo('onboarding'); }
             }
 
-            document.getElementById('profileForm').onsubmit = async (e) => {
-                e.preventDefault();
-                const payload = {
-                    discord_name: currentUser.user_metadata.full_name || "Raider",
-                    avatar_url: currentUser.user_metadata.avatar_url,
-                    play_style: document.getElementById('p-style').value, 
-                    region: document.getElementById('p-region').value, 
-                    timezone: document.getElementById('p-timezone').value,
-                };
-                const { error: updateError } = await supabaseClient.from('profiles').update(payload).eq('id', currentUser.id);
-                if (!updateError) {
-                    checkProfile();
-                } else {
-                    const { error } = await supabaseClient.from('profiles').upsert({
-                        id: currentUser.id, ...payload, status: 'pending'
-                    });
-                    if(!error) checkProfile(); else alert("Error: " + error.message);
-                }
-            };
-
-            document.getElementById('editProfileForm').onsubmit = async (e) => {
-                e.preventDefault();
-                const { error } = await supabaseClient.from('profiles').update({
-                    play_style: document.getElementById('ep-style').value, region: document.getElementById('ep-region').value, timezone: document.getElementById('ep-timezone').value
-                }).eq('id', currentUser.id);
-                if(!error) { document.getElementById('profileModal').classList.add('hidden'); checkProfile(); }
-            };
-
-            function populateTimezones(selectId) {
-                const select = document.getElementById(selectId); if(!select) return; select.innerHTML = '';
-                Intl.supportedValuesOf('timeZone').forEach(tz => {
-                    const opt = document.createElement('option'); opt.value = tz; opt.text = tz;
-                    if(tz === userTimezone) opt.selected = true; select.appendChild(opt);
-                });
-            }
+            document.getElementById('profileForm').onsubmit = async (e) => { e.preventDefault(); const payload = { discord_name: currentUser.user_metadata.full_name || "Raider", avatar_url: currentUser.user_metadata.avatar_url, play_style: document.getElementById('p-style').value, region: document.getElementById('p-region').value, timezone: document.getElementById('p-timezone').value, }; const { error: updateError } = await supabaseClient.from('profiles').update(payload).eq('id', currentUser.id); if (!updateError) { checkProfile(); } else { const { error } = await supabaseClient.from('profiles').upsert({ id: currentUser.id, ...payload, status: 'pending' }); if(!error) checkProfile(); else alert("Error: " + error.message); } };
+            document.getElementById('editProfileForm').onsubmit = async (e) => { e.preventDefault(); const { error } = await supabaseClient.from('profiles').update({ play_style: document.getElementById('ep-style').value, region: document.getElementById('ep-region').value, timezone: document.getElementById('ep-timezone').value }).eq('id', currentUser.id); if(!error) { document.getElementById('profileModal').classList.add('hidden'); checkProfile(); } };
+            function populateTimezones(selectId) { const select = document.getElementById(selectId); if(!select) return; select.innerHTML = ''; Intl.supportedValuesOf('timeZone').forEach(tz => { const opt = document.createElement('option'); opt.value = tz; opt.text = tz; if(tz === userTimezone) opt.selected = true; select.appendChild(opt); }); }
             populateTimezones('ep-timezone'); populateTimezones('p-timezone'); populateTimezones('e-timezone');
-
             const sModal = document.getElementById('scheduleModal'); const eModal = document.getElementById('eventModal'); const pModal = document.getElementById('profileModal');
             document.getElementById('openScheduleBtn').onclick = () => sModal.classList.remove('hidden');
             document.getElementById('openEventModalBtn').onclick = () => eModal.classList.remove('hidden');
-            document.getElementById('openProfileModalBtn').onclick = () => {
-                document.getElementById('ep-style').value = document.getElementById('u-playstyle').textContent;
-                document.getElementById('ep-region').value = document.getElementById('u-region').textContent;
-                document.getElementById('ep-timezone').value = document.getElementById('u-timezone').textContent;
-                pModal.classList.remove('hidden');
-            };
+            document.getElementById('openProfileModalBtn').onclick = () => { document.getElementById('ep-style').value = document.getElementById('u-playstyle').textContent; document.getElementById('ep-region').value = document.getElementById('u-region').textContent; document.getElementById('ep-timezone').value = document.getElementById('u-timezone').textContent; pModal.classList.remove('hidden'); };
             document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => { sModal.classList.add('hidden'); eModal.classList.add('hidden'); pModal.classList.add('hidden'); });
 
-            // --- CRITICAL ROSTER FIX ---
+            // --- DIAGNOSTIC ROSTER LOADER ---
             async function loadRoster() {
                 if(!isVerified) return;
-                const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Scanning...';
+                const grid = document.getElementById('rosterGrid'); 
+                grid.innerHTML = '<span style="color:var(--accent-color)">INITIATING SCAN...</span>';
                 
                 try {
+                    grid.innerHTML = '<span style="color:var(--text-dim)">CONNECTING TO DB...</span>';
                     const { data: profiles, error } = await supabaseClient.from('profiles').select('*').order('created_at', {ascending: false});
                     
                     if(error) {
                         console.error("DB Error:", error);
-                        grid.innerHTML = `<span style="color:red">ERROR LOADING ROSTER</span>`;
+                        grid.innerHTML = `<span style="color:var(--danger-color)">ERROR: ${error.message} (Code: ${error.code})</span>`;
                         return;
                     }
                     if(!profiles || profiles.length === 0) {
-                        grid.innerHTML = `<span style="color:var(--text-dim)">NO AGENTS FOUND.</span>`;
+                        grid.innerHTML = `<span style="color:var(--text-dim)">SCAN COMPLETE: 0 AGENTS FOUND.</span>`;
                         return;
                     }
 
-                    grid.innerHTML = '';
+                    grid.innerHTML = ''; // Clear status
                     const today = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"][new Date().getDay()];
                     
-                    console.log(`Checking Roster for Day: ${today}`); // DEBUG LOG
-
                     profiles.forEach(p => {
                         let status = '<span style="color:var(--text-dim)">OFFLINE</span>';
                         const isPending = p.status === 'pending';
-                        
-                        // SAFE CHECK for Availability
                         if(isPending) {
                             status = '<span style="color:var(--locked-color)">[ACCESS PENDING]</span>';
                         } else if(p.availability_json && p.availability_json[today]?.active) {
@@ -403,8 +298,8 @@
                         grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url || 'https://placehold.co/50'}" class="member-avatar"><div><h3>${p.discord_name || 'Unknown Agent'}</h3><div style="font-size:1rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div></div></div><div style="margin-top:15px; border-top:2px dashed #333; padding-top:10px; font-weight:bold;">${status}</div>${adminActions}</div>`;
                     });
                 } catch (e) {
-                    console.error("Roster Crash:", e);
-                    grid.innerHTML = `<span style="color:red">SYSTEM FAILURE: ${e.message}</span>`;
+                    console.error("Crash:", e);
+                    grid.innerHTML = `<span style="color:red">CRITICAL FAILURE: ${e.message}</span>`;
                 }
             }
 
