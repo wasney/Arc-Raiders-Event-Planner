@@ -179,13 +179,15 @@
         .day-row {
             display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
             background: var(--bg-color); padding: 10px; border-radius: 4px;
+            transition: opacity 0.2s;
         }
-        .day-check { width: 20px; height: 20px; }
+        .day-check { width: 24px; height: 24px; cursor: pointer; }
         .day-label { width: 50px; font-weight: bold; }
         .time-inputs { display: flex; gap: 5px; flex-grow: 1; align-items: center; }
         .time-inputs input { padding: 5px; font-size: 0.9rem; }
         
-        .disabled-row { opacity: 0.5; pointer-events: none; }
+        /* FIX: Removed pointer-events: none so checkbox is clickable */
+        .disabled-row { opacity: 0.4; }
 
         /* --- UTILS --- */
         .hidden { display: none !important; }
@@ -277,7 +279,6 @@
             </p>
             <form id="scheduleForm">
                 <div id="daysContainer"></div>
-                
                 <button type="submit" class="btn-primary">Save Routine</button>
             </form>
         </div>
@@ -308,17 +309,16 @@
         const closeModalBtn = document.getElementById('closeModalBtn');
         const scheduleForm = document.getElementById('scheduleForm');
 
-        // Display Elements
+        // Display
         const userNameDisplay = document.getElementById('userName');
         const userAvatarDisplay = document.getElementById('userAvatar');
         const displayPlaystyle = document.getElementById('displayPlaystyle');
         const displayRegion = document.getElementById('displayRegion');
         const displayRoutineStatus = document.getElementById('displayRoutineStatus');
 
-        // Days Config
         const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-        // --- AUTH & INIT ---
+        // --- AUTH ---
         async function signInWithDiscord() {
             const currentURL = window.location.href; 
             await supabaseClient.auth.signInWithOAuth({
@@ -341,26 +341,16 @@
             }
         });
 
-        // --- PROFILE LOGIC (FIXED) ---
+        // --- PROFILE ---
         async function checkProfile(session) {
             const user = session.user;
-            
-            // Try to find existing profile
             const { data, error } = await supabaseClient
                 .from('profiles')
                 .select('*')
                 .eq('id', user.id)
                 .single();
 
-            // If error is not "Row Missing" (PGRST116), it's a real problem (network, etc)
-            if (error && error.code !== 'PGRST116') {
-                console.error("Critical Profile Error:", error);
-                alert("Database Connection Error: " + error.message);
-                return;
-            }
-
             if (data) {
-                // SUCCESS: Profile found
                 showDashboard(session, data);
                 if(data.availability_json) {
                     populateScheduleModal(data.availability_json);
@@ -370,7 +360,6 @@
                     populateScheduleModal(null);
                 }
             } else {
-                // FAILURE: No Profile -> Show Onboarding
                 showOnboarding(session);
             }
         }
@@ -386,8 +375,6 @@
                                 "Raider";
             const avatarUrl = user.user_metadata.avatar_url;
 
-            // FIX: Use UPSERT (Update if exists, Insert if new)
-            // Also select() to get the data back immediately
             const { data, error } = await supabaseClient
                 .from('profiles')
                 .upsert({
@@ -400,15 +387,11 @@
                 .select()
                 .single();
 
-            if (error) {
-                alert("Failed to save profile: " + error.message);
-            } else {
-                // FIX: Do NOT reload. Just switch to dashboard immediately.
-                showDashboard(null, data); 
-            }
+            if (error) alert("Failed to save: " + error.message);
+            else showDashboard(null, data);
         }
 
-        // --- SCHEDULE LOGIC ---
+        // --- SCHEDULE ---
         function populateScheduleModal(savedData) {
             daysContainer.innerHTML = ''; 
             
@@ -473,16 +456,17 @@
                 .eq('id', user.id);
 
             if (error) {
-                alert("Error saving schedule: " + error.message);
+                alert("Error saving: " + error.message);
             } else {
                 closeModal();
                 displayRoutineStatus.textContent = "Active";
                 displayRoutineStatus.style.color = "var(--success-color)";
-                alert("Routine Updated! 📅");
+                // Optional: Alert user safely
+                // alert("Routine Updated!"); 
             }
         }
 
-        // --- UI HELPERS ---
+        // --- HELPERS ---
         function showDashboard(session, profileData) {
             loginSection.classList.add('hidden');
             onboardingSection.classList.add('hidden');
