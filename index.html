@@ -21,6 +21,7 @@
             --border-color: #333;
             --success-color: #2ecc71;
             --input-bg: #25282e;
+            --danger-color: #e74c3c;
         }
 
         /* --- GLOBAL STYLES --- */
@@ -160,7 +161,7 @@
             border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;
         }
 
-        /* --- MODAL (For Schedule Editing) --- */
+        /* --- MODAL (MULTI-SLOT STYLE) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8); z-index: 200;
@@ -168,28 +169,43 @@
             backdrop-filter: blur(2px);
         }
         .modal-content {
-            background: var(--modal-bg); width: 95%; max-width: 500px;
+            background: var(--modal-bg); width: 95%; max-width: 600px;
             padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);
             max-height: 90vh; overflow-y: auto;
         }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
         .close-btn { background: none; border: none; color: var(--text-dim); font-size: 1.5rem; cursor: pointer; }
         
-        /* Schedule Grid */
-        .day-row {
-            display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+        /* Day Section */
+        .day-section {
             background: var(--bg-color); padding: 10px; border-radius: 4px;
-            transition: opacity 0.2s;
+            margin-bottom: 10px; border: 1px solid var(--border-color);
         }
-        .day-check { width: 24px; height: 24px; cursor: pointer; }
-        .day-label { width: 50px; font-weight: bold; }
-        .time-inputs { display: flex; gap: 5px; flex-grow: 1; align-items: center; }
-        .time-inputs input { padding: 5px; font-size: 0.9rem; }
+        .day-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .day-title-group { display: flex; align-items: center; gap: 10px; }
+        .day-check { width: 20px; height: 20px; cursor: pointer; }
+        .day-label { font-weight: bold; font-size: 1rem; }
         
-        /* FIX: Removed pointer-events: none so checkbox is clickable */
-        .disabled-row { opacity: 0.4; }
+        .add-slot-btn {
+            background: var(--card-bg); border: 1px solid var(--success-color);
+            color: var(--success-color); border-radius: 50%; width: 24px; height: 24px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-weight: bold;
+        }
 
-        /* --- UTILS --- */
+        /* Time Slots List */
+        .slots-container { display: flex; flex-direction: column; gap: 8px; padding-left: 30px; }
+        .time-slot { display: flex; align-items: center; gap: 8px; }
+        .time-slot input { padding: 4px; font-size: 0.85rem; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 4px; }
+        .remove-slot-btn {
+            background: none; border: none; color: var(--danger-color); font-weight: bold;
+            cursor: pointer; font-size: 1.2rem; line-height: 1;
+        }
+
+        .disabled-day { opacity: 0.5; }
         .hidden { display: none !important; }
 
         @media (max-width: 768px) {
@@ -220,7 +236,6 @@
 
         <section id="onboarding-section" class="card hidden">
             <h2>Operator Registration</h2>
-            <p style="margin-bottom: 20px; color: var(--text-dim);">Finalize your profile.</p>
             <form id="profileForm">
                 <div class="form-group">
                     <label for="playstyle">Preferred Playstyle</label>
@@ -250,19 +265,11 @@
                 <h2 id="userName">Welcome, Raider</h2>
                 <span class="status-badge">● SIGNAL ESTABLISHED</span>
             </div>
-
             <div class="profile-details">
-                <div class="detail-row">
-                    <span>Playstyle:</span><strong id="displayPlaystyle">-</strong>
-                </div>
-                <div class="detail-row">
-                    <span>Region:</span><strong id="displayRegion">-</strong>
-                </div>
-                <div class="detail-row" style="border: none;">
-                    <span>Routine:</span><strong id="displayRoutineStatus">Not Set</strong>
-                </div>
+                <div class="detail-row"><span>Playstyle:</span><strong id="displayPlaystyle">-</strong></div>
+                <div class="detail-row"><span>Region:</span><strong id="displayRegion">-</strong></div>
+                <div class="detail-row" style="border: none;"><span>Routine:</span><strong id="displayRoutineStatus">Not Set</strong></div>
             </div>
-
             <button id="editScheduleBtn" class="btn-secondary">Edit Weekly Schedule</button>
             <button id="logoutBtn" class="btn-logout">Disconnect Signal (Logout)</button>
         </section>
@@ -275,7 +282,7 @@
                 <button id="closeModalBtn" class="close-btn">&times;</button>
             </div>
             <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1rem;">
-                Set your "Standard" weekly hours. Uncheck days you are offline.
+                Add time slots for days you are active. You can add multiple slots per day.
             </p>
             <form id="scheduleForm">
                 <div id="daysContainer"></div>
@@ -289,27 +296,21 @@
     </footer>
 
     <script>
-        // --- CONFIGURATION ---
+        // --- CONFIG ---
         const SUPABASE_URL = 'https://olmaoftlbrookqwxvlvx.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- DOM ELEMENTS ---
+        // --- DOM ---
         const loginSection = document.getElementById('login-section');
         const onboardingSection = document.getElementById('onboarding-section');
         const dashboardSection = document.getElementById('dashboard-section');
         const scheduleModal = document.getElementById('scheduleModal');
         const daysContainer = document.getElementById('daysContainer');
-        
-        // Buttons
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const profileForm = document.getElementById('profileForm');
         const editScheduleBtn = document.getElementById('editScheduleBtn');
         const closeModalBtn = document.getElementById('closeModalBtn');
         const scheduleForm = document.getElementById('scheduleForm');
 
-        // Display
         const userNameDisplay = document.getElementById('userName');
         const userAvatarDisplay = document.getElementById('userAvatar');
         const displayPlaystyle = document.getElementById('displayPlaystyle');
@@ -319,18 +320,16 @@
         const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
         // --- AUTH ---
-        async function signInWithDiscord() {
+        document.getElementById('loginBtn').addEventListener('click', async () => {
             const currentURL = window.location.href; 
             await supabaseClient.auth.signInWithOAuth({
-                provider: 'discord',
-                options: { redirectTo: currentURL }
+                provider: 'discord', options: { redirectTo: currentURL }
             });
-        }
+        });
 
-        async function signOut() {
-            await supabaseClient.auth.signOut();
-            location.reload();
-        }
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabaseClient.auth.signOut(); location.reload();
+        });
 
         supabaseClient.auth.onAuthStateChange((event, session) => {
             if (session) checkProfile(session);
@@ -344,11 +343,7 @@
         // --- PROFILE ---
         async function checkProfile(session) {
             const user = session.user;
-            const { data, error } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('id', user.id)
-                .single();
+            const { data } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
 
             if (data) {
                 showDashboard(session, data);
@@ -360,74 +355,121 @@
                     populateScheduleModal(null);
                 }
             } else {
-                showOnboarding(session);
+                loginSection.classList.add('hidden');
+                dashboardSection.classList.add('hidden');
+                onboardingSection.classList.remove('hidden');
             }
         }
 
-        async function createProfile(e) {
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const { data: { user } } = await supabaseClient.auth.getUser();
-            
             const playstyle = document.getElementById('playstyle').value;
             const region = document.getElementById('region').value;
-            const discordName = user.user_metadata.full_name || 
-                                user.user_metadata.custom_claims?.global_name || 
-                                "Raider";
+            const discordName = user.user_metadata.full_name || "Raider";
             const avatarUrl = user.user_metadata.avatar_url;
 
-            const { data, error } = await supabaseClient
-                .from('profiles')
-                .upsert({
-                    id: user.id, 
-                    discord_name: discordName, 
-                    avatar_url: avatarUrl,
-                    play_style: playstyle, 
-                    region: region
-                })
-                .select()
-                .single();
+            const { data, error } = await supabaseClient.from('profiles')
+                .upsert({ id: user.id, discord_name: discordName, avatar_url: avatarUrl, play_style: playstyle, region: region })
+                .select().single();
 
-            if (error) alert("Failed to save: " + error.message);
-            else showDashboard(null, data);
-        }
+            if (!error) showDashboard(null, data);
+        });
 
-        // --- SCHEDULE ---
+        // --- NEW MULTI-SLOT SCHEDULE LOGIC ---
         function populateScheduleModal(savedData) {
-            daysContainer.innerHTML = ''; 
-            
+            daysContainer.innerHTML = ''; // Reset
+
             DAYS.forEach(day => {
                 const dayKey = day.toLowerCase();
-                const existing = savedData ? savedData[dayKey] : null;
-                const isActive = existing ? existing.active : false;
-                const start = existing ? existing.start : "18:00";
-                const end = existing ? existing.end : "22:00";
+                const dayData = savedData ? savedData[dayKey] : null;
+                // Old format support (if user has old data): convert {start, end} to [{start, end}]
+                let slots = [];
+                let isActive = false;
 
-                const row = document.createElement('div');
-                row.className = `day-row ${isActive ? '' : 'disabled-row'}`;
-                row.innerHTML = `
-                    <input type="checkbox" class="day-check" data-day="${dayKey}" ${isActive ? 'checked' : ''}>
-                    <span class="day-label">${day.substring(0,3)}</span>
-                    <div class="time-inputs">
-                        <input type="time" class="time-start" value="${start}" ${isActive ? '' : 'disabled'}>
-                        <span>to</span>
-                        <input type="time" class="time-end" value="${end}" ${isActive ? '' : 'disabled'}>
+                if (dayData) {
+                    if (Array.isArray(dayData.slots)) {
+                        // New Format
+                        slots = dayData.slots;
+                        isActive = dayData.active;
+                    } else if (dayData.start) {
+                        // Migration for Old Format
+                        isActive = dayData.active;
+                        if(isActive) slots.push({ start: dayData.start, end: dayData.end });
+                    }
+                }
+
+                // Create Day Section
+                const daySection = document.createElement('div');
+                daySection.className = `day-section ${isActive ? '' : 'disabled-day'}`;
+                daySection.dataset.day = dayKey;
+
+                // 1. Header
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.innerHTML = `
+                    <div class="day-title-group">
+                        <input type="checkbox" class="day-check" ${isActive ? 'checked' : ''}>
+                        <span class="day-label">${day}</span>
                     </div>
+                    <button type="button" class="add-slot-btn" title="Add Time Slot" ${isActive ? '' : 'disabled'}>+</button>
                 `;
-                
-                const checkbox = row.querySelector('.day-check');
-                const inputs = row.querySelectorAll('input[type="time"]');
+
+                // 2. Slots Container
+                const slotsContainer = document.createElement('div');
+                slotsContainer.className = 'slots-container';
+                if (!isActive) slotsContainer.classList.add('hidden');
+
+                // 3. Add Existing Slots
+                slots.forEach(slot => {
+                    addTimeSlotToUI(slotsContainer, slot.start, slot.end);
+                });
+
+                // --- Event Listeners ---
+                const checkbox = header.querySelector('.day-check');
+                const addBtn = header.querySelector('.add-slot-btn');
+
                 checkbox.addEventListener('change', (e) => {
-                    if(e.target.checked) {
-                        row.classList.remove('disabled-row');
-                        inputs.forEach(i => i.disabled = false);
+                    if (e.target.checked) {
+                        daySection.classList.remove('disabled-day');
+                        slotsContainer.classList.remove('hidden');
+                        addBtn.disabled = false;
+                        // Add one empty slot if none exist
+                        if (slotsContainer.children.length === 0) {
+                            addTimeSlotToUI(slotsContainer);
+                        }
                     } else {
-                        row.classList.add('disabled-row');
-                        inputs.forEach(i => i.disabled = true);
+                        daySection.classList.add('disabled-day');
+                        slotsContainer.classList.add('hidden');
+                        addBtn.disabled = true;
                     }
                 });
 
-                daysContainer.appendChild(row);
+                addBtn.addEventListener('click', () => {
+                    addTimeSlotToUI(slotsContainer);
+                });
+
+                daySection.appendChild(header);
+                daySection.appendChild(slotsContainer);
+                daysContainer.appendChild(daySection);
             });
+        }
+
+        function addTimeSlotToUI(container, startVal = "18:00", endVal = "22:00") {
+            const slotRow = document.createElement('div');
+            slotRow.className = 'time-slot';
+            slotRow.innerHTML = `
+                <input type="time" class="slot-start" value="${startVal}">
+                <span>to</span>
+                <input type="time" class="slot-end" value="${endVal}">
+                <button type="button" class="remove-slot-btn" title="Remove">&times;</button>
+            `;
+
+            slotRow.querySelector('.remove-slot-btn').addEventListener('click', () => {
+                slotRow.remove();
+            });
+
+            container.appendChild(slotRow);
         }
 
         async function saveSchedule(e) {
@@ -435,68 +477,58 @@
             const { data: { user } } = await supabaseClient.auth.getUser();
             
             const scheduleData = {};
-            const rows = daysContainer.querySelectorAll('.day-row');
             
-            rows.forEach(row => {
-                const checkbox = row.querySelector('.day-check');
-                const dayKey = checkbox.dataset.day;
-                const start = row.querySelector('.time-start').value;
-                const end = row.querySelector('.time-end').value;
+            // Loop through all day sections
+            const daySections = daysContainer.querySelectorAll('.day-section');
+            daySections.forEach(section => {
+                const dayKey = section.dataset.day;
+                const isActive = section.querySelector('.day-check').checked;
+                const slotRows = section.querySelectorAll('.time-slot');
                 
+                const slots = [];
+                if (isActive) {
+                    slotRows.forEach(row => {
+                        slots.push({
+                            start: row.querySelector('.slot-start').value,
+                            end: row.querySelector('.slot-end').value
+                        });
+                    });
+                }
+
                 scheduleData[dayKey] = {
-                    active: checkbox.checked,
-                    start: start,
-                    end: end
+                    active: isActive,
+                    slots: slots // Saving array of slots now!
                 };
             });
 
-            const { error } = await supabaseClient
-                .from('profiles')
+            console.log("Saving Multi-Slot Schedule:", scheduleData);
+
+            const { error } = await supabaseClient.from('profiles')
                 .update({ availability_json: scheduleData })
                 .eq('id', user.id);
 
-            if (error) {
-                alert("Error saving: " + error.message);
-            } else {
-                closeModal();
+            if (error) alert("Error saving: " + error.message);
+            else {
+                scheduleModal.classList.add('hidden');
                 displayRoutineStatus.textContent = "Active";
                 displayRoutineStatus.style.color = "var(--success-color)";
-                // Optional: Alert user safely
-                // alert("Routine Updated!"); 
             }
         }
 
-        // --- HELPERS ---
-        function showDashboard(session, profileData) {
+        // --- LISTENERS ---
+        editScheduleBtn.addEventListener('click', () => scheduleModal.classList.remove('hidden'));
+        closeModalBtn.addEventListener('click', () => scheduleModal.classList.add('hidden'));
+        scheduleForm.addEventListener('submit', saveSchedule);
+
+        function showDashboard(session, data) {
             loginSection.classList.add('hidden');
             onboardingSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
-            
-            if(profileData) {
-                userNameDisplay.textContent = `Welcome, ${profileData.discord_name}`;
-                if (profileData.avatar_url) userAvatarDisplay.src = profileData.avatar_url;
-                displayPlaystyle.textContent = profileData.play_style;
-                displayRegion.textContent = profileData.region;
-            }
+            userNameDisplay.textContent = `Welcome, ${data.discord_name}`;
+            if(data.avatar_url) userAvatarDisplay.src = data.avatar_url;
+            displayPlaystyle.textContent = data.play_style;
+            displayRegion.textContent = data.region;
         }
-
-        function showOnboarding(session) {
-            loginSection.classList.add('hidden');
-            dashboardSection.classList.add('hidden');
-            onboardingSection.classList.remove('hidden');
-        }
-
-        function openModal() { scheduleModal.classList.remove('hidden'); }
-        function closeModal() { scheduleModal.classList.add('hidden'); }
-
-        // --- LISTENERS ---
-        if (loginBtn) loginBtn.addEventListener('click', signInWithDiscord);
-        if (logoutBtn) logoutBtn.addEventListener('click', signOut);
-        if (profileForm) profileForm.addEventListener('submit', createProfile);
-        
-        if (editScheduleBtn) editScheduleBtn.addEventListener('click', openModal);
-        if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-        if (scheduleForm) scheduleForm.addEventListener('submit', saveSchedule);
 
     </script>
 </body>
