@@ -7,31 +7,28 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
-        /* --- CSS VARIABLES (The Color Palette) --- */
+        /* --- CSS VARIABLES --- */
         :root {
-            --bg-color: #0f1012;       /* Deep dark background */
-            --card-bg: #1a1c20;        /* Slightly lighter for cards */
-            --accent-color: #ff4c29;   /* ARC Raiders-ish Orange/Red */
-            --text-main: #e0e0e0;      /* Off-white text */
-            --text-dim: #a0a0a0;       /* Dimmed text */
+            --bg-color: #0f1012;
+            --card-bg: #1a1c20;
+            --accent-color: #ff4c29;
+            --text-main: #e0e0e0;
+            --text-dim: #a0a0a0;
             --border-color: #333;
+            --success-color: #2ecc71;
         }
 
         /* --- GLOBAL STYLES --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             line-height: 1.6;
         }
-
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; }
 
@@ -47,7 +44,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .logo {
             font-size: 1.5rem;
             font-weight: 800;
@@ -55,27 +51,10 @@
             letter-spacing: -0.5px;
             text-transform: uppercase;
         }
-
-        nav ul {
-            display: flex;
-            gap: 20px;
-        }
-
-        nav a {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-dim);
-            transition: color 0.3s;
-        }
-
-        nav a:hover {
-            color: var(--accent-color);
-        }
-
-        /* Special style for the external tool link */
-        .nav-external {
-            color: #4cd1ff !important; /* distinct cyan color */
-        }
+        nav ul { display: flex; gap: 20px; }
+        nav a { font-size: 0.9rem; font-weight: 600; color: var(--text-dim); transition: color 0.3s; }
+        nav a:hover { color: var(--accent-color); }
+        .nav-external { color: #4cd1ff !important; }
 
         /* --- HERO SECTION --- */
         .hero {
@@ -84,22 +63,12 @@
             max-width: 800px;
             margin: 0 auto;
         }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            font-weight: 800;
-        }
-
-        .hero p {
-            font-size: 1.1rem;
-            color: var(--text-dim);
-            margin-bottom: 2rem;
-        }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; font-weight: 800; }
+        .hero p { font-size: 1.1rem; color: var(--text-dim); margin-bottom: 2rem; }
 
         /* --- BUTTONS --- */
         .btn-discord {
-            background-color: #5865F2; /* Discord Blurple */
+            background-color: #5865F2;
             color: white;
             padding: 12px 24px;
             border-radius: 4px;
@@ -112,17 +81,45 @@
             border: none;
             font-size: 1rem;
         }
+        .btn-discord:hover { background-color: #4752C4; transform: translateY(-2px); }
 
-        .btn-discord:hover {
-            background-color: #4752C4;
-            transform: translateY(-2px);
+        .btn-logout {
+            background-color: var(--card-bg);
+            color: var(--text-dim);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 1rem;
         }
+        .btn-logout:hover { border-color: var(--text-main); color: var(--text-main); }
 
-        /* --- GRID LAYOUT (For future calendar/dashboard) --- */
-        .container {
-            max-width: 1200px;
+        /* --- DASHBOARD / USER PROFILE --- */
+        #dashboard {
+            max-width: 800px;
             margin: 0 auto;
+            background: var(--card-bg);
             padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .user-info { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-color);
+        }
+        .status-badge {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success-color);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
 
         /* --- FOOTER --- */
@@ -135,20 +132,13 @@
             font-size: 0.8rem;
         }
 
-        /* --- MOBILE RESPONSIVENESS --- */
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            nav ul {
-                gap: 15px;
-            }
+        /* --- UTILS --- */
+        .hidden { display: none !important; }
 
-            .hero h1 {
-                font-size: 2rem;
-            }
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 10px; }
+            nav ul { gap: 15px; }
+            .hero h1 { font-size: 2rem; }
         }
     </style>
 </head>
@@ -159,31 +149,34 @@
         <nav>
             <ul>
                 <li><a href="#">Home</a></li>
-                <li><a href="#">Calendar</a></li>
                 <li><a href="https://first-wave-bp-share.netlify.app/" target="_blank" class="nav-external">Blueprint Tool ↗</a></li>
             </ul>
         </nav>
     </header>
 
     <main class="container">
-        <section class="hero">
+        <section id="login-section" class="hero">
             <h1>Coordinate. Survive. Extract.</h1>
             <p>
                 Connect with your guild, manage your availability, and plan your next raid.
                 Login securely with Discord to access the tactical calendar.
             </p>
-
             <button id="loginBtn" class="btn-discord">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.086 2.157 2.419 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.086 2.157 2.419 0 1.334-.946 2.419-2.157 2.419z" fill="currentColor"/>
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" fill="currentColor"/>
                 </svg>
                 Login with Discord
             </button>
         </section>
         
-        <section id="dashboard" style="display: none;">
-            <h2>Availability Board</h2>
-            <p>Please login to view availability.</p>
+        <section id="dashboard" class="hidden">
+            <div class="user-info">
+                <img id="userAvatar" src="" alt="Avatar" class="avatar">
+                <h2 id="userName">Welcome, Raider</h2>
+                <span class="status-badge">● SIGNAL ESTABLISHED</span>
+                <p>You are logged in. We can now start building your Availability Profile!</p>
+            </div>
+            <button id="logoutBtn" class="btn-logout">Disconnect Signal (Logout)</button>
         </section>
     </main>
 
@@ -192,12 +185,75 @@
     </footer>
 
     <script>
-        console.log("Welcome to the Guild Tool! Ready for logic implementation.");
+        // 1. Initialize Supabase
+        // Senpai's Project Config
+        const SUPABASE_URL = 'https://olmaoftlbrookqwxvlvx.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo';
         
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 2. DOM Elements
         const loginBtn = document.getElementById('loginBtn');
-        loginBtn.addEventListener('click', () => {
-            alert('Senpai! We need to set up Firebase Auth for this to work. Shall we proceed to that step next?');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginSection = document.getElementById('login-section');
+        const dashboardSection = document.getElementById('dashboard');
+        const userNameDisplay = document.getElementById('userName');
+        const userAvatarDisplay = document.getElementById('userAvatar');
+
+        // 3. Login Function
+        async function signInWithDiscord() {
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'discord',
+                });
+                if (error) throw error;
+            } catch (error) {
+                console.error("Login Error:", error.message);
+                alert("Signal Jammed! Could not login: " + error.message);
+            }
+        }
+
+        // 4. Logout Function
+        async function signOut() {
+            const { error } = await supabase.auth.signOut();
+            if (error) console.error("Logout Error:", error);
+            // The onAuthStateChange listener will handle the UI update
+        }
+
+        // 5. Update UI based on Session
+        function updateUI(session) {
+            if (session) {
+                // User is logged in
+                console.log("User detected:", session.user);
+                
+                // Extract Discord data
+                const discordName = session.user.user_metadata.full_name || "Raider";
+                const avatarUrl = session.user.user_metadata.avatar_url;
+
+                userNameDisplay.textContent = `Welcome, ${discordName}`;
+                if (avatarUrl) userAvatarDisplay.src = avatarUrl;
+
+                // Toggle Views
+                loginSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+            } else {
+                // User is logged out
+                loginSection.classList.remove('hidden');
+                dashboardSection.classList.add('hidden');
+            }
+        }
+
+        // 6. Event Listeners
+        loginBtn.addEventListener('click', signInWithDiscord);
+        logoutBtn.addEventListener('click', signOut);
+
+        // 7. Check Auth State on Load
+        // This runs automatically when the page loads to see if we have a user
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log("Auth Event:", event);
+            updateUI(session);
         });
+
     </script>
 </body>
 </html>
