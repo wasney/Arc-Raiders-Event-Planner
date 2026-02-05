@@ -35,14 +35,12 @@
         .hero { text-align: center; padding: 6rem 1rem; }
         .hero h1 { font-size: 3.5rem; margin-bottom: 1rem; font-weight: 700; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
         
-        /* CARDS & LAYOUT */
         .card, .member-card, .event-card { background: var(--card-bg); border: 2px solid var(--border-color); border-left: 6px solid var(--border-color); padding: 2rem; margin-top: 2rem; position: relative; }
         .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-top: 2rem; }
         .event-card { border-left-color: var(--accent-color); }
         .locked-screen { text-align: center; padding: 4rem; border: 2px solid var(--locked-color); background: rgba(255, 170, 0, 0.05); color: var(--locked-color); margin-top: 2rem; }
         .locked-icon { font-size: 4rem; margin-bottom: 1rem; display: block; }
         
-        /* ELEMENTS */
         .countdown-timer { font-size: 1.5rem; color: var(--success-color); font-weight: bold; background: rgba(0, 255, 65, 0.1); padding: 5px 10px; display: inline-block; border: 1px solid var(--success-color); margin-bottom: 10px; }
         .time-display-group { background: #080808; padding: 10px; border: 1px solid var(--border-color); margin: 10px 0; }
         .local-time { color: var(--text-main); font-size: 1.2rem; font-weight: bold; }
@@ -53,7 +51,6 @@
         .condition-tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 5px 0; }
         .condition-tag { font-size: 0.8rem; background: #222; color: #ccc; padding: 2px 6px; border: 1px solid #444; }
         
-        /* BUTTONS */
         button { font-family: 'Share Tech Mono', monospace; text-transform: uppercase; cursor: pointer; border: 1px solid transparent; font-size: 1rem; font-weight: 700; transition: 0.2s; }
         .btn-primary { background: var(--accent-color); color: #000; padding: 14px 28px; width: 100%; }
         .btn-primary:hover { background: #fff; color: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); }
@@ -67,26 +64,25 @@
         .btn-sync { background: transparent; border: 1px solid var(--cal-color); color: var(--cal-color); padding: 5px 10px; font-size: 0.8rem; flex: 1; margin-top:10px; }
         .btn-sync:hover { background: var(--cal-color); color: #000; }
         
-        /* ADMIN ACTIONS */
         .btn-admin-delete { position: absolute; top: 15px; right: 15px; background: var(--admin-color); color: #000; font-size: 0.8rem; padding: 4px 8px; border: none; }
         .btn-admin-kick { display: block; margin-top: 10px; background: #000; border: 1px solid var(--admin-color); color: var(--admin-color); width: 100%; font-size: 0.8rem; }
         .btn-admin-approve { display: block; margin-top: 10px; background: var(--success-color); color: #000; width: 100%; font-size: 0.9rem; padding: 8px; border: none; }
         .btn-admin-approve:hover { background: #fff; box-shadow: 0 0 10px var(--success-color); }
         
-        /* FORMS & TOOLBARS */
         .form-group { margin-bottom: 1.5rem; }
         label { display: block; margin-bottom: 0.5rem; color: var(--accent-color); font-size: 1rem; font-weight: bold; }
         input, select, textarea { width: 100%; padding: 14px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--text-main); font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; font-weight: 600; }
         .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #080808; padding: 10px; border: 1px solid var(--border-color); }
         .checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
         .checkbox-item input { width: 18px; height: 18px; }
+        
         .roster-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding: 15px; background: #080808; border: 1px solid var(--border-color); }
         .toolbar-group { flex: 1; min-width: 200px; }
         .toolbar-group input, .toolbar-group select { padding: 8px; font-size: 0.9rem; }
         .toolbar-toggle { display: flex; align-items: center; gap: 10px; color: var(--text-dim); font-size: 0.9rem; cursor: pointer; user-select: none; }
         .toolbar-toggle input { width: 18px; height: 18px; }
 
-        /* --- ADMIN TABLE (NEW v17.0) --- */
+        /* ADMIN TABLE */
         .admin-table-container { overflow-x: auto; background: var(--card-bg); border: 2px solid var(--admin-color); padding: 1rem; }
         .admin-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         .admin-table th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border-color); color: var(--text-dim); font-weight: normal; }
@@ -100,7 +96,6 @@
         .btn-red { color: var(--danger-color); border-color: var(--danger-color); }
         .btn-red:hover { background: var(--danger-color); color: #000; }
 
-        /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; display: flex; justify-content: center; align-items: center; }
         .modal-content { background: #000; width: 95%; max-width: 600px; padding: 2.5rem; border: 3px solid var(--accent-color); box-shadow: 0 0 40px rgba(255, 85, 0, 0.2); max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -186,7 +181,9 @@
             <h2 style="border-bottom:2px solid var(--border-color); padding-bottom:10px;">// ACTIVE AGENTS</h2>
             
             <div class="roster-toolbar">
-                <div class="toolbar-group"><input type="text" id="roster-search" placeholder="SEARCH AGENT NAME..."></div>
+                <div class="toolbar-group">
+                    <input type="text" id="roster-search" placeholder="SEARCH AGENT NAME...">
+                </div>
                 <div class="toolbar-group">
                     <select id="roster-filter-region">
                         <option value="ALL">REGION: ALL</option>
@@ -215,7 +212,7 @@
         <section id="admin-section" class="hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h2 style="color:var(--admin-color)">// COMMAND CENTER (FULL PERSONNEL)</h2>
-                <button onclick="window.loadAdminTable()" class="mini-btn" style="color:var(--text-main); border:1px solid var(--text-dim)">REFRESH DATA</button>
+                <button id="refreshAdminBtn" class="mini-btn" style="color:var(--text-main); border:1px solid var(--text-dim)">REFRESH DATA</button>
             </div>
             <div class="admin-table-container">
                 <table class="admin-table">
@@ -243,7 +240,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v17.0 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v17.1 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="scheduleModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal">[X]</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form></div></div>
@@ -251,25 +248,28 @@
     <div id="eventModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>MISSION BRIEFING</h3><button class="close-modal">[X]</button></div><form id="eventForm"><div class="form-group"><label>OPERATION NAME</label><input id="e-title" required></div><div class="form-group"><label>MISSION TYPE</label><select id="e-type"><option value="Standard Raid">Standard Raid (30m)</option><option value="Locked Gate">Locked Gate (40m)</option><option value="Hidden Bunker">Hidden Bunker (30m)</option><option value="Matriarch">Matriarch Boss (30m)</option><option value="Harvester">Harvester (30m)</option></select></div><div class="form-group"><label>DETAILS</label><textarea id="e-desc" rows="3"></textarea></div><div class="form-group"><label>T-MINUS (TIME)</label><input id="e-time" type="datetime-local" required></div><div class="form-group"><label>MISSION TIMEZONE</label><select id="e-timezone"></select></div><div class="form-group"><label>THEATER</label><select id="e-region"><option>NA</option><option>EU</option><option>OTHER</option></select></div><div class="form-group"><label>CONDITIONS</label><div class="checkbox-grid"><div class="checkbox-item"><input type="checkbox" name="cond" value="Bird City"> Bird City</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Night Raid"> Night Raid</div><div class="checkbox-item"><input type="checkbox" name="cond" value="EM Storm"> EM Storm</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Lush Blooms"> Lush Blooms</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Husk Graveyard"> Husk Graveyard</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Uncovered Caches"> Uncovered Caches</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Launch Tower"> Launch Tower Loot</div></div></div><button type="submit" class="btn-primary">INITIATE MISSION</button></form></div></div>
 
     <script>
-        // GLOBAL ERROR HANDLER
-        window.onerror = function(msg, url, line) {
-            alert("SYSTEM ERROR: " + msg + "\nLine: " + line);
-            return false;
-        };
-
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v17.0 [COMMANDER] ONLINE...");
-            const REQUIRED_GUILD_ID = "1465694444484427903"; 
+            console.log("🚀 ARC SYSTEM v17.1 [STABILITY PATCH] ONLINE...");
             
-            dayjs.extend(window.dayjs_plugin_utc);
-            dayjs.extend(window.dayjs_plugin_timezone);
-            dayjs.extend(window.dayjs_plugin_relativeTime);
-
+            // --- CONSTANTS ---
+            const REQUIRED_GUILD_ID = "1465694444484427903"; 
             const MISSION_DURATIONS = { 'Locked Gate': 40, 'default': 30 };
+            
+            // --- DEPENDENCY SETUP ---
+            try {
+                dayjs.extend(window.dayjs_plugin_utc);
+                dayjs.extend(window.dayjs_plugin_timezone);
+                dayjs.extend(window.dayjs_plugin_relativeTime);
+            } catch (e) {
+                console.error("DayJS Load Error:", e);
+                alert("System Init Error: Libraries failed to load.");
+            }
+
             const CONFIG = {
                 url: 'https://olmaoftlbrookqwxvlvx.supabase.co',
                 key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo'
             };
+            
             const supabaseClient = supabase.createClient(CONFIG.url, CONFIG.key);
             let currentUser = null;
             let currentSession = null;
@@ -278,16 +278,20 @@
             let isAdmin = false; 
             let isVerified = false;
 
-            // --- NAV ---
+            // --- NAVIGATION CONTROLLER ---
             function navTo(pageId) {
                 console.log(`Navigating to: ${pageId}`);
-                ['login','onboarding','dashboard','roster','board', 'locked', 'admin'].forEach(p => {
+                
+                // Hide all sections
+                const sections = ['login','onboarding','dashboard','roster','board', 'locked', 'admin'];
+                sections.forEach(p => {
                     const el = document.getElementById(p+'-section');
                     if(el) el.classList.add('hidden');
                 });
                 
+                // Special States
                 if (pageId === 'onboarding') {
-                    document.getElementById(pageId+'-section').classList.remove('hidden');
+                    document.getElementById('onboarding-section').classList.remove('hidden');
                     document.getElementById('main-nav').style.display = 'none';
                     return;
                 }
@@ -298,16 +302,87 @@
                     return;
                 }
                 
+                // Active State
                 document.getElementById('main-nav').style.display = 'flex';
-                document.getElementById(pageId+'-section').classList.remove('hidden');
+                const target = document.getElementById(pageId+'-section');
+                if(target) target.classList.remove('hidden');
                 
+                // Load Data
                 if(pageId === 'roster') loadRoster();
                 if(pageId === 'board') loadBoard();
-                if(pageId === 'admin') loadAdminTable(); // New Admin Loader
+                if(pageId === 'admin') loadAdminTable();
             }
 
-            // --- AUTH ---
+            // --- UI HANDLER ATTACHMENT (SAFE) ---
+            function attachListener(id, event, handler) {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener(event, handler);
+                else console.warn(`Element ${id} not found for listener.`);
+            }
+
+            // Navigation
+            attachListener('nav-home', 'click', () => navTo('dashboard'));
+            attachListener('nav-roster', 'click', () => navTo('roster'));
+            attachListener('nav-board', 'click', () => navTo('board'));
+            attachListener('nav-admin', 'click', () => navTo('admin'));
+
+            // Auth Buttons
+            const getCleanURL = () => window.location.origin + window.location.pathname;
+            
+            attachListener('loginBtn', 'click', async () => {
+                document.getElementById('loading-msg').style.display = 'block';
+                await supabaseClient.auth.signInWithOAuth({ 
+                    provider: 'discord', 
+                    options: { redirectTo: getCleanURL(), scopes: 'guilds' } 
+                });
+            });
+
+            attachListener('retryScanBtn', 'click', async () => {
+                await supabaseClient.auth.signInWithOAuth({ 
+                    provider: 'discord', 
+                    options: { redirectTo: getCleanURL(), scopes: 'guilds' } 
+                });
+            });
+
+            attachListener('logoutBtn', 'click', async () => { await supabaseClient.auth.signOut(); window.location.reload(); });
+            attachListener('lockedLogoutBtn', 'click', async () => { await supabaseClient.auth.signOut(); window.location.reload(); });
+            attachListener('resetAppBtn', 'click', () => { localStorage.clear(); window.location.reload(); });
+
+            // Roster Filters
+            attachListener('roster-search', 'input', loadRoster);
+            attachListener('roster-filter-region', 'change', loadRoster);
+            attachListener('roster-filter-style', 'change', loadRoster);
+            attachListener('roster-show-pending', 'change', loadRoster);
+
+            // Admin Actions
+            attachListener('refreshAdminBtn', 'click', () => loadAdminTable());
+
+            // Modal Triggers
+            const sModal = document.getElementById('scheduleModal'); 
+            const eModal = document.getElementById('eventModal'); 
+            const pModal = document.getElementById('profileModal');
+
+            attachListener('openScheduleBtn', 'click', () => sModal.classList.remove('hidden'));
+            attachListener('openEventModalBtn', 'click', () => eModal.classList.remove('hidden'));
+            
+            attachListener('openProfileModalBtn', 'click', () => {
+                document.getElementById('ep-style').value = document.getElementById('u-playstyle').textContent;
+                document.getElementById('ep-region').value = document.getElementById('u-region').textContent;
+                document.getElementById('ep-timezone').value = document.getElementById('u-timezone').textContent;
+                pModal.classList.remove('hidden');
+            });
+
+            if(document.getElementById('repairProfileBtn')) {
+                attachListener('repairProfileBtn', 'click', () => navTo('onboarding'));
+            }
+
+            document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => { 
+                sModal.classList.add('hidden'); eModal.classList.add('hidden'); pModal.classList.add('hidden'); 
+            });
+
+            // --- AUTH INIT FLOW ---
             const { data: { session } } = await supabaseClient.auth.getSession();
+            
             if (session) { 
                 currentSession = session;
                 currentUser = session.user;
@@ -324,7 +399,8 @@
                 }); 
             }
 
-            // --- GUILD CHECK ---
+            // --- CORE FUNCTIONS ---
+
             async function performGuildCheck() {
                 const statusEl = document.getElementById('locked-reason');
                 const progressEl = document.getElementById('scan-progress');
@@ -337,6 +413,7 @@
                     const response = await fetch('https://discord.com/api/users/@me/guilds', {
                         headers: { Authorization: `Bearer ${currentSession.provider_token}` }
                     });
+                    
                     if (!response.ok) throw new Error("Discord API Error");
                     const guilds = await response.json();
                     const isInGuild = guilds.some(g => g.id === REQUIRED_GUILD_ID);
@@ -362,38 +439,6 @@
                 }
             }
 
-            // --- UI HANDLERS ---
-            const getCleanURL = () => window.location.origin + window.location.pathname;
-
-            document.getElementById('loginBtn').onclick = async () => {
-                document.getElementById('loading-msg').style.display = 'block';
-                await supabaseClient.auth.signInWithOAuth({ 
-                    provider: 'discord', 
-                    options: { redirectTo: getCleanURL(), scopes: 'guilds' } 
-                });
-            };
-            
-            document.getElementById('retryScanBtn').onclick = async () => {
-                await supabaseClient.auth.signInWithOAuth({ 
-                    provider: 'discord', 
-                    options: { redirectTo: getCleanURL(), scopes: 'guilds' } 
-                });
-            };
-            
-            document.getElementById('logoutBtn').onclick = async () => { await supabaseClient.auth.signOut(); window.location.reload(); };
-            document.getElementById('lockedLogoutBtn').onclick = async () => { await supabaseClient.auth.signOut(); window.location.reload(); };
-            document.getElementById('resetAppBtn').onclick = () => { localStorage.clear(); window.location.reload(); };
-            
-            document.getElementById('nav-home').onclick = () => navTo('dashboard');
-            document.getElementById('nav-roster').onclick = () => navTo('roster');
-            document.getElementById('nav-board').onclick = () => navTo('board');
-            document.getElementById('nav-admin').onclick = () => navTo('admin'); // Admin Click
-            
-            if(document.getElementById('repairProfileBtn')) {
-                document.getElementById('repairProfileBtn').onclick = () => navTo('onboarding');
-            }
-
-            // --- PROFILE LOGIC ---
             async function loadProfilesCache() {
                 const { data } = await supabaseClient.from('profiles').select('id, discord_name');
                 if(data) data.forEach(p => profilesMap[p.id] = p.discord_name);
@@ -418,11 +463,13 @@
                     if(isAdmin) {
                         document.getElementById('admin-badge').style.display = 'inline-block';
                         document.getElementById('pending-toggle-label').style.display = 'flex';
-                        document.getElementById('nav-admin-li').style.display = 'block'; // SHOW COMMAND TAB
+                        document.getElementById('nav-admin-li').style.display = 'block'; 
                     }
                     
                     userTimezone = data.timezone || dayjs.tz.guess();
-                    if(data.availability_json) populateScheduleModal(data.availability_json); else populateScheduleModal(null);
+                    
+                    if(data.availability_json) populateScheduleModal(data.availability_json); 
+                    else populateScheduleModal(null);
 
                     if (!isVerified) {
                         navTo('locked');
@@ -433,135 +480,14 @@
                 } else { navTo('onboarding'); }
             }
 
-            document.getElementById('profileForm').onsubmit = async (e) => {
-                e.preventDefault();
-                const payload = {
-                    discord_name: currentUser.user_metadata.full_name || "Raider",
-                    avatar_url: currentUser.user_metadata.avatar_url,
-                    play_style: document.getElementById('p-style').value, 
-                    region: document.getElementById('p-region').value, 
-                    timezone: document.getElementById('p-timezone').value,
-                };
-                
-                const { error: updateError } = await supabaseClient.from('profiles').update(payload).eq('id', currentUser.id);
-                if (!updateError) {
-                    checkProfile();
-                } else {
-                    const { error } = await supabaseClient.from('profiles').upsert({
-                        id: currentUser.id, ...payload, status: 'pending'
-                    });
-                    if(!error) checkProfile(); else alert("Error: " + error.message);
-                }
-            };
-
-            document.getElementById('editProfileForm').onsubmit = async (e) => {
-                e.preventDefault();
-                const { error } = await supabaseClient.from('profiles').update({
-                    play_style: document.getElementById('ep-style').value, 
-                    region: document.getElementById('ep-region').value, 
-                    timezone: document.getElementById('ep-timezone').value
-                }).eq('id', currentUser.id);
-                if(!error) { document.getElementById('profileModal').classList.add('hidden'); checkProfile(); }
-            };
-
-            function populateTimezones(selectId) {
-                const select = document.getElementById(selectId); if(!select) return; 
-                select.innerHTML = '';
-                Intl.supportedValuesOf('timeZone').forEach(tz => {
-                    const opt = document.createElement('option'); opt.value = tz; opt.text = tz;
-                    if(tz === userTimezone) opt.selected = true; select.appendChild(opt);
-                });
-            }
-            populateTimezones('ep-timezone'); populateTimezones('p-timezone'); populateTimezones('e-timezone');
-
-            const sModal = document.getElementById('scheduleModal'); const eModal = document.getElementById('eventModal'); const pModal = document.getElementById('profileModal');
-            document.getElementById('openScheduleBtn').onclick = () => sModal.classList.remove('hidden');
-            document.getElementById('openEventModalBtn').onclick = () => eModal.classList.remove('hidden');
-            document.getElementById('openProfileModalBtn').onclick = () => {
-                document.getElementById('ep-style').value = document.getElementById('u-playstyle').textContent;
-                document.getElementById('ep-region').value = document.getElementById('u-region').textContent;
-                document.getElementById('ep-timezone').value = document.getElementById('u-timezone').textContent;
-                pModal.classList.remove('hidden');
-            };
-            document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => { sModal.classList.add('hidden'); eModal.classList.add('hidden'); pModal.classList.add('hidden'); });
-
-            // --- ROSTER LOGIC ---
-            document.getElementById('roster-search').addEventListener('input', loadRoster);
-            document.getElementById('roster-filter-region').addEventListener('change', loadRoster);
-            document.getElementById('roster-filter-style').addEventListener('change', loadRoster);
-            document.getElementById('roster-show-pending').addEventListener('change', loadRoster);
-
-            async function loadRoster() {
-                if(!isVerified) return;
-                const grid = document.getElementById('rosterGrid'); 
-                grid.innerHTML = '<div style="color:var(--accent-color); padding:20px;">UPDATING INTEL...</div>';
-                
-                try {
-                    const { data: profiles, error } = await supabaseClient.from('profiles').select('*').order('created_at', {ascending: false});
-                    if(error) { grid.innerHTML = `<span style="color:red">ERROR: ${error.message}</span>`; return; }
-                    if(!profiles || profiles.length === 0) { grid.innerHTML = `<span style="color:var(--text-dim)">NO AGENTS FOUND.</span>`; return; }
-
-                    grid.innerHTML = ''; 
-                    const today = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"][new Date().getDay()];
-                    
-                    const searchTerm = document.getElementById('roster-search').value.toLowerCase();
-                    const regionFilter = document.getElementById('roster-filter-region').value;
-                    const styleFilter = document.getElementById('roster-filter-style').value;
-                    const showPending = document.getElementById('roster-show-pending').checked;
-
-                    let visibleCount = 0;
-
-                    profiles.forEach(p => {
-                        const isPending = p.status === 'pending';
-                        if (showPending && !isPending) return; 
-                        if (!showPending && isPending) return; 
-                        if (searchTerm && !p.discord_name.toLowerCase().includes(searchTerm)) return;
-                        if (regionFilter !== 'ALL' && p.region !== regionFilter) return;
-                        if (styleFilter !== 'ALL' && p.play_style !== styleFilter) return;
-
-                        visibleCount++;
-
-                        let status = '<span style="color:var(--text-dim)">OFFLINE</span>';
-                        if(isPending) {
-                            status = '<span style="color:var(--locked-color)">[ACCESS PENDING]</span>';
-                        } else if(p.availability_json && p.availability_json[today]?.active) {
-                            const slots = Array.isArray(p.availability_json[today].slots) ? p.availability_json[today].slots : [];
-                            const times = slots.map(s => `${s.start}-${s.end}`).join(' // ');
-                            status = `<span style="color:var(--success-color)">ACTIVE: ${times}</span>`;
-                        }
-                        
-                        let adminActions = '';
-                        if (isAdmin && p.id !== currentUser.id) {
-                            if(isPending) adminActions += `<button class="btn-admin-approve" onclick="window.approveUser('${p.id}')">[APPROVE]</button>`;
-                            adminActions += `<button class="btn-admin-kick" onclick="window.kickUser('${p.id}')">[DISCHARGE]</button>`;
-                        }
-
-                        grid.innerHTML += `
-                            <div class="member-card">
-                                <div class="member-header">
-                                    <img src="${p.avatar_url || 'https://placehold.co/50'}" class="member-avatar">
-                                    <div>
-                                        <h3>${p.discord_name || 'Unknown Agent'}</h3>
-                                        <div style="font-size:1rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div>
-                                    </div>
-                                </div>
-                                <div style="margin-top:15px; border-top:2px dashed #333; padding-top:10px; font-weight:bold;">
-                                    ${status}
-                                </div>
-                                ${adminActions}
-                            </div>`;
-                    });
-
-                    if (visibleCount === 0) grid.innerHTML = '<div style="padding:20px; color:var(--text-dim)">NO MATCHING AGENTS FOUND.</div>';
-
-                } catch (e) { console.error("Crash:", e); grid.innerHTML = `<span style="color:red">FAILURE: ${e.message}</span>`; }
-            }
-
-            // --- ADMIN TABLE LOGIC (NEW) ---
-            window.loadAdminTable = async () => {
+            // --- ADMIN TABLE LOGIC ---
+            // Exposed to Window for button onclicks
+            window.loadAdminTable = async function() {
                 if (!isAdmin) return;
                 const tbody = document.getElementById('adminTableBody');
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--accent-color)">LOADING PERSONNEL DATABASE...</td></tr>';
+                if(!tbody) return;
+                
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--accent-color)">LOADING...</td></tr>';
 
                 const { data: profiles, error } = await supabaseClient.from('profiles').select('*').order('created_at', {ascending: false});
                 
@@ -603,53 +529,283 @@
                 });
             };
 
+            // --- ROSTER LOGIC ---
+            async function loadRoster() {
+                if(!isVerified) return;
+                const grid = document.getElementById('rosterGrid'); 
+                grid.innerHTML = '<div style="color:var(--accent-color); padding:20px;">UPDATING INTEL...</div>';
+                
+                try {
+                    const { data: profiles, error } = await supabaseClient.from('profiles').select('*').order('created_at', {ascending: false});
+                    if(error) { grid.innerHTML = `<span style="color:red">ERROR: ${error.message}</span>`; return; }
+                    if(!profiles || profiles.length === 0) { grid.innerHTML = `<span style="color:var(--text-dim)">NO AGENTS FOUND.</span>`; return; }
+
+                    grid.innerHTML = ''; 
+                    const today = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"][new Date().getDay()];
+                    
+                    const searchTerm = document.getElementById('roster-search').value.toLowerCase();
+                    const regionFilter = document.getElementById('roster-filter-region').value;
+                    const styleFilter = document.getElementById('roster-filter-style').value;
+                    const showPending = document.getElementById('roster-show-pending').checked;
+
+                    let visibleCount = 0;
+
+                    profiles.forEach(p => {
+                        const isPending = p.status === 'pending';
+                        if (showPending && !isPending) return; 
+                        if (!showPending && isPending) return; 
+                        if (searchTerm && p.discord_name && !p.discord_name.toLowerCase().includes(searchTerm)) return;
+                        if (regionFilter !== 'ALL' && p.region !== regionFilter) return;
+                        if (styleFilter !== 'ALL' && p.play_style !== styleFilter) return;
+
+                        visibleCount++;
+
+                        let status = '<span style="color:var(--text-dim)">OFFLINE</span>';
+                        if(isPending) {
+                            status = '<span style="color:var(--locked-color)">[ACCESS PENDING]</span>';
+                        } else if(p.availability_json && p.availability_json[today] && p.availability_json[today].active) {
+                            const slots = Array.isArray(p.availability_json[today].slots) ? p.availability_json[today].slots : [];
+                            const times = slots.map(s => `${s.start}-${s.end}`).join(' // ');
+                            status = `<span style="color:var(--success-color)">ACTIVE: ${times}</span>`;
+                        }
+                        
+                        let adminActions = '';
+                        if (isAdmin && p.id !== currentUser.id) {
+                            if(isPending) adminActions += `<button class="btn-admin-approve" onclick="window.approveUser('${p.id}')">[APPROVE]</button>`;
+                            adminActions += `<button class="btn-admin-kick" onclick="window.kickUser('${p.id}')">[DISCHARGE]</button>`;
+                        }
+
+                        grid.innerHTML += `
+                            <div class="member-card">
+                                <div class="member-header">
+                                    <img src="${p.avatar_url || 'https://placehold.co/50'}" class="member-avatar">
+                                    <div>
+                                        <h3>${p.discord_name || 'Unknown Agent'}</h3>
+                                        <div style="font-size:1rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top:15px; border-top:2px dashed #333; padding-top:10px; font-weight:bold;">
+                                    ${status}
+                                </div>
+                                ${adminActions}
+                            </div>`;
+                    });
+
+                    if (visibleCount === 0) grid.innerHTML = '<div style="padding:20px; color:var(--text-dim)">NO MATCHING AGENTS FOUND.</div>';
+
+                } catch (e) { 
+                    console.error("Crash:", e); 
+                    grid.innerHTML = `<span style="color:red">FAILURE: ${e.message}</span>`; 
+                }
+            }
+
+            // --- BOARD LOGIC ---
             async function loadBoard() {
                 if(!isVerified) return;
-                const grid = document.getElementById('eventsGrid'); grid.innerHTML = 'Scanning...';
+                const grid = document.getElementById('eventsGrid'); 
+                grid.innerHTML = 'Scanning...';
+                
                 const { data: events } = await supabaseClient.from('events').select('*').order('start_time', {ascending: true});
                 const { data: signups } = await supabaseClient.from('event_signups').select('*');
+                
                 grid.innerHTML = '';
                 if(!events || events.length === 0) { grid.innerHTML = '<p style="color:var(--text-dim); font-size:1.2rem;">NO OPERATIONS FOUND.</p>'; return; }
+                
                 events.forEach(ev => {
                     const host = profilesMap[ev.host_id] || 'UNKNOWN';
                     const attending = signups.filter(s => s.event_id === ev.id);
                     const isSignedUp = attending.some(s => s.user_id === currentUser.id);
                     const isHost = ev.host_id === currentUser.id;
                     const canDelete = isHost || isAdmin; 
+                    
                     const eventTimeUTC = dayjs(ev.start_time);
                     const userTime = eventTimeUTC.tz(userTimezone);
                     const hostTZ = ev.timezone || 'UTC';
                     const hostTime = eventTimeUTC.tz(hostTZ);
                     const timerId = `timer-${ev.id}`;
+                    
                     const duration = MISSION_DURATIONS[ev.mission_type] || 30;
                     const conditions = ev.conditions || [];
                     const tagsHtml = conditions.map(c => `<span class="condition-tag">${c}</span>`).join('');
+
                     grid.innerHTML += `
                         <div class="event-card">
                             ${canDelete ? `<button class="btn-admin-delete" onclick="window.deleteEvent('${ev.id}')">${isAdmin && !isHost ? '[OVERRIDE]' : '[TERMINATE]'}</button>` : ''}
                             <div id="${timerId}" class="countdown-timer">T-MINUS: CALC...</div>
-                            <div class="time-display-group"><div class="local-time">${userTime.format('MMM D, HH:mm')} (${dayjs().tz(userTimezone).format('z')})</div><div class="host-time">ORIGIN: ${hostTime.format('HH:mm')} (${hostTZ})</div></div>
-                            <div class="mission-type">${ev.mission_type || 'Standard Raid'} (${duration}m)</div><div class="condition-tags">${tagsHtml}</div>
-                            <div class="sync-group"><button class="btn-sync" onclick="window.downloadICS('${ev.id}', '${ev.title}', '${ev.start_time}', '${ev.description}', ${duration})">[ICS FILE]</button><button class="btn-sync" onclick="window.openGoogleCal('${ev.title}', '${ev.start_time}', '${ev.description}', '${ev.region}', ${duration})">[GOOGLE CAL]</button></div>
-                            <div class="event-title">${ev.title}</div><div style="font-size:1rem; color:var(--accent-color); font-weight:bold;">LEADER: ${host} // ${ev.region}</div><p style="color:var(--text-dim); margin-bottom:10px; font-size:1.1rem;">${ev.description || 'NO INTEL.'}</p>
+                            <div class="time-display-group">
+                                <div class="local-time">${userTime.format('MMM D, HH:mm')} (${dayjs().tz(userTimezone).format('z')})</div>
+                                <div class="host-time">ORIGIN: ${hostTime.format('HH:mm')} (${hostTZ})</div>
+                            </div>
+                            
+                            <div class="mission-type">${ev.mission_type || 'Standard Raid'} (${duration}m)</div>
+                            <div class="condition-tags">${tagsHtml}</div>
+
+                            <div class="sync-group">
+                                <button class="btn-sync" onclick="window.downloadICS('${ev.id}', '${ev.title}', '${ev.start_time}', '${ev.description}', ${duration})">[ICS FILE]</button>
+                                <button class="btn-sync" onclick="window.openGoogleCal('${ev.title}', '${ev.start_time}', '${ev.description}', '${ev.region}', ${duration})">[GOOGLE CAL]</button>
+                            </div>
+
+                            <div class="event-title">${ev.title}</div>
+                            <div style="font-size:1rem; color:var(--accent-color); font-weight:bold;">LEADER: ${host} // ${ev.region}</div>
+                            <p style="color:var(--text-dim); margin-bottom:10px; font-size:1.1rem;">${ev.description || 'NO INTEL.'}</p>
                             <div class="attendees-list">SQUAD [${attending.length}]: ${attending.map(s => `<span class="attendee-pill">${profilesMap[s.user_id]||'???'}</span>`).join('')}</div>
                             ${isSignedUp ? `<button class="btn-leave" onclick="window.leaveEvent('${ev.id}')">ABORT MISSION</button>` : `<button class="btn-join" onclick="window.joinEvent('${ev.id}')">JOIN SQUAD</button>`}
                         </div>`;
                     startTimer(timerId, eventTimeUTC);
                 });
             }
+
             function startTimer(elementId, targetTime) {
                 const el = document.getElementById(elementId); if(!el) return;
-                const update = () => { const now = dayjs(); const diff = targetTime.diff(now); if(diff <= 0) { el.textContent = "STATUS: ACTIVE / DEPLOYED"; el.style.color = "white"; el.style.backgroundColor = "var(--accent-color)"; } else { const d = Math.floor(diff / (1000 * 60 * 60 * 24)); const h = Math.floor((diff / (1000 * 60 * 60)) % 24); const m = Math.floor((diff / 1000 / 60) % 60); const s = Math.floor((diff / 1000) % 60); el.textContent = `T-MINUS: ${d}d ${h}h ${m}m ${s}s`; } }; update(); setInterval(update, 1000);
+                const update = () => {
+                    const now = dayjs(); const diff = targetTime.diff(now);
+                    if(diff <= 0) { el.textContent = "STATUS: ACTIVE / DEPLOYED"; el.style.color = "white"; el.style.backgroundColor = "var(--accent-color)"; } 
+                    else {
+                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                        const m = Math.floor((diff / 1000 / 60) % 60);
+                        const s = Math.floor((diff / 1000) % 60);
+                        el.textContent = `T-MINUS: ${d}d ${h}h ${m}m ${s}s`;
+                    }
+                };
+                update(); setInterval(update, 1000);
             }
-            window.downloadICS = (id, title, startUTC, desc, duration) => { const start = dayjs(startUTC).format('YYYYMMDDTHHmmss') + 'Z'; const end = dayjs(startUTC).add(duration, 'minute').format('YYYYMMDDTHHmmss') + 'Z'; const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Mission: ${title}\nDTSTART:${start}\nDTEND:${end}\nDESCRIPTION:${desc || 'Raid Mission'}\nEND:VEVENT\nEND:VCALENDAR`; const blob = new Blob([icsContent], { type: 'text/calendar' }); const url = window.URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `mission_${id}.ics`; document.body.appendChild(a); a.click(); document.body.removeChild(a); };
-            window.openGoogleCal = (title, startUTC, desc, loc, duration) => { const start = dayjs(startUTC).format('YYYYMMDDTHHmmss') + 'Z'; const end = dayjs(startUTC).add(duration, 'minute').format('YYYYMMDDTHHmmss') + 'Z'; const gUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(desc)}&location=${encodeURIComponent(loc)}`; window.open(gUrl, '_blank'); };
+
+            // --- HELPERS ---
+            function populateTimezones(selectId) {
+                const select = document.getElementById(selectId); if(!select) return; 
+                select.innerHTML = '';
+                Intl.supportedValuesOf('timeZone').forEach(tz => {
+                    const opt = document.createElement('option'); opt.value = tz; opt.text = tz;
+                    if(tz === userTimezone) opt.selected = true; select.appendChild(opt);
+                });
+            }
+            populateTimezones('ep-timezone'); populateTimezones('p-timezone'); populateTimezones('e-timezone');
+
+            function populateScheduleModal(json) {
+                const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+                const cont = document.getElementById('daysContainer'); cont.innerHTML = '';
+                days.forEach(d => {
+                    const data = json ? json[d] : {};
+                    const active = data.active || false;
+                    const slots = Array.isArray(data.slots) ? data.slots : (data.start ? [{start:data.start, end:data.end}] : []);
+                    const div = document.createElement('div'); div.className = `day-section ${active?'':'disabled-day'}`;
+                    div.innerHTML = `<div class="day-header"><div class="day-title-group"><input type="checkbox" class="d-check" data-day="${d}" ${active?'checked':''}><strong style="text-transform:uppercase">${d}</strong></div><button type="button" class="add-slot-btn" ${active?'':'disabled'}>+</button></div><div class="slots-container ${active?'':'hidden'}"></div>`;
+                    const sCont = div.querySelector('.slots-container');
+                    slots.forEach(s => addSlotUI(sCont, s.start, s.end));
+                    div.querySelector('.d-check').onchange = (e) => { div.classList.toggle('disabled-day', !e.target.checked); sCont.classList.toggle('hidden', !e.target.checked); div.querySelector('.add-slot-btn').disabled = !e.target.checked; if(e.target.checked && sCont.children.length===0) addSlotUI(sCont); };
+                    div.querySelector('.add-slot-btn').onclick = () => addSlotUI(sCont);
+                    cont.appendChild(div);
+                });
+            }
+
+            function addSlotUI(cont, start="18:00", end="22:00") {
+                const d = document.createElement('div'); d.className='time-slot';
+                d.innerHTML = `<input type="time" class="t-start" value="${start}"> > <input type="time" class="t-end" value="${end}"> <button type="button" class="remove-slot-btn">[x]</button>`;
+                d.querySelector('.remove-slot-btn').onclick = () => d.remove(); cont.appendChild(d);
+            }
+
+            // --- GLOBAL ACTIONS ---
+            // Exposed to Window for OnClick
+            window.downloadICS = (id, title, startUTC, desc, duration) => {
+                const start = dayjs(startUTC).format('YYYYMMDDTHHmmss') + 'Z';
+                const end = dayjs(startUTC).add(duration, 'minute').format('YYYYMMDDTHHmmss') + 'Z';
+                const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Mission: ${title}\nDTSTART:${start}\nDTEND:${end}\nDESCRIPTION:${desc || 'Raid Mission'}\nEND:VEVENT\nEND:VCALENDAR`;
+                const blob = new Blob([icsContent], { type: 'text/calendar' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = `mission_${id}.ics`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            };
+
+            window.openGoogleCal = (title, startUTC, desc, loc, duration) => {
+                const start = dayjs(startUTC).format('YYYYMMDDTHHmmss') + 'Z';
+                const end = dayjs(startUTC).add(duration, 'minute').format('YYYYMMDDTHHmmss') + 'Z';
+                const gUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(desc)}&location=${encodeURIComponent(loc)}`;
+                window.open(gUrl, '_blank');
+            };
+
             window.joinEvent = async (id) => { await supabaseClient.from('event_signups').insert({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.leaveEvent = async (id) => { await supabaseClient.from('event_signups').delete().match({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.deleteEvent = async (id) => { if(confirm('CONFIRM DELETION?')) { await supabaseClient.from('events').delete().eq('id', id); loadBoard(); } };
-            window.kickUser = async (id) => { if(confirm('CONFIRM DISCHARGE? This will delete the user profile.')) { const { error } = await supabaseClient.from('profiles').delete().eq('id', id); if(error) alert(error.message); else { loadRoster(); if(document.getElementById('admin-section').classList.contains('hidden') === false) window.loadAdminTable(); } } };
-            window.approveUser = async (id) => { if(confirm('GRANT SECURITY CLEARANCE?')) { const { error } = await supabaseClient.from('profiles').update({status: 'verified'}).eq('id', id); if(error) alert(error.message); else { loadRoster(); if(document.getElementById('admin-section').classList.contains('hidden') === false) window.loadAdminTable(); } } };
-            document.getElementById('eventForm').onsubmit = async (e) => { e.preventDefault(); const eTime = document.getElementById('e-time').value; const eZone = document.getElementById('e-timezone').value; const utcDate = dayjs.tz(eTime, eZone).utc().format(); const conditions = []; document.querySelectorAll('input[name="cond"]:checked').forEach(cb => conditions.push(cb.value)); const { error } = await supabaseClient.from('events').insert({ title: document.getElementById('e-title').value, description: document.getElementById('e-desc').value, start_time: utcDate, region: document.getElementById('e-region').value, timezone: eZone, mission_type: document.getElementById('e-type').value, conditions: conditions, host_id: currentUser.id }); if(!error) { eModal.classList.add('hidden'); loadBoard(); } else { alert(error.message); } };
+            
+            window.approveUser = async (id) => {
+                if(confirm('GRANT SECURITY CLEARANCE?')) {
+                    const { error } = await supabaseClient.from('profiles').update({status: 'verified'}).eq('id', id);
+                    if(error) alert(error.message); else { loadRoster(); if(!document.getElementById('admin-section').classList.contains('hidden')) window.loadAdminTable(); }
+                }
+            };
+            window.kickUser = async (id) => {
+                if(confirm('CONFIRM DISCHARGE? This will delete the user profile.')) {
+                    const { error } = await supabaseClient.from('profiles').delete().eq('id', id);
+                    if(error) alert(error.message); else { loadRoster(); if(!document.getElementById('admin-section').classList.contains('hidden')) window.loadAdminTable(); }
+                }
+            };
+
+            // --- FORM SUBMITS ---
+            document.getElementById('profileForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const payload = {
+                    discord_name: currentUser.user_metadata.full_name || "Raider",
+                    avatar_url: currentUser.user_metadata.avatar_url,
+                    play_style: document.getElementById('p-style').value, 
+                    region: document.getElementById('p-region').value, 
+                    timezone: document.getElementById('p-timezone').value,
+                };
+                
+                const { error: updateError } = await supabaseClient.from('profiles').update(payload).eq('id', currentUser.id);
+                if (!updateError) {
+                    checkProfile();
+                } else {
+                    const { error } = await supabaseClient.from('profiles').upsert({
+                        id: currentUser.id, ...payload, status: 'pending'
+                    });
+                    if(!error) checkProfile(); else alert("Error: " + error.message);
+                }
+            };
+
+            document.getElementById('editProfileForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const { error } = await supabaseClient.from('profiles').update({
+                    play_style: document.getElementById('ep-style').value, 
+                    region: document.getElementById('ep-region').value, 
+                    timezone: document.getElementById('ep-timezone').value
+                }).eq('id', currentUser.id);
+                if(!error) { document.getElementById('profileModal').classList.add('hidden'); checkProfile(); }
+            };
+
+            document.getElementById('scheduleForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const res = {};
+                document.querySelectorAll('.d-check').forEach(c => {
+                    const div = c.closest('.day-section');
+                    const slots = [];
+                    if(c.checked) div.querySelectorAll('.time-slot').forEach(s => slots.push({start:s.querySelector('.t-start').value, end:s.querySelector('.t-end').value}));
+                    res[c.dataset.day] = {active: c.checked, slots};
+                });
+                await supabaseClient.from('profiles').update({availability_json: res}).eq('id', currentUser.id);
+                sModal.classList.add('hidden'); checkProfile();
+            };
+
+            document.getElementById('eventForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const eTime = document.getElementById('e-time').value;
+                const eZone = document.getElementById('e-timezone').value;
+                const utcDate = dayjs.tz(eTime, eZone).utc().format();
+                const conditions = [];
+                document.querySelectorAll('input[name="cond"]:checked').forEach(cb => conditions.push(cb.value));
+
+                const { error } = await supabaseClient.from('events').insert({
+                    title: document.getElementById('e-title').value,
+                    description: document.getElementById('e-desc').value,
+                    start_time: utcDate,
+                    region: document.getElementById('e-region').value,
+                    timezone: eZone,
+                    mission_type: document.getElementById('e-type').value,
+                    conditions: conditions,
+                    host_id: currentUser.id
+                });
+                if(!error) { eModal.classList.add('hidden'); loadBoard(); } else { alert(error.message); }
+            };
         });
     </script>
 </body>
