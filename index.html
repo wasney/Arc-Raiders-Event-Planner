@@ -14,6 +14,7 @@
         :root {
             --bg-color: #0f1012;
             --card-bg: #1a1c20;
+            --modal-bg: #22252b;
             --accent-color: #ff4c29;
             --text-main: #e0e0e0;
             --text-dim: #a0a0a0;
@@ -57,7 +58,7 @@
         nav a:hover { color: var(--accent-color); }
         .nav-external { color: #4cd1ff !important; }
 
-        /* --- HERO & CONTAINERS --- */
+        /* --- LAYOUT --- */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -82,12 +83,11 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            transition: transform 0.2s, background-color 0.2s;
             cursor: pointer;
             border: none;
             font-size: 1rem;
         }
-        .btn-discord:hover { background-color: #4752C4; transform: translateY(-2px); }
+        .btn-discord:hover { background-color: #4752C4; }
 
         .btn-primary {
             background-color: var(--accent-color);
@@ -103,6 +103,18 @@
         }
         .btn-primary:hover { opacity: 0.9; }
 
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .btn-secondary:hover { background-color: rgba(255, 76, 41, 0.1); }
+
         .btn-logout {
             background-color: var(--card-bg);
             color: var(--text-dim);
@@ -113,34 +125,8 @@
             font-size: 0.9rem;
             margin-top: 2rem;
         }
-        .btn-logout:hover { border-color: var(--text-main); color: var(--text-main); }
 
-        /* --- FORMS --- */
-        .form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-dim);
-        }
-        select, input {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            color: var(--text-main);
-            font-family: inherit;
-        }
-        select:focus, input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        /* --- CARDS (Dashboard/Onboarding) --- */
+        /* --- CARDS & FORMS --- */
         .card {
             max-width: 600px;
             margin: 0 auto;
@@ -151,46 +137,55 @@
             text-align: center;
             margin-top: 2rem;
         }
-        .user-info { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-        .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 2px solid var(--accent-color);
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-dim); }
+        select, input {
+            width: 100%; padding: 12px; background-color: var(--input-bg);
+            border: 1px solid var(--border-color); border-radius: 4px;
+            color: var(--text-main); font-family: inherit;
         }
+        
+        .user-info { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .avatar { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent-color); }
         .status-badge {
-            background: rgba(46, 204, 113, 0.2);
-            color: var(--success-color);
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            background: rgba(46, 204, 113, 0.2); color: var(--success-color);
+            padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;
         }
         .profile-details {
-            margin-top: 1rem;
-            text-align: left;
-            width: 100%;
-            background: var(--bg-color);
-            padding: 1rem;
-            border-radius: 4px;
+            margin-top: 1rem; text-align: left; width: 100%;
+            background: var(--bg-color); padding: 1rem; border-radius: 4px;
         }
         .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
+            display: flex; justify-content: space-between; margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;
         }
 
-        /* --- FOOTER --- */
-        footer {
-            text-align: center;
-            padding: 2rem;
-            margin-top: 4rem;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-dim);
-            font-size: 0.8rem;
+        /* --- MODAL (For Schedule Editing) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); z-index: 200;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(2px);
         }
+        .modal-content {
+            background: var(--modal-bg); width: 95%; max-width: 500px;
+            padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .close-btn { background: none; border: none; color: var(--text-dim); font-size: 1.5rem; cursor: pointer; }
+        
+        /* Schedule Grid */
+        .day-row {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+            background: var(--bg-color); padding: 10px; border-radius: 4px;
+        }
+        .day-check { width: 20px; height: 20px; }
+        .day-label { width: 50px; font-weight: bold; }
+        .time-inputs { display: flex; gap: 5px; flex-grow: 1; align-items: center; }
+        .time-inputs input { padding: 5px; font-size: 0.9rem; }
+        
+        .disabled-row { opacity: 0.5; pointer-events: none; }
 
         /* --- UTILS --- */
         .hidden { display: none !important; }
@@ -217,32 +212,22 @@
     <main class="container">
         <section id="login-section" class="hero">
             <h1>Coordinate. Survive. Extract.</h1>
-            <p>
-                Connect with your guild, manage your availability, and plan your next raid.
-                Login securely with Discord to access the tactical calendar.
-            </p>
-            <button id="loginBtn" class="btn-discord">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" fill="currentColor"/>
-                </svg>
-                Login with Discord
-            </button>
+            <p>Connect with your guild to manage raid availability.</p>
+            <button id="loginBtn" class="btn-discord">Login with Discord</button>
         </section>
 
         <section id="onboarding-section" class="card hidden">
             <h2>Operator Registration</h2>
-            <p style="margin-bottom: 20px; color: var(--text-dim);">Finalize your profile to access the guild network.</p>
-            
+            <p style="margin-bottom: 20px; color: var(--text-dim);">Finalize your profile.</p>
             <form id="profileForm">
                 <div class="form-group">
                     <label for="playstyle">Preferred Playstyle</label>
                     <select id="playstyle" required>
-                        <option value="PvP">PvP (Player vs Player)</option>
-                        <option value="PvE">PvE (Player vs Environment)</option>
-                        <option value="Hybrid">Hybrid (Both)</option>
+                        <option value="PvP">PvP</option>
+                        <option value="PvE">PvE</option>
+                        <option value="Hybrid">Hybrid</option>
                     </select>
                 </div>
-                
                 <div class="form-group">
                     <label for="region">Region</label>
                     <select id="region" required>
@@ -253,7 +238,6 @@
                         <option value="SA">South America</option>
                     </select>
                 </div>
-
                 <button type="submit" class="btn-primary">Initialize Profile</button>
             </form>
         </section>
@@ -267,66 +251,80 @@
 
             <div class="profile-details">
                 <div class="detail-row">
-                    <span>Playstyle:</span>
-                    <strong id="displayPlaystyle">-</strong>
+                    <span>Playstyle:</span><strong id="displayPlaystyle">-</strong>
                 </div>
                 <div class="detail-row">
-                    <span>Region:</span>
-                    <strong id="displayRegion">-</strong>
+                    <span>Region:</span><strong id="displayRegion">-</strong>
                 </div>
                 <div class="detail-row" style="border: none;">
-                    <span>Status:</span>
-                    <strong style="color: var(--accent-color);">OPERATIONAL</strong>
+                    <span>Routine:</span><strong id="displayRoutineStatus">Not Set</strong>
                 </div>
             </div>
 
-            <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-dim);">
-                Availability Calendar coming next update...
-            </p>
-
+            <button id="editScheduleBtn" class="btn-secondary">Edit Weekly Schedule</button>
             <button id="logoutBtn" class="btn-logout">Disconnect Signal (Logout)</button>
         </section>
     </main>
 
+    <div id="scheduleModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Weekly Availability</h3>
+                <button id="closeModalBtn" class="close-btn">&times;</button>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1rem;">
+                Set your "Standard" weekly hours. Uncheck days you are offline.
+            </p>
+            <form id="scheduleForm">
+                <div id="daysContainer"></div>
+                
+                <button type="submit" class="btn-primary">Save Routine</button>
+            </form>
+        </div>
+    </div>
+
     <footer>
-        &copy; 2026 Arc Raiders Guild Tool. Not affiliated with Embark Studios.
+        &copy; 2026 Arc Raiders Guild Tool.
     </footer>
 
     <script>
-        // --- 1. CONFIGURATION ---
+        // --- CONFIGURATION ---
         const SUPABASE_URL = 'https://olmaoftlbrookqwxvlvx.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo';
-        
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- 2. DOM ELEMENTS ---
+        // --- DOM ELEMENTS ---
         const loginSection = document.getElementById('login-section');
         const onboardingSection = document.getElementById('onboarding-section');
         const dashboardSection = document.getElementById('dashboard-section');
+        const scheduleModal = document.getElementById('scheduleModal');
+        const daysContainer = document.getElementById('daysContainer');
         
+        // Buttons
         const loginBtn = document.getElementById('loginBtn');
         const logoutBtn = document.getElementById('logoutBtn');
         const profileForm = document.getElementById('profileForm');
+        const editScheduleBtn = document.getElementById('editScheduleBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const scheduleForm = document.getElementById('scheduleForm');
 
-        // Dashboard Elements
+        // Display Elements
         const userNameDisplay = document.getElementById('userName');
         const userAvatarDisplay = document.getElementById('userAvatar');
         const displayPlaystyle = document.getElementById('displayPlaystyle');
         const displayRegion = document.getElementById('displayRegion');
+        const displayRoutineStatus = document.getElementById('displayRoutineStatus');
 
-        // --- 3. AUTH LOGIC ---
+        // Days Config
+        const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+        // --- AUTH & INIT ---
         async function signInWithDiscord() {
-            // "Smart Redirect" to handle GitHub Pages vs Localhost
             const currentURL = window.location.href; 
-            try {
-                const { error } = await supabaseClient.auth.signInWithOAuth({
-                    provider: 'discord',
-                    options: { redirectTo: currentURL }
-                });
-                if (error) throw error;
-            } catch (error) {
-                alert("Login Error: " + error.message);
-            }
+            await supabaseClient.auth.signInWithOAuth({
+                provider: 'discord',
+                options: { redirectTo: currentURL }
+            });
         }
 
         async function signOut() {
@@ -334,81 +332,140 @@
             location.reload();
         }
 
-        // --- 4. PROFILE LOGIC ---
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (session) checkProfile(session);
+            else {
+                loginSection.classList.remove('hidden');
+                dashboardSection.classList.add('hidden');
+                onboardingSection.classList.add('hidden');
+            }
+        });
+
+        // --- PROFILE LOGIC ---
         async function checkProfile(session) {
             const user = session.user;
-            console.log("Checking profile for:", user.id);
-
-            // Fetch profile from DB
             const { data, error } = await supabaseClient
                 .from('profiles')
                 .select('*')
                 .eq('id', user.id)
                 .single();
 
-            if (error && error.code !== 'PGRST116') {
-                // Real error (not just "row not found")
-                console.error("Profile Fetch Error:", error);
-            }
-
             if (data) {
-                // Profile Exists -> Show Dashboard
-                console.log("Profile found!");
                 showDashboard(session, data);
+                // Pre-fill schedule if exists
+                if(data.availability_json) {
+                    populateScheduleModal(data.availability_json);
+                    displayRoutineStatus.textContent = "Active";
+                    displayRoutineStatus.style.color = "var(--success-color)";
+                } else {
+                    populateScheduleModal(null); // Fresh form
+                }
             } else {
-                // Profile Missing -> Show Onboarding
-                console.log("No profile found. Starting Onboarding.");
                 showOnboarding(session);
             }
         }
 
         async function createProfile(e) {
-            e.preventDefault(); // Stop page reload
-            
-            // Get current user again
+            e.preventDefault();
             const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) return alert("Error: No user found.");
-
-            // Gather Form Data
             const playstyle = document.getElementById('playstyle').value;
             const region = document.getElementById('region').value;
-            
-            // Extract Discord Metadata
-            const discordName = user.user_metadata.full_name || user.user_metadata.custom_claims?.global_name || "Raider";
+            const discordName = user.user_metadata.full_name || "Raider";
             const avatarUrl = user.user_metadata.avatar_url;
 
-            console.log("Creating Profile...");
+            await supabaseClient.from('profiles').insert({
+                id: user.id, discord_name: discordName, avatar_url: avatarUrl,
+                play_style: playstyle, region: region
+            });
+            location.reload();
+        }
 
-            // Insert into Supabase
-            const { error } = await supabaseClient
-                .from('profiles')
-                .insert({
-                    id: user.id,
-                    discord_name: discordName,
-                    avatar_url: avatarUrl,
-                    play_style: playstyle,
-                    region: region
+        // --- SCHEDULE LOGIC ---
+        function populateScheduleModal(savedData) {
+            daysContainer.innerHTML = ''; // Clear previous
+            
+            DAYS.forEach(day => {
+                const dayKey = day.toLowerCase();
+                const existing = savedData ? savedData[dayKey] : null;
+                const isActive = existing ? existing.active : false;
+                const start = existing ? existing.start : "18:00";
+                const end = existing ? existing.end : "22:00";
+
+                const row = document.createElement('div');
+                row.className = `day-row ${isActive ? '' : 'disabled-row'}`;
+                row.innerHTML = `
+                    <input type="checkbox" class="day-check" data-day="${dayKey}" ${isActive ? 'checked' : ''}>
+                    <span class="day-label">${day.substring(0,3)}</span>
+                    <div class="time-inputs">
+                        <input type="time" class="time-start" value="${start}" ${isActive ? '' : 'disabled'}>
+                        <span>to</span>
+                        <input type="time" class="time-end" value="${end}" ${isActive ? '' : 'disabled'}>
+                    </div>
+                `;
+                
+                // Add event listener to toggle disabled state
+                const checkbox = row.querySelector('.day-check');
+                const inputs = row.querySelectorAll('input[type="time"]');
+                checkbox.addEventListener('change', (e) => {
+                    if(e.target.checked) {
+                        row.classList.remove('disabled-row');
+                        inputs.forEach(i => i.disabled = false);
+                    } else {
+                        row.classList.add('disabled-row');
+                        inputs.forEach(i => i.disabled = true);
+                    }
                 });
 
+                daysContainer.appendChild(row);
+            });
+        }
+
+        async function saveSchedule(e) {
+            e.preventDefault();
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            
+            // Build JSON Object
+            const scheduleData = {};
+            const rows = daysContainer.querySelectorAll('.day-row');
+            
+            rows.forEach(row => {
+                const checkbox = row.querySelector('.day-check');
+                const dayKey = checkbox.dataset.day;
+                const start = row.querySelector('.time-start').value;
+                const end = row.querySelector('.time-end').value;
+                
+                scheduleData[dayKey] = {
+                    active: checkbox.checked,
+                    start: start,
+                    end: end
+                };
+            });
+
+            console.log("Saving Schedule:", scheduleData);
+
+            // Send to Supabase
+            const { error } = await supabaseClient
+                .from('profiles')
+                .update({ availability_json: scheduleData })
+                .eq('id', user.id);
+
             if (error) {
-                console.error("Insert Error:", error);
-                alert("Failed to create profile: " + error.message);
+                alert("Error saving schedule: " + error.message);
             } else {
-                // Success -> Reload page to trigger checkProfile again
-                location.reload();
+                closeModal();
+                displayRoutineStatus.textContent = "Active";
+                displayRoutineStatus.style.color = "var(--success-color)";
+                alert("Routine Updated! 📅");
             }
         }
 
-        // --- 5. UI HELPERS ---
+        // --- UI HELPERS ---
         function showDashboard(session, profileData) {
             loginSection.classList.add('hidden');
             onboardingSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
-
-            // Populate UI
             userNameDisplay.textContent = `Welcome, ${profileData.discord_name}`;
             if (profileData.avatar_url) userAvatarDisplay.src = profileData.avatar_url;
-            
             displayPlaystyle.textContent = profileData.play_style;
             displayRegion.textContent = profileData.region;
         }
@@ -419,25 +476,18 @@
             onboardingSection.classList.remove('hidden');
         }
 
-        // --- 6. INITIALIZATION ---
-        // Listen for Login Button
-        if (loginBtn) loginBtn.addEventListener('click', signInWithDiscord);
-        // Listen for Logout Button
-        if (logoutBtn) logoutBtn.addEventListener('click', signOut);
-        // Listen for Form Submit
-        if (profileForm) profileForm.addEventListener('submit', createProfile);
+        function openModal() { scheduleModal.classList.remove('hidden'); }
+        function closeModal() { scheduleModal.classList.add('hidden'); }
 
-        // Check Auth State on Load
-        supabaseClient.auth.onAuthStateChange((event, session) => {
-            console.log("Auth Event:", event);
-            if (session) {
-                checkProfile(session);
-            } else {
-                loginSection.classList.remove('hidden');
-                dashboardSection.classList.add('hidden');
-                onboardingSection.classList.add('hidden');
-            }
-        });
+        // --- LISTENERS ---
+        if (loginBtn) loginBtn.addEventListener('click', signInWithDiscord);
+        if (logoutBtn) logoutBtn.addEventListener('click', signOut);
+        if (profileForm) profileForm.addEventListener('submit', createProfile);
+        
+        // Modal Listeners
+        if (editScheduleBtn) editScheduleBtn.addEventListener('click', openModal);
+        if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+        if (scheduleForm) scheduleForm.addEventListener('submit', saveSchedule);
 
     </script>
 </body>
