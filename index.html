@@ -153,7 +153,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v15.4 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v15.5 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="scheduleModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal">[X]</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form></div></div>
@@ -162,7 +162,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v15.4 [CLEAN-LINK] ONLINE...");
+            console.log("🚀 ARC SYSTEM v15.5 [ROSTER HARDENING] ONLINE...");
             const REQUIRED_GUILD_ID = "1465694444484427903"; 
             
             dayjs.extend(window.dayjs_plugin_utc);
@@ -254,7 +254,6 @@
                 }
             }
 
-            // --- CRITICAL FIX: CLEAN URL REDIRECT ---
             const getCleanURL = () => window.location.origin + window.location.pathname;
 
             document.getElementById('loginBtn').onclick = async () => {
@@ -359,6 +358,56 @@
             };
             document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => { sModal.classList.add('hidden'); eModal.classList.add('hidden'); pModal.classList.add('hidden'); });
 
+            // --- CRITICAL ROSTER FIX ---
+            async function loadRoster() {
+                if(!isVerified) return;
+                const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Scanning...';
+                
+                try {
+                    const { data: profiles, error } = await supabaseClient.from('profiles').select('*').order('created_at', {ascending: false});
+                    
+                    if(error) {
+                        console.error("DB Error:", error);
+                        grid.innerHTML = `<span style="color:red">ERROR LOADING ROSTER</span>`;
+                        return;
+                    }
+                    if(!profiles || profiles.length === 0) {
+                        grid.innerHTML = `<span style="color:var(--text-dim)">NO AGENTS FOUND.</span>`;
+                        return;
+                    }
+
+                    grid.innerHTML = '';
+                    const today = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"][new Date().getDay()];
+                    
+                    console.log(`Checking Roster for Day: ${today}`); // DEBUG LOG
+
+                    profiles.forEach(p => {
+                        let status = '<span style="color:var(--text-dim)">OFFLINE</span>';
+                        const isPending = p.status === 'pending';
+                        
+                        // SAFE CHECK for Availability
+                        if(isPending) {
+                            status = '<span style="color:var(--locked-color)">[ACCESS PENDING]</span>';
+                        } else if(p.availability_json && p.availability_json[today]?.active) {
+                            const slots = Array.isArray(p.availability_json[today].slots) ? p.availability_json[today].slots : [];
+                            const times = slots.map(s => `${s.start}-${s.end}`).join(' // ');
+                            status = `<span style="color:var(--success-color)">ACTIVE: ${times}</span>`;
+                        }
+                        
+                        let adminActions = '';
+                        if (isAdmin && p.id !== currentUser.id) {
+                            if(isPending) adminActions += `<button class="btn-admin-approve" onclick="window.approveUser('${p.id}')">[APPROVE AGENT]</button>`;
+                            adminActions += `<button class="btn-admin-kick" onclick="window.kickUser('${p.id}')">[DISCHARGE AGENT]</button>`;
+                        }
+
+                        grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url || 'https://placehold.co/50'}" class="member-avatar"><div><h3>${p.discord_name || 'Unknown Agent'}</h3><div style="font-size:1rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div></div></div><div style="margin-top:15px; border-top:2px dashed #333; padding-top:10px; font-weight:bold;">${status}</div>${adminActions}</div>`;
+                    });
+                } catch (e) {
+                    console.error("Roster Crash:", e);
+                    grid.innerHTML = `<span style="color:red">SYSTEM FAILURE: ${e.message}</span>`;
+                }
+            }
+
             async function loadBoard() {
                 if(!isVerified) return;
                 const grid = document.getElementById('eventsGrid'); grid.innerHTML = 'Scanning...';
@@ -406,6 +455,7 @@
             window.kickUser = async (id) => { if(confirm('CONFIRM DISCHARGE? This will delete the user profile.')) { const { error } = await supabaseClient.from('profiles').delete().eq('id', id); if(error) alert(error.message); else loadRoster(); } };
             window.approveUser = async (id) => { if(confirm('GRANT SECURITY CLEARANCE?')) { const { error } = await supabaseClient.from('profiles').update({status: 'verified'}).eq('id', id); if(error) alert(error.message); else loadRoster(); } };
             document.getElementById('eventForm').onsubmit = async (e) => { e.preventDefault(); const eTime = document.getElementById('e-time').value; const eZone = document.getElementById('e-timezone').value; const utcDate = dayjs.tz(eTime, eZone).utc().format(); const conditions = []; document.querySelectorAll('input[name="cond"]:checked').forEach(cb => conditions.push(cb.value)); const { error } = await supabaseClient.from('events').insert({ title: document.getElementById('e-title').value, description: document.getElementById('e-desc').value, start_time: utcDate, region: document.getElementById('e-region').value, timezone: eZone, mission_type: document.getElementById('e-type').value, conditions: conditions, host_id: currentUser.id }); if(!error) { eModal.classList.add('hidden'); loadBoard(); } else { alert(error.message); } };
+            
             async function loadRoster() { if(!isVerified) return; const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Scanning...'; const { data: profiles } = await supabaseClient.from('profiles').select('*').order('created_at', {ascending: false}); if(!profiles) return; grid.innerHTML = ''; const today = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"][new Date().getDay()]; profiles.forEach(p => { let status = '<span style="color:var(--text-dim)">OFFLINE</span>'; const isPending = p.status === 'pending'; if(isPending) { status = '<span style="color:var(--locked-color)">[ACCESS PENDING]</span>'; } else if(p.availability_json && p.availability_json[today] && p.availability_json[today].active) { const slots = Array.isArray(p.availability_json[today].slots) ? p.availability_json[today].slots : []; const times = slots.map(s => `${s.start}-${s.end}`).join(' // '); status = `<span style="color:var(--success-color)">ACTIVE: ${times}</span>`; } let adminActions = ''; if (isAdmin && p.id !== currentUser.id) { if(isPending) adminActions += `<button class="btn-admin-approve" onclick="window.approveUser('${p.id}')">[APPROVE AGENT]</button>`; adminActions += `<button class="btn-admin-kick" onclick="window.kickUser('${p.id}')">[DISCHARGE AGENT]</button>`; } grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url}" class="member-avatar"><div><h3>${p.discord_name}</h3><div style="font-size:1rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div></div></div><div style="margin-top:15px; border-top:2px dashed #333; padding-top:10px; font-weight:bold;">${status}</div>${adminActions}</div>`; }); }
             function populateScheduleModal(json) { const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]; const cont = document.getElementById('daysContainer'); cont.innerHTML = ''; days.forEach(d => { const data = json ? json[d] : {}; const active = data.active || false; const slots = Array.isArray(data.slots) ? data.slots : (data.start ? [{start:data.start, end:data.end}] : []); const div = document.createElement('div'); div.className = `day-section ${active?'':'disabled-day'}`; div.innerHTML = `<div class="day-header"><div class="day-title-group"><input type="checkbox" class="d-check" data-day="${d}" ${active?'checked':''}><strong style="text-transform:uppercase">${d}</strong></div><button type="button" class="add-slot-btn" ${active?'':'disabled'}>+</button></div><div class="slots-container ${active?'':'hidden'}"></div>`; const sCont = div.querySelector('.slots-container'); slots.forEach(s => addSlotUI(sCont, s.start, s.end)); div.querySelector('.d-check').onchange = (e) => { div.classList.toggle('disabled-day', !e.target.checked); sCont.classList.toggle('hidden', !e.target.checked); div.querySelector('.add-slot-btn').disabled = !e.target.checked; if(e.target.checked && sCont.children.length===0) addSlotUI(sCont); }; div.querySelector('.add-slot-btn').onclick = () => addSlotUI(sCont); cont.appendChild(div); }); }
             function addSlotUI(cont, start="18:00", end="22:00") { const d = document.createElement('div'); d.className='time-slot'; d.innerHTML = `<input type="time" class="t-start" value="${start}"> > <input type="time" class="t-end" value="${end}"> <button type="button" class="remove-slot-btn">[x]</button>`; d.querySelector('.remove-slot-btn').onclick = () => d.remove(); cont.appendChild(d); }
