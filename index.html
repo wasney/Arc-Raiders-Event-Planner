@@ -185,12 +185,20 @@
     </footer>
 
     <script>
+        // Check if Supabase loaded
+        if (typeof supabase === 'undefined') {
+            console.error('CRITICAL: Supabase library not loaded. Check script tag or ad blocker.');
+            alert('Error: Supabase library failed to load.');
+        } else {
+            console.log('Supabase Library Loaded.');
+        }
+
         // 1. Initialize Supabase
-        // Senpai's Project Config
         const SUPABASE_URL = 'https://olmaoftlbrookqwxvlvx.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo';
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // FIX: Use a distinct variable name 'supabaseClient'
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // 2. DOM Elements
         const loginBtn = document.getElementById('loginBtn');
@@ -202,8 +210,9 @@
 
         // 3. Login Function
         async function signInWithDiscord() {
+            console.log("Login Button Clicked. Initiating Discord OAuth...");
             try {
-                const { data, error } = await supabase.auth.signInWithOAuth({
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'discord',
                 });
                 if (error) throw error;
@@ -215,16 +224,16 @@
 
         // 4. Logout Function
         async function signOut() {
-            const { error } = await supabase.auth.signOut();
+            console.log("Logout initiated...");
+            const { error } = await supabaseClient.auth.signOut();
             if (error) console.error("Logout Error:", error);
-            // The onAuthStateChange listener will handle the UI update
         }
 
         // 5. Update UI based on Session
         function updateUI(session) {
             if (session) {
                 // User is logged in
-                console.log("User detected:", session.user);
+                console.log("Session Active:", session.user.id);
                 
                 // Extract Discord data
                 const discordName = session.user.user_metadata.full_name || "Raider";
@@ -238,19 +247,22 @@
                 dashboardSection.classList.remove('hidden');
             } else {
                 // User is logged out
+                console.log("No Active Session.");
                 loginSection.classList.remove('hidden');
                 dashboardSection.classList.add('hidden');
             }
         }
 
         // 6. Event Listeners
-        loginBtn.addEventListener('click', signInWithDiscord);
-        logoutBtn.addEventListener('click', signOut);
+        if (loginBtn) {
+            loginBtn.addEventListener('click', signInWithDiscord);
+            console.log("Login Listener Attached.");
+        }
+        if (logoutBtn) logoutBtn.addEventListener('click', signOut);
 
         // 7. Check Auth State on Load
-        // This runs automatically when the page loads to see if we have a user
-        supabase.auth.onAuthStateChange((event, session) => {
-            console.log("Auth Event:", event);
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            console.log("Auth State Changed:", event);
             updateUI(session);
         });
 
