@@ -18,7 +18,7 @@
             --bg-color: #050505; --card-bg: #111111; --accent-color: #ff5500;
             --text-main: #ffffff; --text-dim: #888888; --border-color: #333333;
             --success-color: #00ff41; --danger-color: #ff3333; --input-bg: #0a0a0a;
-            --cal-color: #00d9ff; --tag-bg: #222;
+            --cal-color: #00d9ff; --admin-color: #ff00ea; /* Magenta for Admin Actions */
         }
 
         /* --- GLOBAL --- */
@@ -58,7 +58,7 @@
         .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-top: 2rem; }
         .event-card { border-left-color: var(--accent-color); }
 
-        /* --- EVENT ELEMENTS --- */
+        /* --- ELEMENTS --- */
         .countdown-timer { 
             font-size: 1.5rem; color: var(--success-color); font-weight: bold; 
             background: rgba(0, 255, 65, 0.1); padding: 5px 10px; display: inline-block;
@@ -69,18 +69,9 @@
         .host-time { color: var(--text-dim); font-size: 0.9rem; margin-top: 4px; }
         .attendees-list { background: #0a0a0a; padding: 10px; border: 1px solid var(--border-color); margin-top: 10px; }
         .attendee-pill { display: inline-block; background: #333; padding: 2px 8px; border-radius: 12px; margin: 2px; font-size: 0.8rem; }
-        
         .mission-type { color: var(--accent-color); text-transform: uppercase; font-weight: bold; border: 1px solid var(--accent-color); padding: 2px 6px; font-size: 0.9rem; display: inline-block; margin-bottom: 5px; }
         .condition-tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 5px 0; }
-        .condition-tag { font-size: 0.8rem; background: var(--tag-bg); color: #ccc; padding: 2px 6px; border: 1px solid #444; }
-
-        /* --- SYNC BUTTONS --- */
-        .sync-group { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-sync {
-            background: transparent; border: 1px solid var(--cal-color); color: var(--cal-color);
-            padding: 5px 10px; font-size: 0.8rem; flex: 1; text-align: center;
-        }
-        .btn-sync:hover { background: var(--cal-color); color: #000; box-shadow: 0 0 10px var(--cal-color); }
+        .condition-tag { font-size: 0.8rem; background: #222; color: #ccc; padding: 2px 6px; border: 1px solid #444; }
 
         /* --- CONTROLS --- */
         button { font-family: 'Share Tech Mono', monospace; text-transform: uppercase; cursor: pointer; border: 1px solid transparent; font-size: 1rem; font-weight: 700; transition: 0.2s; }
@@ -93,17 +84,29 @@
         .btn-join:hover { background: var(--success-color); color: #000; }
         .btn-leave { background: transparent; border: 2px solid var(--danger-color); color: var(--danger-color); width: 100%; padding: 12px; margin-top:10px; }
         .btn-leave:hover { background: var(--danger-color); color: #000; }
-        .delete-event-btn { position: absolute; top: 15px; right: 15px; background: none; color: var(--danger-color); font-size: 1.2rem; border: none; }
+        .btn-sync { background: transparent; border: 1px solid var(--cal-color); color: var(--cal-color); padding: 5px 10px; font-size: 0.8rem; flex: 1; margin-top:10px; }
+        .btn-sync:hover { background: var(--cal-color); color: #000; }
+        
+        /* ADMIN CONTROLS */
+        .btn-admin-delete { 
+            position: absolute; top: 15px; right: 15px; 
+            background: var(--admin-color); color: #000; 
+            font-size: 0.8rem; padding: 4px 8px; border: none;
+        }
+        .btn-admin-delete:hover { background: #fff; box-shadow: 0 0 10px var(--admin-color); }
+        .btn-admin-kick {
+            display: block; margin-top: 10px; background: #000; 
+            border: 1px solid var(--admin-color); color: var(--admin-color); 
+            width: 100%; font-size: 0.8rem;
+        }
+        .btn-admin-kick:hover { background: var(--admin-color); color: #000; }
 
         .form-group { margin-bottom: 1.5rem; }
         label { display: block; margin-bottom: 0.5rem; color: var(--accent-color); font-size: 1rem; font-weight: bold; }
         input, select, textarea { width: 100%; padding: 14px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--text-main); font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; font-weight: 600; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 10px rgba(255, 85, 0, 0.2); }
-
-        /* CHECKBOX GRID */
         .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #080808; padding: 10px; border: 1px solid var(--border-color); }
         .checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
-        .checkbox-item input { width: 18px; height: 18px; margin: 0; padding: 0; }
+        .checkbox-item input { width: 18px; height: 18px; }
 
         /* --- MODALS --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; display: flex; justify-content: center; align-items: center; }
@@ -164,6 +167,8 @@
                 REGION: <strong id="u-region" style="color:var(--text-main)">-</strong> //
                 TZ: <strong id="u-timezone" style="color:var(--accent-color)">-</strong>
             </div>
+            <div id="admin-badge" style="display:none; color:var(--admin-color); font-weight:bold; margin-bottom:20px; border:1px solid var(--admin-color); padding:5px; display:inline-block;">[COMMANDER ACCESS GRANTED]</div>
+            <br>
             <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                 <button id="openScheduleBtn" class="btn-secondary">EDIT SCHEDULE</button>
                 <button id="openProfileModalBtn" class="btn-secondary">EDIT PROFILE</button>
@@ -185,64 +190,28 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v12.0 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v13.0 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="scheduleModal" class="modal-overlay hidden">
         <div class="modal-content"><div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal">[X]</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form></div>
     </div>
-
     <div id="profileModal" class="modal-overlay hidden">
         <div class="modal-content"><div class="modal-header"><h3>EDIT ID CARD</h3><button class="close-modal">[X]</button></div><form id="editProfileForm"><div class="form-group"><label>COMBAT PREFERENCE</label><select id="ep-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div><div class="form-group"><label>DEPLOYMENT REGION</label><select id="ep-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option></select></div><div class="form-group"><label>LOCAL TIMEZONE</label><select id="ep-timezone"></select></div><button type="submit" class="btn-primary">SAVE CHANGES</button></form></div>
     </div>
-
     <div id="eventModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-header"><h3>MISSION BRIEFING</h3><button class="close-modal">[X]</button></div>
-            <form id="eventForm">
-                <div class="form-group"><label>OPERATION NAME</label><input id="e-title" required></div>
-                <div class="form-group"><label>MISSION TYPE</label>
-                    <select id="e-type">
-                        <option value="Standard Raid">Standard Raid (30m)</option>
-                        <option value="Locked Gate">Locked Gate (40m)</option>
-                        <option value="Hidden Bunker">Hidden Bunker (30m)</option>
-                        <option value="Matriarch">Matriarch Boss (30m)</option>
-                        <option value="Harvester">Harvester (30m)</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>DETAILS</label><textarea id="e-desc" rows="3"></textarea></div>
-                <div class="form-group"><label>T-MINUS (TIME)</label><input id="e-time" type="datetime-local" required></div>
-                <div class="form-group"><label>MISSION TIMEZONE</label><select id="e-timezone"></select></div>
-                <div class="form-group"><label>THEATER</label><select id="e-region"><option>NA</option><option>EU</option></select></div>
-                
-                <div class="form-group">
-                    <label>CONDITIONS</label>
-                    <div class="checkbox-grid">
-                        <div class="checkbox-item"><input type="checkbox" name="cond" value="Bird City"> Bird City</div>
-                        <div class="checkbox-item"><input type="checkbox" name="cond" value="Night Raid"> Night Raid</div>
-                        <div class="checkbox-item"><input type="checkbox" name="cond" value="EM Storm"> EM Storm</div>
-                        <div class="checkbox-item"><input type="checkbox" name="cond" value="Lush Blooms"> Lush Blooms</div>
-                        <div class="checkbox-item"><input type="checkbox" name="cond" value="Husk Graveyard"> Husk Graveyard</div>
-                        <div class="checkbox-item"><input type="checkbox" name="cond" value="Uncovered Caches"> Uncovered Caches</div>
-                        <div class="checkbox-item"><input type="checkbox" name="cond" value="Launch Tower"> Launch Tower Loot</div>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-primary">INITIATE MISSION</button>
-            </form>
-        </div>
+        <div class="modal-content"><div class="modal-header"><h3>MISSION BRIEFING</h3><button class="close-modal">[X]</button></div><form id="eventForm"><div class="form-group"><label>OPERATION NAME</label><input id="e-title" required></div><div class="form-group"><label>MISSION TYPE</label><select id="e-type"><option value="Standard Raid">Standard Raid (30m)</option><option value="Locked Gate">Locked Gate (40m)</option><option value="Hidden Bunker">Hidden Bunker (30m)</option><option value="Matriarch">Matriarch Boss (30m)</option><option value="Harvester">Harvester (30m)</option></select></div><div class="form-group"><label>DETAILS</label><textarea id="e-desc" rows="3"></textarea></div><div class="form-group"><label>T-MINUS (TIME)</label><input id="e-time" type="datetime-local" required></div><div class="form-group"><label>MISSION TIMEZONE</label><select id="e-timezone"></select></div><div class="form-group"><label>THEATER</label><select id="e-region"><option>NA</option><option>EU</option></select></div><div class="form-group"><label>CONDITIONS</label><div class="checkbox-grid"><div class="checkbox-item"><input type="checkbox" name="cond" value="Bird City"> Bird City</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Night Raid"> Night Raid</div><div class="checkbox-item"><input type="checkbox" name="cond" value="EM Storm"> EM Storm</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Lush Blooms"> Lush Blooms</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Husk Graveyard"> Husk Graveyard</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Uncovered Caches"> Uncovered Caches</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Launch Tower"> Launch Tower Loot</div></div></div><button type="submit" class="btn-primary">INITIATE MISSION</button></form></div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v12.0 [SPECIALIST] ONLINE...");
+            console.log("🚀 ARC SYSTEM v13.0 [COMMANDER] ONLINE...");
             
             dayjs.extend(window.dayjs_plugin_utc);
             dayjs.extend(window.dayjs_plugin_timezone);
             dayjs.extend(window.dayjs_plugin_relativeTime);
 
             const MISSION_DURATIONS = { 'Locked Gate': 40, 'default': 30 };
-
             const CONFIG = {
                 url: 'https://olmaoftlbrookqwxvlvx.supabase.co',
                 key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo'
@@ -251,23 +220,18 @@
             let currentUser = null;
             let profilesMap = {};
             let userTimezone = dayjs.tz.guess();
+            let isAdmin = false; // ADMIN FLAG
 
             // --- HELPERS ---
             function populateTimezones(selectId) {
                 const select = document.getElementById(selectId);
-                if(!select) return;
-                select.innerHTML = '';
-                const tzs = Intl.supportedValuesOf('timeZone');
-                tzs.forEach(tz => {
-                    const opt = document.createElement('option');
-                    opt.value = tz; opt.text = tz;
-                    if(tz === userTimezone) opt.selected = true;
-                    select.appendChild(opt);
+                if(!select) return; select.innerHTML = '';
+                Intl.supportedValuesOf('timeZone').forEach(tz => {
+                    const opt = document.createElement('option'); opt.value = tz; opt.text = tz;
+                    if(tz === userTimezone) opt.selected = true; select.appendChild(opt);
                 });
             }
-            populateTimezones('ep-timezone'); 
-            populateTimezones('p-timezone');
-            populateTimezones('e-timezone');
+            populateTimezones('ep-timezone'); populateTimezones('p-timezone'); populateTimezones('e-timezone');
 
             // --- NAV ---
             function navTo(pageId) {
@@ -301,11 +265,16 @@
                 await loadProfilesCache();
                 const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
                 if (data) {
+                    isAdmin = data.is_admin || false; // CHECK ADMIN STATUS
+                    
                     document.getElementById('u-name').textContent = data.discord_name;
                     document.getElementById('u-avatar').src = data.avatar_url || 'https://placehold.co/50';
                     document.getElementById('u-playstyle').textContent = data.play_style;
                     document.getElementById('u-region').textContent = data.region;
                     document.getElementById('u-timezone').textContent = data.timezone || userTimezone;
+                    
+                    if(isAdmin) document.getElementById('admin-badge').style.display = 'inline-block';
+
                     userTimezone = data.timezone || dayjs.tz.guess();
                     if(data.availability_json) populateScheduleModal(data.availability_json); else populateScheduleModal(null);
                     navTo('dashboard');
@@ -353,6 +322,7 @@
                     const attending = signups.filter(s => s.event_id === ev.id);
                     const isSignedUp = attending.some(s => s.user_id === currentUser.id);
                     const isHost = ev.host_id === currentUser.id;
+                    const canDelete = isHost || isAdmin; // ADMIN OVERRIDE
 
                     const eventTimeUTC = dayjs(ev.start_time);
                     const userTime = eventTimeUTC.tz(userTimezone);
@@ -366,21 +336,18 @@
 
                     grid.innerHTML += `
                         <div class="event-card">
-                            ${isHost ? `<button class="delete-event-btn" onclick="window.deleteEvent('${ev.id}')">[X]</button>` : ''}
+                            ${canDelete ? `<button class="btn-admin-delete" onclick="window.deleteEvent('${ev.id}')">${isAdmin && !isHost ? '[OVERRIDE]' : '[TERMINATE]'}</button>` : ''}
                             <div id="${timerId}" class="countdown-timer">T-MINUS: CALC...</div>
                             <div class="time-display-group">
                                 <div class="local-time">${userTime.format('MMM D, HH:mm')} (${dayjs().tz(userTimezone).format('z')})</div>
                                 <div class="host-time">ORIGIN: ${hostTime.format('HH:mm')} (${hostTZ})</div>
                             </div>
-                            
                             <div class="mission-type">${ev.mission_type || 'Standard Raid'} (${duration}m)</div>
                             <div class="condition-tags">${tagsHtml}</div>
-
                             <div class="sync-group">
                                 <button class="btn-sync" onclick="window.downloadICS('${ev.id}', '${ev.title}', '${ev.start_time}', '${ev.description}', ${duration})">[ICS FILE]</button>
                                 <button class="btn-sync" onclick="window.openGoogleCal('${ev.title}', '${ev.start_time}', '${ev.description}', '${ev.region}', ${duration})">[GOOGLE CAL]</button>
                             </div>
-
                             <div class="event-title">${ev.title}</div>
                             <div style="font-size:1rem; color:var(--accent-color); font-weight:bold;">LEADER: ${host} // ${ev.region}</div>
                             <p style="color:var(--text-dim); margin-bottom:10px; font-size:1.1rem;">${ev.description || 'NO INTEL.'}</p>
@@ -395,7 +362,7 @@
                 const el = document.getElementById(elementId); if(!el) return;
                 const update = () => {
                     const now = dayjs(); const diff = targetTime.diff(now);
-                    if(diff <= 0) { el.textContent = "STATUS: ACTIVE"; el.style.color = "white"; el.style.backgroundColor = "var(--accent-color)"; } 
+                    if(diff <= 0) { el.textContent = "STATUS: ACTIVE / DEPLOYED"; el.style.color = "white"; el.style.backgroundColor = "var(--accent-color)"; } 
                     else {
                         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                         const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
@@ -407,15 +374,13 @@
                 update(); setInterval(update, 1000);
             }
 
-            // SYNC ACTIONS (UPDATED FOR DURATION)
+            // --- SYNC ACTIONS ---
             window.downloadICS = (id, title, startUTC, desc, duration) => {
                 const start = dayjs(startUTC).format('YYYYMMDDTHHmmss') + 'Z';
                 const end = dayjs(startUTC).add(duration, 'minute').format('YYYYMMDDTHHmmss') + 'Z';
                 const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Mission: ${title}\nDTSTART:${start}\nDTEND:${end}\nDESCRIPTION:${desc || 'Raid Mission'}\nEND:VEVENT\nEND:VCALENDAR`;
-                const blob = new Blob([icsContent], { type: 'text/calendar' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url; a.download = `mission_${id}.ics`;
-                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                const blob = new Blob([icsContent], { type: 'text/calendar' }); const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = `mission_${id}.ics`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
             };
             window.openGoogleCal = (title, startUTC, desc, loc, duration) => {
                 const start = dayjs(startUTC).format('YYYYMMDDTHHmmss') + 'Z';
@@ -424,19 +389,27 @@
                 window.open(gUrl, '_blank');
             };
 
-            // GLOBAL ACTIONS
+            // --- GLOBAL ACTIONS ---
             window.joinEvent = async (id) => { await supabaseClient.from('event_signups').insert({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.leaveEvent = async (id) => { await supabaseClient.from('event_signups').delete().match({event_id: id, user_id: currentUser.id}); loadBoard(); };
-            window.deleteEvent = async (id) => { if(confirm('TERMINATE MISSION?')) { await supabaseClient.from('events').delete().eq('id', id); loadBoard(); } };
+            
+            // DELETE: Works for Host OR Admin now
+            window.deleteEvent = async (id) => { if(confirm('CONFIRM DELETION?')) { await supabaseClient.from('events').delete().eq('id', id); loadBoard(); } };
+            
+            // KICK (Admin Only)
+            window.kickUser = async (id) => {
+                if(confirm('CONFIRM DISCHARGE? This will delete the user profile.')) {
+                    const { error } = await supabaseClient.from('profiles').delete().eq('id', id);
+                    if(error) alert(error.message); else loadRoster();
+                }
+            };
 
-            // EVENT FORM SUBMIT
+            // --- EVENT SUBMIT ---
             document.getElementById('eventForm').onsubmit = async (e) => {
                 e.preventDefault();
                 const eTime = document.getElementById('e-time').value;
                 const eZone = document.getElementById('e-timezone').value;
                 const utcDate = dayjs.tz(eTime, eZone).utc().format();
-                
-                // Capture checkboxes
                 const conditions = [];
                 document.querySelectorAll('input[name="cond"]:checked').forEach(cb => conditions.push(cb.value));
 
@@ -450,11 +423,10 @@
                     conditions: conditions,
                     host_id: currentUser.id
                 });
-                if(!error) { eModal.classList.add('hidden'); loadBoard(); }
-                else { alert(error.message); }
+                if(!error) { eModal.classList.add('hidden'); loadBoard(); } else { alert(error.message); }
             };
 
-            // SCHEDULE (PRESERVED)
+            // --- ROSTER (Updated for Admin) ---
             async function loadRoster() {
                 const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Scanning...';
                 const { data: profiles } = await supabaseClient.from('profiles').select('*');
@@ -467,9 +439,16 @@
                         const times = slots.map(s => `${s.start}-${s.end}`).join(' // ');
                         status = `<span style="color:var(--success-color)">ACTIVE: ${times}</span>`;
                     }
-                    grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url}" class="member-avatar"><div><h3>${p.discord_name}</h3><div style="font-size:1rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div></div></div><div style="margin-top:15px; border-top:2px dashed #333; padding-top:10px; font-weight:bold;">${status}</div></div>`;
+                    // Add Kick Button if Admin
+                    const kickBtn = isAdmin && p.id !== currentUser.id 
+                        ? `<button class="btn-admin-kick" onclick="window.kickUser('${p.id}')">[DISCHARGE AGENT]</button>` 
+                        : '';
+
+                    grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url}" class="member-avatar"><div><h3>${p.discord_name}</h3><div style="font-size:1rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div></div></div><div style="margin-top:15px; border-top:2px dashed #333; padding-top:10px; font-weight:bold;">${status}</div>${kickBtn}</div>`;
                 });
             }
+
+            // SCHEDULE
             function populateScheduleModal(json) {
                 const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
                 const cont = document.getElementById('daysContainer'); cont.innerHTML = '';
