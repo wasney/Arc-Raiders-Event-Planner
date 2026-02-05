@@ -7,158 +7,99 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/utc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/timezone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>
 
     <style>
         /* --- ARC PALETTE --- */
         :root {
-            --bg-color: #050505;
-            --card-bg: #111111;
-            --accent-color: #ff5500;
-            --text-main: #ffffff; /* Pure white for max contrast */
-            --text-dim: #888888;  /* Lighter gray for readability */
-            --border-color: #333333;
-            --success-color: #00ff41;
-            --danger-color: #ff3333;
-            --input-bg: #0a0a0a;
-            --scanline-color: rgba(0, 0, 0, 0.5);
+            --bg-color: #050505; --card-bg: #111111; --accent-color: #ff5500;
+            --text-main: #ffffff; --text-dim: #888888; --border-color: #333333;
+            --success-color: #00ff41; --danger-color: #ff3333; --input-bg: #0a0a0a;
         }
 
         /* --- GLOBAL --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Share Tech Mono', monospace;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding-bottom: 4rem;
-            overflow-x: hidden;
-            font-size: 18px; /* Increased Base Size */
-            font-weight: 500; /* Added Weight */
-            line-height: 1.5;
+            font-family: 'Share Tech Mono', monospace; background-color: var(--bg-color); color: var(--text-main);
+            padding-bottom: 4rem; overflow-x: hidden; font-size: 18px; font-weight: 500; line-height: 1.5;
         }
 
-        /* --- CRT SCANLINE OVERLAY --- */
+        /* --- CRT SCANLINES --- */
         .scanlines {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
-            background-size: 100% 4px;
-            pointer-events: none; z-index: 9999;
-            opacity: 0.4; /* Reduced opacity slightly to help readability */
+            background-size: 100% 4px; pointer-events: none; z-index: 9999; opacity: 0.4;
         }
 
         /* --- HEADER --- */
         header {
-            background-color: rgba(5, 5, 5, 0.95);
-            border-bottom: 3px solid var(--accent-color); /* Thicker line */
+            background-color: rgba(5, 5, 5, 0.95); border-bottom: 3px solid var(--accent-color);
             padding: 1.5rem 2rem; position: sticky; top: 0; z-index: 100;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .logo { 
-            font-size: 2.2rem; letter-spacing: 2px; color: var(--accent-color); 
-            text-transform: uppercase; text-shadow: 0 0 10px rgba(255, 85, 0, 0.5);
-            font-weight: 700;
-        }
+        .logo { font-size: 2.2rem; letter-spacing: 2px; color: var(--accent-color); font-weight: 700; text-shadow: 0 0 10px rgba(255,85,0,0.5); }
         nav ul { display: flex; gap: 30px; }
-        nav a { 
-            font-size: 1.2rem; color: var(--text-dim); cursor: pointer; 
-            transition: 0.2s; text-transform: uppercase; letter-spacing: 1px;
-            font-weight: 600;
-        }
-        nav a:hover, nav a.active { 
-            color: var(--text-main); text-shadow: 0 0 8px var(--text-main); 
-            border-bottom: 2px solid var(--accent-color);
-        }
+        nav a { font-size: 1.2rem; color: var(--text-dim); cursor: pointer; transition: 0.2s; font-weight: 600; text-transform: uppercase; }
+        nav a:hover, nav a.active { color: var(--text-main); text-shadow: 0 0 8px var(--text-main); border-bottom: 2px solid var(--accent-color); }
 
         /* --- LAYOUT --- */
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
         .hidden { display: none !important; }
-        
         .hero { text-align: center; padding: 6rem 1rem; }
-        .hero h1 { 
-            font-size: 3.5rem; margin-bottom: 1rem; color: var(--text-main);
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-            font-weight: 700;
-        }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 1rem; font-weight: 700; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
 
-        /* --- CARDS --- */
+        /* --- CARDS & GRID --- */
         .card, .member-card, .event-card {
-            background: var(--card-bg); 
-            border: 2px solid var(--border-color); /* Thicker border */
-            border-left: 6px solid var(--border-color);
-            padding: 2rem; margin-top: 2rem;
-            position: relative;
+            background: var(--card-bg); border: 2px solid var(--border-color); border-left: 6px solid var(--border-color);
+            padding: 2rem; margin-top: 2rem; position: relative;
         }
         .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-top: 2rem; }
 
+        /* --- EVENT SPECIFIC --- */
+        .event-card { border-left-color: var(--accent-color); }
+        .countdown-timer { 
+            font-size: 1.5rem; color: var(--success-color); font-weight: bold; 
+            background: rgba(0, 255, 65, 0.1); padding: 5px 10px; display: inline-block;
+            border: 1px solid var(--success-color); margin-bottom: 10px;
+        }
+        .time-display-group {
+            background: #080808; padding: 10px; border: 1px solid var(--border-color); margin: 10px 0;
+        }
+        .local-time { color: var(--text-main); font-size: 1.2rem; font-weight: bold; }
+        .host-time { color: var(--text-dim); font-size: 0.9rem; margin-top: 4px; }
+
         /* --- BUTTONS --- */
-        button {
-            font-family: 'Share Tech Mono', monospace; text-transform: uppercase; letter-spacing: 1px;
-            transition: all 0.2s; cursor: pointer; border: 1px solid transparent;
-            font-size: 1rem; font-weight: 700; /* Bold buttons */
-        }
-        .btn-primary {
-            background: var(--accent-color); color: #000;
-            padding: 14px 28px; width: 100%;
-        }
-        .btn-primary:hover {
-            background: #fff; color: var(--accent-color); box-shadow: 0 0 15px var(--accent-color);
-        }
-        .btn-discord {
-            background: #5865F2; color: white; padding: 14px 30px; border: none; font-size: 1.2rem;
-        }
-        .btn-discord:hover { background: #fff; color: #5865F2; }
-        
-        .btn-secondary {
-            background: transparent; border: 2px solid var(--text-dim); color: var(--text-dim);
-            padding: 10px 20px; margin-top: 1rem;
-        }
+        button { font-family: 'Share Tech Mono', monospace; text-transform: uppercase; cursor: pointer; border: 1px solid transparent; font-size: 1rem; font-weight: 700; transition: 0.2s; }
+        .btn-primary { background: var(--accent-color); color: #000; padding: 14px 28px; width: 100%; }
+        .btn-primary:hover { background: #fff; color: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); }
+        .btn-discord { background: #5865F2; color: white; padding: 14px 30px; border: none; font-size: 1.2rem; }
+        .btn-secondary { background: transparent; border: 2px solid var(--text-dim); color: var(--text-dim); padding: 10px 20px; margin-top: 1rem; }
         .btn-secondary:hover { border-color: var(--text-main); color: var(--text-main); }
-        
         .btn-join { background: transparent; border: 2px solid var(--success-color); color: var(--success-color); width: 100%; padding: 12px; margin-top:10px; }
         .btn-join:hover { background: var(--success-color); color: #000; }
-        
         .btn-leave { background: transparent; border: 2px solid var(--danger-color); color: var(--danger-color); width: 100%; padding: 12px; margin-top:10px; }
         .btn-leave:hover { background: var(--danger-color); color: #000; }
+        .delete-event-btn { position: absolute; top: 15px; right: 15px; background: none; color: var(--danger-color); font-size: 1.2rem; border: none; }
 
-        /* --- INPUTS --- */
+        /* --- FORMS --- */
         .form-group { margin-bottom: 1.5rem; }
         label { display: block; margin-bottom: 0.5rem; color: var(--accent-color); font-size: 1rem; font-weight: bold; }
-        input, select, textarea {
-            width: 100%; padding: 14px; background: var(--input-bg);
-            border: 2px solid var(--border-color); color: var(--text-main);
-            font-family: 'Share Tech Mono', monospace; font-size: 1.1rem;
-            font-weight: 600;
-        }
-        input:focus, select:focus, textarea:focus {
-            outline: none; border-color: var(--accent-color); box-shadow: 0 0 10px rgba(255, 85, 0, 0.2);
-        }
+        input, select, textarea { width: 100%; padding: 14px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--text-main); font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; font-weight: 600; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 10px rgba(255, 85, 0, 0.2); }
 
-        /* --- SPECIFIC ELEMENTS --- */
-        .member-header { display: flex; align-items: center; gap: 20px; border-bottom: 2px dashed var(--border-color); padding-bottom: 15px; }
-        .member-avatar { width: 70px; height: 70px; border: 3px solid var(--text-dim); }
-        .member-info h3 { font-size: 1.4rem; font-weight: 800; }
-        
-        .event-date { color: var(--accent-color); border: 2px solid var(--accent-color); display: inline-block; padding: 4px 8px; font-size: 1rem; margin-bottom: 8px; font-weight: bold; }
-        .event-title { font-size: 1.8rem; color: var(--text-main); margin: 10px 0; font-weight: 800; }
-        .attendees-list { background: #0a0a0a; padding: 15px; border: 2px solid var(--border-color); margin-top: 15px; font-size: 1rem; line-height: 1.6; }
+        /* --- MODALS --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; display: flex; justify-content: center; align-items: center; }
+        .modal-content { background: #000; width: 95%; max-width: 600px; padding: 2.5rem; border: 3px solid var(--accent-color); box-shadow: 0 0 40px rgba(255, 85, 0, 0.2); max-height: 90vh; overflow-y: auto; }
         
         /* --- SCHEDULE --- */
         .day-section { border: 2px solid var(--border-color); padding: 15px; margin-bottom: 15px; background: #080808; }
-        .day-check { width: 24px; height: 24px; margin-right: 15px; }
-        .day-header strong { font-size: 1.3rem; }
-        .time-slot { margin-top: 10px; padding-left: 40px; }
+        .day-header { display: flex; align-items: center; justify-content: space-between; }
+        .time-slot { margin-top: 10px; display: flex; gap: 10px; align-items: center; padding-left: 20px; }
+        .add-slot-btn { background: #111; border: 1px solid var(--success-color); color: var(--success-color); width: 30px; height: 30px; }
         .disabled-day { opacity: 0.3; }
-
-        /* --- MODALS --- */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); z-index: 200; 
-            display: flex; justify-content: center; align-items: center; 
-        }
-        .modal-content { 
-            background: #000; width: 95%; max-width: 600px; padding: 2.5rem; 
-            border: 3px solid var(--accent-color); 
-            box-shadow: 0 0 40px rgba(255, 85, 0, 0.2);
-        }
 
         @media (max-width: 768px) { header { flex-direction: column; gap: 15px; } .grid-view { grid-template-columns: 1fr; } }
     </style>
@@ -191,6 +132,7 @@
             <form id="profileForm">
                 <div class="form-group"><label>COMBAT PREFERENCE</label><select id="p-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div>
                 <div class="form-group"><label>DEPLOYMENT REGION</label><select id="p-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option></select></div>
+                <div class="form-group"><label>LOCAL TIMEZONE</label><select id="p-timezone"></select></div>
                 <button type="submit" class="btn-primary">CREATE ID CARD</button>
             </form>
         </section>
@@ -202,7 +144,8 @@
             <h2 id="u-name" style="font-size:2.5rem; margin-top:15px; font-weight:800;">UNKNOWN</h2>
             <div style="color:var(--text-dim); margin-bottom:20px; font-size:1.1rem;">
                 STYLE: <strong id="u-playstyle" style="color:var(--text-main)">-</strong> // 
-                REGION: <strong id="u-region" style="color:var(--text-main)">-</strong>
+                REGION: <strong id="u-region" style="color:var(--text-main)">-</strong> //
+                TZ: <strong id="u-timezone" style="color:var(--accent-color)">-</strong>
             </div>
             <button id="openScheduleBtn" class="btn-secondary">EDIT AVAILABILITY</button>
             <button id="logoutBtn" class="btn-secondary" style="border-color:var(--danger-color); color:var(--danger-color);">TERMINATE LINK</button>
@@ -222,22 +165,23 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM VERSION 9.1 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v10.0 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="scheduleModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal" style="background:none; border:none; color:var(--accent-color); font-size:2rem;">[X]</button></div>
+            <div class="modal-header" style="display:flex;justify-content:space-between;margin-bottom:20px;"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal" style="background:none; border:none; color:var(--accent-color); font-size:2rem;">[X]</button></div>
             <form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form>
         </div>
     </div>
     <div id="eventModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <div class="modal-header"><h3>MISSION BRIEFING</h3><button class="close-modal" style="background:none; border:none; color:var(--accent-color); font-size:2rem;">[X]</button></div>
+            <div class="modal-header" style="display:flex;justify-content:space-between;margin-bottom:20px;"><h3>MISSION BRIEFING</h3><button class="close-modal" style="background:none; border:none; color:var(--accent-color); font-size:2rem;">[X]</button></div>
             <form id="eventForm">
                 <div class="form-group"><label>OPERATION NAME</label><input id="e-title" required></div>
                 <div class="form-group"><label>DETAILS</label><textarea id="e-desc" rows="3"></textarea></div>
                 <div class="form-group"><label>T-MINUS (TIME)</label><input id="e-time" type="datetime-local" required></div>
+                <div class="form-group"><label>MISSION TIMEZONE</label><select id="e-timezone"></select></div>
                 <div class="form-group"><label>THEATER</label><select id="e-region"><option>NA</option><option>EU</option></select></div>
                 <button type="submit" class="btn-primary">INITIATE MISSION</button>
             </form>
@@ -246,7 +190,12 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v9.1 [HIGH VISIBILITY] ONLINE...");
+            console.log("🚀 ARC SYSTEM v10.0 [CHRONO] ONLINE...");
+            
+            // 1. SETUP DAYJS PLUGINS
+            dayjs.extend(window.dayjs_plugin_utc);
+            dayjs.extend(window.dayjs_plugin_timezone);
+            dayjs.extend(window.dayjs_plugin_relativeTime);
 
             const CONFIG = {
                 url: 'https://olmaoftlbrookqwxvlvx.supabase.co',
@@ -255,8 +204,25 @@
             const supabaseClient = supabase.createClient(CONFIG.url, CONFIG.key);
             let currentUser = null;
             let profilesMap = {};
+            let userTimezone = dayjs.tz.guess(); // Default to browser guess
 
-            // NAV
+            // --- TIMEZONE HELPERS ---
+            function populateTimezones(selectId) {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '';
+                const tzs = Intl.supportedValuesOf('timeZone');
+                tzs.forEach(tz => {
+                    const opt = document.createElement('option');
+                    opt.value = tz;
+                    opt.text = tz;
+                    if(tz === userTimezone) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            }
+            populateTimezones('p-timezone');
+            populateTimezones('e-timezone');
+
+            // --- NAV ---
             function navTo(pageId) {
                 console.log(`🧭 SECTOR: ${pageId}`);
                 ['login','onboarding','dashboard','roster','board'].forEach(p => document.getElementById(p+'-section').classList.add('hidden'));
@@ -269,7 +235,7 @@
             document.getElementById('nav-board').onclick = () => navTo('board');
             document.getElementById('resetAppBtn').onclick = () => { localStorage.clear(); window.location.reload(); };
 
-            // AUTH
+            // --- AUTH ---
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) { currentUser = session.user; await checkProfile(); }
             else { supabaseClient.auth.onAuthStateChange(async (e, session) => { if (session) { currentUser = session.user; await checkProfile(); } }); }
@@ -280,7 +246,7 @@
             };
             document.getElementById('logoutBtn').onclick = async () => { await supabaseClient.auth.signOut(); window.location.reload(); };
 
-            // DATA
+            // --- PROFILE ---
             async function loadProfilesCache() {
                 const { data } = await supabaseClient.from('profiles').select('id, discord_name');
                 if(data) data.forEach(p => profilesMap[p.id] = p.discord_name);
@@ -293,6 +259,11 @@
                     document.getElementById('u-avatar').src = data.avatar_url || 'https://placehold.co/50';
                     document.getElementById('u-playstyle').textContent = data.play_style;
                     document.getElementById('u-region').textContent = data.region;
+                    document.getElementById('u-timezone').textContent = data.timezone || userTimezone;
+                    
+                    // Update global var for calculations
+                    userTimezone = data.timezone || dayjs.tz.guess();
+                    
                     if(data.availability_json) populateScheduleModal(data.availability_json);
                     else populateScheduleModal(null);
                     navTo('dashboard');
@@ -303,12 +274,14 @@
                 const { error } = await supabaseClient.from('profiles').upsert({
                     id: currentUser.id, discord_name: currentUser.user_metadata.full_name || "Raider",
                     avatar_url: currentUser.user_metadata.avatar_url,
-                    play_style: document.getElementById('p-style').value, region: document.getElementById('p-region').value
+                    play_style: document.getElementById('p-style').value,
+                    region: document.getElementById('p-region').value,
+                    timezone: document.getElementById('p-timezone').value
                 });
                 if(!error) checkProfile();
             };
 
-            // ROSTER
+            // --- ROSTER ---
             async function loadRoster() {
                 const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Scanning...';
                 const { data: profiles } = await supabaseClient.from('profiles').select('*');
@@ -325,43 +298,88 @@
                 });
             }
 
-            // BOARD
+            // --- BOARD (WITH TIMEZONES & COUNTDOWN) ---
             async function loadBoard() {
                 const grid = document.getElementById('eventsGrid'); grid.innerHTML = 'Scanning...';
                 const { data: events } = await supabaseClient.from('events').select('*').order('start_time', {ascending: true});
                 const { data: signups } = await supabaseClient.from('event_signups').select('*');
                 grid.innerHTML = '';
                 if(!events || events.length === 0) { grid.innerHTML = '<p style="color:var(--text-dim); font-size:1.2rem;">NO OPERATIONS FOUND.</p>'; return; }
+                
                 events.forEach(ev => {
                     const host = profilesMap[ev.host_id] || 'UNKNOWN';
                     const attending = signups.filter(s => s.event_id === ev.id);
                     const isSignedUp = attending.some(s => s.user_id === currentUser.id);
                     const isHost = ev.host_id === currentUser.id;
+
+                    // Time Calcs
+                    const eventTimeUTC = dayjs(ev.start_time); // Supabase returns UTC ISO
+                    const userTime = eventTimeUTC.tz(userTimezone);
+                    const hostTZ = ev.timezone || 'UTC';
+                    const hostTime = eventTimeUTC.tz(hostTZ);
+
+                    // Countdown ID
+                    const timerId = `timer-${ev.id}`;
+
                     grid.innerHTML += `
                         <div class="event-card">
-                            ${isHost ? `<button class="delete-event-btn" onclick="window.deleteEvent('${ev.id}')">[TERMINATE]</button>` : ''}
-                            <div class="event-date">T-MINUS: ${new Date(ev.start_time).toLocaleString()}</div>
+                            ${isHost ? `<button class="delete-event-btn" onclick="window.deleteEvent('${ev.id}')">[X]</button>` : ''}
+                            
+                            <div id="${timerId}" class="countdown-timer">T-MINUS: CALC...</div>
+
+                            <div class="time-display-group">
+                                <div class="local-time">${userTime.format('MMM D, HH:mm')} (${dayjs().tz(userTimezone).format('z')})</div>
+                                <div class="host-time">ORIGIN: ${hostTime.format('HH:mm')} (${hostTZ})</div>
+                            </div>
+
                             <div class="event-title">${ev.title}</div>
-                            <div style="font-size:1rem; color:var(--accent-color); font-weight:bold;">LEADER: ${host} // THEATER: ${ev.region}</div>
-                            <p style="color:var(--text-dim); margin-bottom:10px; font-size:1.1rem;">${ev.description || 'NO INTEL PROVIDED.'}</p>
+                            <div style="font-size:1rem; color:var(--accent-color); font-weight:bold;">LEADER: ${host} // ${ev.region}</div>
+                            <p style="color:var(--text-dim); margin-bottom:10px; font-size:1.1rem;">${ev.description || 'NO INTEL.'}</p>
                             <div class="attendees-list">SQUAD [${attending.length}]: ${attending.map(s => `<span class="attendee-pill">${profilesMap[s.user_id]||'???'}</span>`).join('')}</div>
                             ${isSignedUp ? `<button class="btn-leave" onclick="window.leaveEvent('${ev.id}')">ABORT MISSION</button>` : `<button class="btn-join" onclick="window.joinEvent('${ev.id}')">JOIN SQUAD</button>`}
                         </div>`;
+
+                    // Start Interval for this card
+                    startTimer(timerId, eventTimeUTC);
                 });
+            }
+
+            function startTimer(elementId, targetTime) {
+                const el = document.getElementById(elementId);
+                if(!el) return;
+                
+                const update = () => {
+                    const now = dayjs();
+                    const diff = targetTime.diff(now);
+                    
+                    if(diff <= 0) {
+                        el.textContent = "STATUS: ACTIVE / DEPLOYED";
+                        el.style.color = "white";
+                        el.style.backgroundColor = "var(--accent-color)";
+                    } else {
+                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                        const m = Math.floor((diff / 1000 / 60) % 60);
+                        const s = Math.floor((diff / 1000) % 60);
+                        el.textContent = `T-MINUS: ${d}d ${h}h ${m}m ${s}s`;
+                    }
+                };
+                update(); // Run immediately
+                setInterval(update, 1000);
             }
 
             window.joinEvent = async (id) => { await supabaseClient.from('event_signups').insert({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.leaveEvent = async (id) => { await supabaseClient.from('event_signups').delete().match({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.deleteEvent = async (id) => { if(confirm('TERMINATE MISSION?')) { await supabaseClient.from('events').delete().eq('id', id); loadBoard(); } };
 
-            // MODALS
+            // --- MODALS & FORMS ---
             const sModal = document.getElementById('scheduleModal');
             const eModal = document.getElementById('eventModal');
             document.getElementById('openScheduleBtn').onclick = () => sModal.classList.remove('hidden');
             document.getElementById('openEventModalBtn').onclick = () => eModal.classList.remove('hidden');
             document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => { sModal.classList.add('hidden'); eModal.classList.add('hidden'); });
 
-            // LOGIC
+            // SCHEDULE (PRESERVED)
             function populateScheduleModal(json) {
                 const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
                 const cont = document.getElementById('daysContainer'); cont.innerHTML = '';
@@ -395,16 +413,28 @@
                 await supabaseClient.from('profiles').update({availability_json: res}).eq('id', currentUser.id);
                 sModal.classList.add('hidden'); checkProfile();
             };
+
+            // NEW EVENT FORM SUBMIT
             document.getElementById('eventForm').onsubmit = async (e) => {
                 e.preventDefault();
-                await supabaseClient.from('events').insert({
+                const eTime = document.getElementById('e-time').value; // Local browser time string
+                const eZone = document.getElementById('e-timezone').value;
+                
+                // Convert local input to UTC based on selected timezone
+                // We assume input is "local" to the selected timezone
+                const utcDate = dayjs.tz(eTime, eZone).utc().format();
+
+                const { error } = await supabaseClient.from('events').insert({
                     title: document.getElementById('e-title').value,
                     description: document.getElementById('e-desc').value,
-                    start_time: document.getElementById('e-time').value,
+                    start_time: utcDate,
                     region: document.getElementById('e-region').value,
+                    timezone: eZone,
                     host_id: currentUser.id
                 });
-                eModal.classList.add('hidden'); loadBoard();
+                
+                if(!error) { eModal.classList.add('hidden'); loadBoard(); }
+                else { alert(error.message); }
             };
         });
     </script>
