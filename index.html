@@ -341,26 +341,36 @@
             }
         });
 
-        // --- PROFILE LOGIC ---
+        // --- PROFILE LOGIC (FIXED) ---
         async function checkProfile(session) {
             const user = session.user;
+            
+            // Try to find existing profile
             const { data, error } = await supabaseClient
                 .from('profiles')
                 .select('*')
                 .eq('id', user.id)
                 .single();
 
+            // If error is not "Row Missing" (PGRST116), it's a real problem (network, etc)
+            if (error && error.code !== 'PGRST116') {
+                console.error("Critical Profile Error:", error);
+                alert("Database Connection Error: " + error.message);
+                return;
+            }
+
             if (data) {
+                // SUCCESS: Profile found
                 showDashboard(session, data);
-                // Pre-fill schedule if exists
                 if(data.availability_json) {
                     populateScheduleModal(data.availability_json);
                     displayRoutineStatus.textContent = "Active";
                     displayRoutineStatus.style.color = "var(--success-color)";
                 } else {
-                    populateScheduleModal(null); // Fresh form
+                    populateScheduleModal(null);
                 }
             } else {
+                // FAILURE: No Profile -> Show Onboarding
                 showOnboarding(session);
             }
         }
@@ -368,21 +378,39 @@
         async function createProfile(e) {
             e.preventDefault();
             const { data: { user } } = await supabaseClient.auth.getUser();
+            
             const playstyle = document.getElementById('playstyle').value;
             const region = document.getElementById('region').value;
-            const discordName = user.user_metadata.full_name || "Raider";
+            const discordName = user.user_metadata.full_name || 
+                                user.user_metadata.custom_claims?.global_name || 
+                                "Raider";
             const avatarUrl = user.user_metadata.avatar_url;
 
-            await supabaseClient.from('profiles').insert({
-                id: user.id, discord_name: discordName, avatar_url: avatarUrl,
-                play_style: playstyle, region: region
-            });
-            location.reload();
+            // FIX: Use UPSERT (Update if exists, Insert if new)
+            // Also select() to get the data back immediately
+            const { data, error } = await supabaseClient
+                .from('profiles')
+                .upsert({
+                    id: user.id, 
+                    discord_name: discordName, 
+                    avatar_url: avatarUrl,
+                    play_style: playstyle, 
+                    region: region
+                })
+                .select()
+                .single();
+
+            if (error) {
+                alert("Failed to save profile: " + error.message);
+            } else {
+                // FIX: Do NOT reload. Just switch to dashboard immediately.
+                showDashboard(null, data); 
+            }
         }
 
         // --- SCHEDULE LOGIC ---
         function populateScheduleModal(savedData) {
-            daysContainer.innerHTML = ''; // Clear previous
+            daysContainer.innerHTML = ''; 
             
             DAYS.forEach(day => {
                 const dayKey = day.toLowerCase();
@@ -403,7 +431,6 @@
                     </div>
                 `;
                 
-                // Add event listener to toggle disabled state
                 const checkbox = row.querySelector('.day-check');
                 const inputs = row.querySelectorAll('input[type="time"]');
                 checkbox.addEventListener('change', (e) => {
@@ -424,7 +451,6 @@
             e.preventDefault();
             const { data: { user } } = await supabaseClient.auth.getUser();
             
-            // Build JSON Object
             const scheduleData = {};
             const rows = daysContainer.querySelectorAll('.day-row');
             
@@ -441,9 +467,6 @@
                 };
             });
 
-            console.log("Saving Schedule:", scheduleData);
-
-            // Send to Supabase
             const { error } = await supabaseClient
                 .from('profiles')
                 .update({ availability_json: scheduleData })
@@ -464,10 +487,13 @@
             loginSection.classList.add('hidden');
             onboardingSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
-            userNameDisplay.textContent = `Welcome, ${profileData.discord_name}`;
-            if (profileData.avatar_url) userAvatarDisplay.src = profileData.avatar_url;
-            displayPlaystyle.textContent = profileData.play_style;
-            displayRegion.textContent = profileData.region;
+            
+            if(profileData) {
+                userNameDisplay.textContent = `Welcome, ${profileData.discord_name}`;
+                if (profileData.avatar_url) userAvatarDisplay.src = profileData.avatar_url;
+                displayPlaystyle.textContent = profileData.play_style;
+                displayRegion.textContent = profileData.region;
+            }
         }
 
         function showOnboarding(session) {
@@ -484,7 +510,6 @@
         if (logoutBtn) logoutBtn.addEventListener('click', signOut);
         if (profileForm) profileForm.addEventListener('submit', createProfile);
         
-        // Modal Listeners
         if (editScheduleBtn) editScheduleBtn.addEventListener('click', openModal);
         if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
         if (scheduleForm) scheduleForm.addEventListener('submit', saveSchedule);
