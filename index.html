@@ -24,194 +24,101 @@
             --danger-color: #e74c3c;
         }
 
-        /* --- GLOBAL STYLES --- */
+        /* --- GLOBAL --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding-bottom: 4rem; }
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; }
 
-        /* --- NAVIGATION --- */
+        /* --- NAV --- */
         header {
-            background-color: rgba(15, 16, 18, 0.95);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background-color: rgba(15, 16, 18, 0.95); border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem; position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--accent-color);
-            letter-spacing: -0.5px;
-            text-transform: uppercase;
-        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); text-transform: uppercase; }
         nav ul { display: flex; gap: 20px; }
-        nav a { font-size: 0.9rem; font-weight: 600; color: var(--text-dim); transition: color 0.3s; }
-        nav a:hover { color: var(--accent-color); }
+        nav a { font-size: 0.9rem; font-weight: 600; color: var(--text-dim); transition: color 0.3s; cursor: pointer; }
+        nav a:hover, nav a.active { color: var(--accent-color); }
         .nav-external { color: #4cd1ff !important; }
 
         /* --- LAYOUT --- */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        .hero {
-            text-align: center;
-            padding: 4rem 1rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .hero { text-align: center; padding: 4rem 1rem; max-width: 800px; margin: 0 auto; }
         .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; font-weight: 800; }
-        .hero p { font-size: 1.1rem; color: var(--text-dim); margin-bottom: 2rem; }
-
-        /* --- BUTTONS --- */
-        .btn-discord {
-            background-color: #5865F2;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            border: none;
-            font-size: 1rem;
-        }
-        .btn-discord:hover { background-color: #4752C4; }
-
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            font-size: 1rem;
-            margin-top: 1rem;
-        }
-        .btn-primary:hover { opacity: 0.9; }
-
-        .btn-secondary {
-            background-color: transparent;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 1rem;
-        }
-        .btn-secondary:hover { background-color: rgba(255, 76, 41, 0.1); }
-
-        .btn-logout {
-            background-color: var(--card-bg);
-            color: var(--text-dim);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-top: 2rem;
-        }
-
-        /* --- CARDS & FORMS --- */
+        
+        /* --- CARDS & GRID --- */
         .card {
-            max-width: 600px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-            margin-top: 2rem;
+            max-width: 600px; margin: 0 auto; background: var(--card-bg);
+            padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color);
+            text-align: center; margin-top: 2rem;
         }
+
+        /* ROSTER GRID */
+        .roster-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px; margin-top: 2rem;
+        }
+        .member-card {
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 10px;
+        }
+        .member-header { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .member-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent-color); }
+        .member-info h3 { font-size: 1.1rem; margin: 0; }
+        .member-meta { font-size: 0.85rem; color: var(--text-dim); }
+        
+        .availability-box {
+            background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; margin-top: 5px;
+        }
+        .status-indicator { font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .dot.online { background-color: var(--success-color); box-shadow: 0 0 8px var(--success-color); }
+        .dot.offline { background-color: var(--border-color); }
+
+        /* --- FORMS & INPUTS --- */
         .form-group { margin-bottom: 1.5rem; text-align: left; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-dim); }
         select, input {
             width: 100%; padding: 12px; background-color: var(--input-bg);
             border: 1px solid var(--border-color); border-radius: 4px;
-            color: var(--text-main); font-family: inherit;
-        }
-        
-        .user-info { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-        .avatar { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent-color); }
-        .status-badge {
-            background: rgba(46, 204, 113, 0.2); color: var(--success-color);
-            padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;
-        }
-        .profile-details {
-            margin-top: 1rem; text-align: left; width: 100%;
-            background: var(--bg-color); padding: 1rem; border-radius: 4px;
-        }
-        .detail-row {
-            display: flex; justify-content: space-between; margin-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;
+            color: var(--text-main);
         }
 
-        /* --- MODAL (MULTI-SLOT STYLE) --- */
+        /* --- BUTTONS --- */
+        .btn-primary { background-color: var(--accent-color); color: white; padding: 12px 24px; border-radius: 4px; font-weight: 600; border: none; cursor: pointer; width: 100%; }
+        .btn-secondary { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 1rem; }
+        .btn-discord { background-color: #5865F2; color: white; padding: 12px 24px; border-radius: 4px; font-weight: 600; cursor: pointer; border: none; }
+        .btn-logout { background-color: var(--card-bg); color: var(--text-dim); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 2rem; }
+
+        /* --- MODAL --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8); z-index: 200;
-            display: flex; justify-content: center; align-items: center;
-            backdrop-filter: blur(2px);
+            display: flex; justify-content: center; align-items: center; backdrop-filter: blur(2px);
         }
         .modal-content {
             background: var(--modal-bg); width: 95%; max-width: 600px;
             padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);
             max-height: 90vh; overflow-y: auto;
         }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .close-btn { background: none; border: none; color: var(--text-dim); font-size: 1.5rem; cursor: pointer; }
         
-        /* Day Section */
-        .day-section {
-            background: var(--bg-color); padding: 10px; border-radius: 4px;
-            margin-bottom: 10px; border: 1px solid var(--border-color);
-        }
-        .day-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 8px;
-        }
-        .day-title-group { display: flex; align-items: center; gap: 10px; }
+        /* Schedule Editor Styles */
+        .day-section { background: var(--bg-color); padding: 10px; border-radius: 4px; margin-bottom: 10px; border: 1px solid var(--border-color); }
+        .day-header { display: flex; justify-content: space-between; align-items: center; }
+        .day-title-group { display: flex; gap: 10px; align-items: center; }
         .day-check { width: 20px; height: 20px; cursor: pointer; }
-        .day-label { font-weight: bold; font-size: 1rem; }
+        .slots-container { padding-left: 30px; margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
+        .time-slot { display: flex; gap: 5px; align-items: center; }
+        .time-slot input { padding: 4px; font-size: 0.85rem; }
+        .add-slot-btn { background: var(--card-bg); border: 1px solid var(--success-color); color: var(--success-color); border-radius: 50%; width: 24px; height: 24px; cursor: pointer; }
+        .remove-slot-btn { background: none; border: none; color: var(--danger-color); font-weight: bold; cursor: pointer; font-size: 1.2rem; }
         
-        .add-slot-btn {
-            background: var(--card-bg); border: 1px solid var(--success-color);
-            color: var(--success-color); border-radius: 50%; width: 24px; height: 24px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-weight: bold;
-        }
-
-        /* Time Slots List */
-        .slots-container { display: flex; flex-direction: column; gap: 8px; padding-left: 30px; }
-        .time-slot { display: flex; align-items: center; gap: 8px; }
-        .time-slot input { padding: 4px; font-size: 0.85rem; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 4px; }
-        .remove-slot-btn {
-            background: none; border: none; color: var(--danger-color); font-weight: bold;
-            cursor: pointer; font-size: 1.2rem; line-height: 1;
-        }
-
-        .disabled-day { opacity: 0.5; }
         .hidden { display: none !important; }
+        .disabled-day { opacity: 0.5; }
 
         @media (max-width: 768px) {
             header { flex-direction: column; gap: 10px; }
-            nav ul { gap: 15px; }
-            .hero h1 { font-size: 2rem; }
+            .roster-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -221,7 +128,8 @@
         <div class="logo">RAIDER // SIGNAL</div>
         <nav>
             <ul>
-                <li><a href="#">Home</a></li>
+                <li><a id="nav-home" class="active">Profile</a></li>
+                <li><a id="nav-roster">Guild Roster</a></li>
                 <li><a href="https://first-wave-bp-share.netlify.app/" target="_blank" class="nav-external">Blueprint Tool ↗</a></li>
             </ul>
         </nav>
@@ -238,7 +146,7 @@
             <h2>Operator Registration</h2>
             <form id="profileForm">
                 <div class="form-group">
-                    <label for="playstyle">Preferred Playstyle</label>
+                    <label>Playstyle</label>
                     <select id="playstyle" required>
                         <option value="PvP">PvP</option>
                         <option value="PvE">PvE</option>
@@ -246,7 +154,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="region">Region</label>
+                    <label>Region</label>
                     <select id="region" required>
                         <option value="NA">North America</option>
                         <option value="EU">Europe</option>
@@ -260,30 +168,35 @@
         </section>
         
         <section id="dashboard-section" class="card hidden">
-            <div class="user-info">
-                <img id="userAvatar" src="" alt="Avatar" class="avatar">
-                <h2 id="userName">Welcome, Raider</h2>
-                <span class="status-badge">● SIGNAL ESTABLISHED</span>
+            <div class="user-info" style="display:flex; flex-direction:column; align-items:center; gap:1rem;">
+                <img id="userAvatar" src="" alt="Avatar" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--accent-color);">
+                <h2 id="userName">Welcome</h2>
+                <span style="color:var(--success-color); font-size:0.8rem;">● SIGNAL ESTABLISHED</span>
             </div>
-            <div class="profile-details">
-                <div class="detail-row"><span>Playstyle:</span><strong id="displayPlaystyle">-</strong></div>
-                <div class="detail-row"><span>Region:</span><strong id="displayRegion">-</strong></div>
-                <div class="detail-row" style="border: none;"><span>Routine:</span><strong id="displayRoutineStatus">Not Set</strong></div>
+            <div style="margin-top:1rem; text-align:left; background:var(--bg-color); padding:1rem; border-radius:4px;">
+                <p><strong>Playstyle:</strong> <span id="displayPlaystyle">-</span></p>
+                <p><strong>Region:</strong> <span id="displayRegion">-</span></p>
             </div>
             <button id="editScheduleBtn" class="btn-secondary">Edit Weekly Schedule</button>
-            <button id="logoutBtn" class="btn-logout">Disconnect Signal (Logout)</button>
+            <button id="logoutBtn" class="btn-logout">Logout</button>
+        </section>
+
+        <section id="roster-section" class="hidden">
+            <h2 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Guild Roster</h2>
+            <p style="color: var(--text-dim); margin-top: 5px;">View agent availability for today.</p>
+            
+            <div id="rosterGrid" class="roster-grid">
+                <p>Loading signals...</p>
+            </div>
         </section>
     </main>
 
     <div id="scheduleModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <div class="modal-header">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
                 <h3>Weekly Availability</h3>
-                <button id="closeModalBtn" class="close-btn">&times;</button>
+                <button id="closeModalBtn" style="background:none; border:none; color:white; font-size:1.5rem;">&times;</button>
             </div>
-            <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1rem;">
-                Add time slots for days you are active. You can add multiple slots per day.
-            </p>
             <form id="scheduleForm">
                 <div id="daysContainer"></div>
                 <button type="submit" class="btn-primary">Save Routine</button>
@@ -291,244 +204,273 @@
         </div>
     </div>
 
-    <footer>
-        &copy; 2026 Arc Raiders Guild Tool.
-    </footer>
-
     <script>
-        // --- CONFIG ---
         const SUPABASE_URL = 'https://olmaoftlbrookqwxvlvx.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- DOM ---
-        const loginSection = document.getElementById('login-section');
-        const onboardingSection = document.getElementById('onboarding-section');
-        const dashboardSection = document.getElementById('dashboard-section');
-        const scheduleModal = document.getElementById('scheduleModal');
-        const daysContainer = document.getElementById('daysContainer');
-        const editScheduleBtn = document.getElementById('editScheduleBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const scheduleForm = document.getElementById('scheduleForm');
+        // State
+        let currentUser = null;
+        const DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
-        const userNameDisplay = document.getElementById('userName');
-        const userAvatarDisplay = document.getElementById('userAvatar');
-        const displayPlaystyle = document.getElementById('displayPlaystyle');
-        const displayRegion = document.getElementById('displayRegion');
-        const displayRoutineStatus = document.getElementById('displayRoutineStatus');
+        // DOM Elements
+        const sections = {
+            login: document.getElementById('login-section'),
+            onboarding: document.getElementById('onboarding-section'),
+            dashboard: document.getElementById('dashboard-section'),
+            roster: document.getElementById('roster-section')
+        };
+        const navs = {
+            home: document.getElementById('nav-home'),
+            roster: document.getElementById('nav-roster')
+        };
 
-        const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        // --- NAVIGATION ---
+        function switchTab(tabName) {
+            // Hide all
+            Object.values(sections).forEach(el => el.classList.add('hidden'));
+            Object.values(navs).forEach(el => el?.classList.remove('active'));
+
+            if (tabName === 'home') {
+                navs.home.classList.add('active');
+                if (currentUser) checkProfile(currentUser);
+                else sections.login.classList.remove('hidden');
+            } else if (tabName === 'roster') {
+                navs.roster.classList.add('active');
+                sections.roster.classList.remove('hidden');
+                fetchRoster();
+            }
+        }
+
+        navs.home.addEventListener('click', () => switchTab('home'));
+        navs.roster.addEventListener('click', () => switchTab('roster'));
 
         // --- AUTH ---
         document.getElementById('loginBtn').addEventListener('click', async () => {
-            const currentURL = window.location.href; 
-            await supabaseClient.auth.signInWithOAuth({
-                provider: 'discord', options: { redirectTo: currentURL }
-            });
+            await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.href } });
         });
-
         document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await supabaseClient.auth.signOut(); location.reload();
+            await supabaseClient.auth.signOut(); window.location.reload();
         });
 
         supabaseClient.auth.onAuthStateChange((event, session) => {
-            if (session) checkProfile(session);
-            else {
-                loginSection.classList.remove('hidden');
-                dashboardSection.classList.add('hidden');
-                onboardingSection.classList.add('hidden');
+            if (session) {
+                currentUser = session.user;
+                switchTab('home'); // Default to home
+            } else {
+                currentUser = null;
+                sections.login.classList.remove('hidden');
             }
         });
 
         // --- PROFILE ---
-        async function checkProfile(session) {
-            const user = session.user;
+        async function checkProfile(user) {
             const { data } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
-
             if (data) {
-                showDashboard(session, data);
-                if(data.availability_json) {
-                    populateScheduleModal(data.availability_json);
-                    displayRoutineStatus.textContent = "Active";
-                    displayRoutineStatus.style.color = "var(--success-color)";
-                } else {
-                    populateScheduleModal(null);
-                }
+                showDashboard(data);
+                if (data.availability_json) populateScheduleModal(data.availability_json);
+                else populateScheduleModal(null);
             } else {
-                loginSection.classList.add('hidden');
-                dashboardSection.classList.add('hidden');
-                onboardingSection.classList.remove('hidden');
+                sections.login.classList.add('hidden');
+                sections.onboarding.classList.remove('hidden');
             }
+        }
+
+        function showDashboard(data) {
+            sections.login.classList.add('hidden');
+            sections.onboarding.classList.add('hidden');
+            sections.dashboard.classList.remove('hidden');
+            
+            document.getElementById('userName').textContent = data.discord_name;
+            if (data.avatar_url) document.getElementById('userAvatar').src = data.avatar_url;
+            document.getElementById('displayPlaystyle').textContent = data.play_style;
+            document.getElementById('displayRegion').textContent = data.region;
         }
 
         document.getElementById('profileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const { data: { user } } = await supabaseClient.auth.getUser();
             const playstyle = document.getElementById('playstyle').value;
             const region = document.getElementById('region').value;
-            const discordName = user.user_metadata.full_name || "Raider";
-            const avatarUrl = user.user_metadata.avatar_url;
-
-            const { data, error } = await supabaseClient.from('profiles')
-                .upsert({ id: user.id, discord_name: discordName, avatar_url: avatarUrl, play_style: playstyle, region: region })
-                .select().single();
-
-            if (!error) showDashboard(null, data);
+            const meta = currentUser.user_metadata;
+            
+            const { data } = await supabaseClient.from('profiles').upsert({
+                id: currentUser.id, discord_name: meta.full_name || "Raider", 
+                avatar_url: meta.avatar_url, play_style: playstyle, region: region
+            }).select().single();
+            
+            showDashboard(data);
         });
 
-        // --- NEW MULTI-SLOT SCHEDULE LOGIC ---
-        function populateScheduleModal(savedData) {
-            daysContainer.innerHTML = ''; // Reset
+        // --- ROSTER LOGIC (NEW) ---
+        async function fetchRoster() {
+            const rosterGrid = document.getElementById('rosterGrid');
+            rosterGrid.innerHTML = '<p>Scanning frequencies...</p>';
 
-            DAYS.forEach(day => {
-                const dayKey = day.toLowerCase();
-                const dayData = savedData ? savedData[dayKey] : null;
-                // Old format support (if user has old data): convert {start, end} to [{start, end}]
-                let slots = [];
-                let isActive = false;
+            const { data: profiles, error } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .order('discord_name');
 
-                if (dayData) {
-                    if (Array.isArray(dayData.slots)) {
-                        // New Format
-                        slots = dayData.slots;
-                        isActive = dayData.active;
-                    } else if (dayData.start) {
-                        // Migration for Old Format
-                        isActive = dayData.active;
-                        if(isActive) slots.push({ start: dayData.start, end: dayData.end });
+            if (error) {
+                rosterGrid.innerHTML = `<p style="color:red">Signal lost: ${error.message}</p>`;
+                return;
+            }
+
+            rosterGrid.innerHTML = ''; // Clear loading
+            
+            // Calculate Today
+            const todayIndex = new Date().getDay(); // 0 = Sunday, 1 = Monday
+            const todayName = DAYS[todayIndex];
+
+            profiles.forEach(profile => {
+                // Determine Availability
+                let isOnlineToday = false;
+                let todaySlots = [];
+                
+                if (profile.availability_json && profile.availability_json[todayName]) {
+                    const dayData = profile.availability_json[todayName];
+                    
+                    // Handle new array format
+                    if (Array.isArray(dayData.slots) && dayData.active) {
+                        isOnlineToday = true;
+                        todaySlots = dayData.slots;
+                    } 
+                    // Handle old single format (Just in case)
+                    else if (dayData.active) {
+                        isOnlineToday = true;
+                        todaySlots = [{ start: dayData.start, end: dayData.end }];
                     }
                 }
 
-                // Create Day Section
-                const daySection = document.createElement('div');
-                daySection.className = `day-section ${isActive ? '' : 'disabled-day'}`;
-                daySection.dataset.day = dayKey;
+                // Render Card
+                const card = document.createElement('div');
+                card.className = 'member-card';
+                
+                let slotsHtml = '<span style="color:var(--text-dim)">Offline Today</span>';
+                if (isOnlineToday) {
+                    const times = todaySlots.map(s => `${s.start}-${s.end}`).join(', ');
+                    slotsHtml = `<span style="color:var(--text-main)">${times}</span>`;
+                }
 
-                // 1. Header
-                const header = document.createElement('div');
-                header.className = 'day-header';
-                header.innerHTML = `
-                    <div class="day-title-group">
-                        <input type="checkbox" class="day-check" ${isActive ? 'checked' : ''}>
-                        <span class="day-label">${day}</span>
+                card.innerHTML = `
+                    <div class="member-header">
+                        <img src="${profile.avatar_url || 'https://placehold.co/50'}" class="member-avatar">
+                        <div class="member-info">
+                            <h3>${profile.discord_name}</h3>
+                            <div class="member-meta">${profile.play_style} • ${profile.region}</div>
+                        </div>
                     </div>
-                    <button type="button" class="add-slot-btn" title="Add Time Slot" ${isActive ? '' : 'disabled'}>+</button>
+                    <div class="availability-box">
+                        <div class="status-indicator">
+                            <span class="dot ${isOnlineToday ? 'online' : 'offline'}"></span>
+                            ${isOnlineToday ? 'AVAILABLE TODAY' : 'OFFLINE'}
+                        </div>
+                        <div style="margin-top:5px; font-size:0.9rem;">
+                            ${slotsHtml}
+                        </div>
+                    </div>
+                `;
+                rosterGrid.appendChild(card);
+            });
+        }
+
+        // --- SCHEDULE EDITOR (Multi-Slot) ---
+        const modal = document.getElementById('scheduleModal');
+        const daysContainer = document.getElementById('daysContainer');
+
+        document.getElementById('editScheduleBtn').addEventListener('click', () => modal.classList.remove('hidden'));
+        document.getElementById('closeModalBtn').addEventListener('click', () => modal.classList.add('hidden'));
+
+        function populateScheduleModal(json) {
+            daysContainer.innerHTML = '';
+            // Display: Monday -> Sunday (Shift the DAYS array so Monday is first for display)
+            const displayDays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+            displayDays.forEach(day => {
+                const dayData = json ? json[day] : null;
+                let isActive = false;
+                let slots = [];
+
+                if (dayData) {
+                    isActive = dayData.active;
+                    if (Array.isArray(dayData.slots)) slots = dayData.slots;
+                    else if (dayData.start) slots.push({ start: dayData.start, end: dayData.end });
+                }
+
+                const dayDiv = document.createElement('div');
+                dayDiv.className = `day-section ${isActive ? '' : 'disabled-day'}`;
+                dayDiv.innerHTML = `
+                    <div class="day-header">
+                        <div class="day-title-group">
+                            <input type="checkbox" class="day-check" ${isActive ? 'checked' : ''}>
+                            <strong style="text-transform:capitalize">${day}</strong>
+                        </div>
+                        <button type="button" class="add-slot-btn" ${isActive ? '' : 'disabled'}>+</button>
+                    </div>
+                    <div class="slots-container ${isActive ? '' : 'hidden'}"></div>
                 `;
 
-                // 2. Slots Container
-                const slotsContainer = document.createElement('div');
-                slotsContainer.className = 'slots-container';
-                if (!isActive) slotsContainer.classList.add('hidden');
+                const container = dayDiv.querySelector('.slots-container');
+                slots.forEach(s => addSlotUI(container, s.start, s.end));
 
-                // 3. Add Existing Slots
-                slots.forEach(slot => {
-                    addTimeSlotToUI(slotsContainer, slot.start, slot.end);
+                // Listeners
+                const check = dayDiv.querySelector('.day-check');
+                const addBtn = dayDiv.querySelector('.add-slot-btn');
+
+                check.addEventListener('change', (e) => {
+                    const active = e.target.checked;
+                    dayDiv.classList.toggle('disabled-day', !active);
+                    container.classList.toggle('hidden', !active);
+                    addBtn.disabled = !active;
+                    if (active && container.children.length === 0) addSlotUI(container);
                 });
 
-                // --- Event Listeners ---
-                const checkbox = header.querySelector('.day-check');
-                const addBtn = header.querySelector('.add-slot-btn');
+                addBtn.addEventListener('click', () => addSlotUI(container));
 
-                checkbox.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        daySection.classList.remove('disabled-day');
-                        slotsContainer.classList.remove('hidden');
-                        addBtn.disabled = false;
-                        // Add one empty slot if none exist
-                        if (slotsContainer.children.length === 0) {
-                            addTimeSlotToUI(slotsContainer);
-                        }
-                    } else {
-                        daySection.classList.add('disabled-day');
-                        slotsContainer.classList.add('hidden');
-                        addBtn.disabled = true;
-                    }
-                });
-
-                addBtn.addEventListener('click', () => {
-                    addTimeSlotToUI(slotsContainer);
-                });
-
-                daySection.appendChild(header);
-                daySection.appendChild(slotsContainer);
-                daysContainer.appendChild(daySection);
+                daysContainer.appendChild(dayDiv);
             });
         }
 
-        function addTimeSlotToUI(container, startVal = "18:00", endVal = "22:00") {
-            const slotRow = document.createElement('div');
-            slotRow.className = 'time-slot';
-            slotRow.innerHTML = `
-                <input type="time" class="slot-start" value="${startVal}">
-                <span>to</span>
-                <input type="time" class="slot-end" value="${endVal}">
-                <button type="button" class="remove-slot-btn" title="Remove">&times;</button>
+        function addSlotUI(container, start="18:00", end="22:00") {
+            const div = document.createElement('div');
+            div.className = 'time-slot';
+            div.innerHTML = `
+                <input type="time" class="s-start" value="${start}"> to 
+                <input type="time" class="s-end" value="${end}">
+                <button type="button" class="remove-slot-btn">&times;</button>
             `;
-
-            slotRow.querySelector('.remove-slot-btn').addEventListener('click', () => {
-                slotRow.remove();
-            });
-
-            container.appendChild(slotRow);
+            div.querySelector('button').addEventListener('click', () => div.remove());
+            container.appendChild(div);
         }
 
-        async function saveSchedule(e) {
+        document.getElementById('scheduleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const result = {};
+            const displayDays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
             
-            const scheduleData = {};
+            // We need to map the DOM elements back to the correct JSON keys
+            const dayDivs = Array.from(daysContainer.children);
             
-            // Loop through all day sections
-            const daySections = daysContainer.querySelectorAll('.day-section');
-            daySections.forEach(section => {
-                const dayKey = section.dataset.day;
-                const isActive = section.querySelector('.day-check').checked;
-                const slotRows = section.querySelectorAll('.time-slot');
-                
+            dayDivs.forEach((div, index) => {
+                const dayName = displayDays[index]; // Get key from order
+                const active = div.querySelector('.day-check').checked;
                 const slots = [];
-                if (isActive) {
-                    slotRows.forEach(row => {
+                if (active) {
+                    div.querySelectorAll('.time-slot').forEach(slot => {
                         slots.push({
-                            start: row.querySelector('.slot-start').value,
-                            end: row.querySelector('.slot-end').value
+                            start: slot.querySelector('.s-start').value,
+                            end: slot.querySelector('.s-end').value
                         });
                     });
                 }
-
-                scheduleData[dayKey] = {
-                    active: isActive,
-                    slots: slots // Saving array of slots now!
-                };
+                result[dayName] = { active, slots };
             });
 
-            console.log("Saving Multi-Slot Schedule:", scheduleData);
-
-            const { error } = await supabaseClient.from('profiles')
-                .update({ availability_json: scheduleData })
-                .eq('id', user.id);
-
-            if (error) alert("Error saving: " + error.message);
-            else {
-                scheduleModal.classList.add('hidden');
-                displayRoutineStatus.textContent = "Active";
-                displayRoutineStatus.style.color = "var(--success-color)";
-            }
-        }
-
-        // --- LISTENERS ---
-        editScheduleBtn.addEventListener('click', () => scheduleModal.classList.remove('hidden'));
-        closeModalBtn.addEventListener('click', () => scheduleModal.classList.add('hidden'));
-        scheduleForm.addEventListener('submit', saveSchedule);
-
-        function showDashboard(session, data) {
-            loginSection.classList.add('hidden');
-            onboardingSection.classList.add('hidden');
-            dashboardSection.classList.remove('hidden');
-            userNameDisplay.textContent = `Welcome, ${data.discord_name}`;
-            if(data.avatar_url) userAvatarDisplay.src = data.avatar_url;
-            displayPlaystyle.textContent = data.play_style;
-            displayRegion.textContent = data.region;
-        }
+            await supabaseClient.from('profiles').update({ availability_json: result }).eq('id', currentUser.id);
+            modal.classList.add('hidden');
+            // Refresh roster if open
+            if(!sections.roster.classList.contains('hidden')) fetchRoster();
+        });
 
     </script>
 </body>
