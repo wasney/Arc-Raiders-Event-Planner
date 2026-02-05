@@ -29,12 +29,8 @@
         .card, .member-card, .event-card { background: var(--card-bg); border: 2px solid var(--border-color); border-left: 6px solid var(--border-color); padding: 2rem; margin-top: 2rem; position: relative; }
         .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-top: 2rem; }
         .event-card { border-left-color: var(--accent-color); }
-        
-        /* LOCKED SCREEN */
         .locked-screen { text-align: center; padding: 4rem; border: 2px solid var(--locked-color); background: rgba(255, 170, 0, 0.05); color: var(--locked-color); margin-top: 2rem; }
         .locked-icon { font-size: 4rem; margin-bottom: 1rem; display: block; }
-
-        /* ELEMENTS */
         .countdown-timer { font-size: 1.5rem; color: var(--success-color); font-weight: bold; background: rgba(0, 255, 65, 0.1); padding: 5px 10px; display: inline-block; border: 1px solid var(--success-color); margin-bottom: 10px; }
         .time-display-group { background: #080808; padding: 10px; border: 1px solid var(--border-color); margin: 10px 0; }
         .local-time { color: var(--text-main); font-size: 1.2rem; font-weight: bold; }
@@ -44,7 +40,6 @@
         .mission-type { color: var(--accent-color); text-transform: uppercase; font-weight: bold; border: 1px solid var(--accent-color); padding: 2px 6px; font-size: 0.9rem; display: inline-block; margin-bottom: 5px; }
         .condition-tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 5px 0; }
         .condition-tag { font-size: 0.8rem; background: #222; color: #ccc; padding: 2px 6px; border: 1px solid #444; }
-
         button { font-family: 'Share Tech Mono', monospace; text-transform: uppercase; cursor: pointer; border: 1px solid transparent; font-size: 1rem; font-weight: 700; transition: 0.2s; }
         .btn-primary { background: var(--accent-color); color: #000; padding: 14px 28px; width: 100%; }
         .btn-primary:hover { background: #fff; color: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); }
@@ -61,14 +56,12 @@
         .btn-admin-kick { display: block; margin-top: 10px; background: #000; border: 1px solid var(--admin-color); color: var(--admin-color); width: 100%; font-size: 0.8rem; }
         .btn-admin-approve { display: block; margin-top: 10px; background: var(--success-color); color: #000; width: 100%; font-size: 0.9rem; padding: 8px; border: none; }
         .btn-admin-approve:hover { background: #fff; box-shadow: 0 0 10px var(--success-color); }
-
         .form-group { margin-bottom: 1.5rem; }
         label { display: block; margin-bottom: 0.5rem; color: var(--accent-color); font-size: 1rem; font-weight: bold; }
         input, select, textarea { width: 100%; padding: 14px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--text-main); font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; font-weight: 600; }
         .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #080808; padding: 10px; border: 1px solid var(--border-color); }
         .checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
         .checkbox-item input { width: 18px; height: 18px; }
-
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; display: flex; justify-content: center; align-items: center; }
         .modal-content { background: #000; width: 95%; max-width: 600px; padding: 2.5rem; border: 3px solid var(--accent-color); box-shadow: 0 0 40px rgba(255, 85, 0, 0.2); max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -78,7 +71,6 @@
         .time-slot { margin-top: 10px; display: flex; gap: 10px; align-items: center; padding-left: 20px; }
         .add-slot-btn { background: #111; border: 1px solid var(--success-color); color: var(--success-color); width: 30px; height: 30px; }
         .disabled-day { opacity: 0.3; }
-
         @media (max-width: 768px) { header { flex-direction: column; gap: 15px; } .grid-view { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -107,6 +99,7 @@
 
         <section id="onboarding-section" class="card hidden">
             <h2 style="color:var(--accent-color); margin-bottom:1rem;">// OPERATOR REGISTRATION</h2>
+            <p style="color:var(--text-dim); margin-bottom:1rem;">PROFILE INCOMPLETE. PLEASE UPDATE YOUR CREDENTIALS.</p>
             <form id="profileForm">
                 <div class="form-group"><label>COMBAT PREFERENCE</label><select id="p-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div>
                 <div class="form-group"><label>DEPLOYMENT REGION</label><select id="p-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option></select></div>
@@ -160,7 +153,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v15.2 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v15.3 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="scheduleModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal">[X]</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form></div></div>
@@ -169,7 +162,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v15.2 [FAST-TRACK] ONLINE...");
+            console.log("🚀 ARC SYSTEM v15.3 [SELF-REPAIR] ONLINE...");
             const REQUIRED_GUILD_ID = "1465694444484427903"; 
             
             dayjs.extend(window.dayjs_plugin_utc);
@@ -193,17 +186,18 @@
             function navTo(pageId) {
                 ['login','onboarding','dashboard','roster','board', 'locked'].forEach(p => document.getElementById(p+'-section').classList.add('hidden'));
                 
-                // GATEKEEPER LOGIC
-                if (!isVerified && pageId !== 'login' && pageId !== 'onboarding' && pageId !== 'locked') {
-                    if(pageId === 'dashboard') {
-                        document.getElementById(pageId+'-section').classList.remove('hidden');
-                        document.getElementById('main-nav').style.display = 'none';
-                        return;
-                    } else {
-                        document.getElementById('locked-section').classList.remove('hidden');
-                        document.getElementById('main-nav').style.display = 'none';
-                        return;
-                    }
+                // GATEKEEPER & REPAIR LOGIC
+                if (pageId === 'onboarding') {
+                    // Always allow access to onboarding to fix profile
+                    document.getElementById(pageId+'-section').classList.remove('hidden');
+                    document.getElementById('main-nav').style.display = 'none';
+                    return;
+                }
+
+                if (!isVerified && pageId !== 'login' && pageId !== 'locked') {
+                    document.getElementById('locked-section').classList.remove('hidden');
+                    document.getElementById('main-nav').style.display = 'none';
+                    return;
                 }
                 
                 document.getElementById('main-nav').style.display = 'flex';
@@ -213,23 +207,14 @@
             }
 
             // --- AUTH & INIT FLOW ---
-            // 1. Check if we just came back from Discord (hash in URL)
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) { 
                 currentSession = session;
                 currentUser = session.user;
-                
-                // CRITICAL FIX: If we have a provider token (fresh login), RUN GUILD CHECK IMMEDIATELY
-                if(session.provider_token) {
-                    console.log("⚡ FRESH LOGIN DETECTED. RUNNING PRIORITY SCAN.");
-                    await performGuildCheck(); 
-                }
-                
-                // Then check profile
+                if(session.provider_token) { await performGuildCheck(); }
                 await checkProfile(); 
             }
             else { 
-                // Listen for late sign-ins
                 supabaseClient.auth.onAuthStateChange(async (e, session) => { 
                     if (session) { 
                         currentSession = session;
@@ -241,16 +226,11 @@
             }
 
             // --- THE AUTO-VERIFIER ---
-            // Triggered on fresh login OR button click
             async function performGuildCheck() {
                 const statusEl = document.getElementById('locked-reason');
                 const progressEl = document.getElementById('scan-progress');
                 
-                if(!currentSession || !currentSession.provider_token) {
-                    console.log("❌ No Provider Token found in session.");
-                    statusEl.textContent = "TOKEN EXPIRED. PLEASE RE-AUTHENTICATE.";
-                    return;
-                }
+                if(!currentSession || !currentSession.provider_token) return; // Silent fail if no token
 
                 statusEl.textContent = "INITIATING GUILD SCAN...";
                 progressEl.style.display = "block";
@@ -267,10 +247,10 @@
                     if (isInGuild) {
                         statusEl.textContent = "IDENTITY CONFIRMED. UPDATING DATABASE...";
                         progressEl.style.color = "var(--success-color)";
-                        // Update DB to Verified
                         await supabaseClient.from('profiles').update({ status: 'verified' }).eq('id', currentUser.id);
                         isVerified = true;
-                        setTimeout(() => navTo('dashboard'), 1000);
+                        // Reload profile to refresh state
+                        checkProfile();
                     } else {
                         statusEl.textContent = "ACCESS DENIED: NOT A MEMBER OF TARGET SERVER.";
                         statusEl.style.color = "var(--danger-color)";
@@ -287,12 +267,9 @@
                 document.getElementById('loading-msg').style.display = 'block';
                 await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.href, scopes: 'guilds' } });
             };
-            
-            // "Retry Scan" now forces a login to get a fresh token
             document.getElementById('retryScanBtn').onclick = async () => {
                 await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.href, scopes: 'guilds' } });
             };
-            
             document.getElementById('logoutBtn').onclick = async () => { await supabaseClient.auth.signOut(); window.location.reload(); };
             document.getElementById('lockedLogoutBtn').onclick = async () => { await supabaseClient.auth.signOut(); window.location.reload(); };
             document.getElementById('resetAppBtn').onclick = () => { localStorage.clear(); window.location.reload(); };
@@ -310,6 +287,13 @@
                 const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
                 
                 if (data) {
+                    // CHECK FOR ZOMBIE PROFILE (Empty Name)
+                    if (!data.discord_name) {
+                        console.log("🧟 ZOMBIE PROFILE DETECTED. FORCING REPAIR.");
+                        navTo('onboarding'); // Force them to fill the form
+                        return;
+                    }
+
                     isAdmin = data.is_admin || false;
                     isVerified = (data.status === 'verified') || isAdmin;
 
@@ -332,24 +316,34 @@
                 } else { navTo('onboarding'); }
             }
 
-            // FORM SUBMITS
+            // FORM SUBMITS - REPAIR LOGIC
             document.getElementById('profileForm').onsubmit = async (e) => {
                 e.preventDefault();
-                // Create profile as 'pending' initially
-                const { error } = await supabaseClient.from('profiles').upsert({
-                    id: currentUser.id, discord_name: currentUser.user_metadata.full_name || "Raider",
+                // We use 'update' first to try and fix an existing zombie row.
+                // If that fails (row doesn't exist), we use 'upsert'.
+                const payload = {
+                    discord_name: currentUser.user_metadata.full_name || "Raider",
                     avatar_url: currentUser.user_metadata.avatar_url,
-                    play_style: document.getElementById('p-style').value, region: document.getElementById('p-region').value, timezone: document.getElementById('p-timezone').value,
-                    status: 'pending'
-                });
-                if(!error) {
-                    // Profile created. NOW try to auto-verify immediately if we have a token.
-                    if(currentSession && currentSession.provider_token) await performGuildCheck();
-                    checkProfile();
+                    play_style: document.getElementById('p-style').value, 
+                    region: document.getElementById('p-region').value, 
+                    timezone: document.getElementById('p-timezone').value,
+                    // If we are repairing, keep status as is. If new, default pending.
+                };
+
+                // Try UPDATE first (to fix the Zombie)
+                const { error: updateError } = await supabaseClient.from('profiles').update(payload).eq('id', currentUser.id);
+                
+                if (!updateError) {
+                    checkProfile(); // Success, reload
                 } else {
-                    alert("Database Error: " + error.message);
+                    // Fallback to UPSERT if update failed (though update shouldn't fail if row exists)
+                    const { error } = await supabaseClient.from('profiles').upsert({
+                        id: currentUser.id, ...payload, status: 'pending'
+                    });
+                    if(!error) checkProfile(); else alert("Error: " + error.message);
                 }
             };
+
             document.getElementById('editProfileForm').onsubmit = async (e) => {
                 e.preventDefault();
                 const { error } = await supabaseClient.from('profiles').update({
@@ -358,7 +352,7 @@
                 if(!error) { document.getElementById('profileModal').classList.add('hidden'); checkProfile(); }
             };
 
-            // MODALS & HELPERS
+            // HELPERS
             function populateTimezones(selectId) {
                 const select = document.getElementById(selectId); if(!select) return; select.innerHTML = '';
                 Intl.supportedValuesOf('timeZone').forEach(tz => {
@@ -379,7 +373,6 @@
             };
             document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => { sModal.classList.add('hidden'); eModal.classList.add('hidden'); pModal.classList.add('hidden'); });
 
-            // BOARD & SCHEDULE LOGIC
             async function loadBoard() {
                 if(!isVerified) return;
                 const grid = document.getElementById('eventsGrid'); grid.innerHTML = 'Scanning...';
