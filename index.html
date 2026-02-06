@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arc Raiders Guild Tool </title>
-
+    <title>Arc Raiders Guild Tool</title>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -31,7 +31,7 @@
         header { background-color: rgba(5, 5, 5, 0.95); border-bottom: 3px solid var(--accent-color); padding: 1.5rem 2rem; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 2.2rem; letter-spacing: 2px; color: var(--accent-color); font-weight: 700; text-shadow: 0 0 10px rgba(255,85,0,0.5); }
         nav ul { display: flex; gap: 30px; }
-        nav a { font-size: 1.2rem; color: var(--text-dim); cursor: pointer; transition: 0.2s; font-weight: 600; text-transform: uppercase; }
+        nav a { font-size: 1.2rem; color: var(--text-dim); cursor: pointer; transition: 0.2s; font-weight: 600; text-transform: uppercase; text-decoration: none; }
         nav a:hover, nav a.active { color: var(--text-main); text-shadow: 0 0 8px var(--text-main); border-bottom: 2px solid var(--accent-color); }
         
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
@@ -124,6 +124,7 @@
                 <li><a id="nav-home">ID Card</a></li>
                 <li><a id="nav-roster">Roster</a></li>
                 <li><a id="nav-board">Missions</a></li>
+                <li><a href="https://first-wave-bp-share.netlify.app/" target="_blank">Blueprints</a></li>
                 <li id="nav-admin-li" style="display:none"><a id="nav-admin" style="color:var(--admin-color); font-weight:bold; border-bottom:2px solid var(--admin-color);">COMMAND</a></li>
             </ul>
         </nav>
@@ -244,7 +245,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v17.1 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v17.2 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="scheduleModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal">[X]</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form></div></div>
@@ -252,14 +253,27 @@
     <div id="eventModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>MISSION BRIEFING</h3><button class="close-modal">[X]</button></div><form id="eventForm"><div class="form-group"><label>OPERATION NAME</label><input id="e-title" required></div><div class="form-group"><label>MISSION TYPE</label><select id="e-type"><option value="Standard Raid">Standard Raid (30m)</option><option value="Locked Gate">Locked Gate (40m)</option><option value="Hidden Bunker">Hidden Bunker (30m)</option><option value="Matriarch">Matriarch Boss (30m)</option><option value="Harvester">Harvester (30m)</option></select></div><div class="form-group"><label>DETAILS</label><textarea id="e-desc" rows="3"></textarea></div><div class="form-group"><label>T-MINUS (TIME)</label><input id="e-time" type="datetime-local" required></div><div class="form-group"><label>MISSION TIMEZONE</label><select id="e-timezone"></select></div><div class="form-group"><label>THEATER</label><select id="e-region"><option>NA</option><option>EU</option><option>OTHER</option></select></div><div class="form-group"><label>CONDITIONS</label><div class="checkbox-grid"><div class="checkbox-item"><input type="checkbox" name="cond" value="Bird City"> Bird City</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Night Raid"> Night Raid</div><div class="checkbox-item"><input type="checkbox" name="cond" value="EM Storm"> EM Storm</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Lush Blooms"> Lush Blooms</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Husk Graveyard"> Husk Graveyard</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Uncovered Caches"> Uncovered Caches</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Launch Tower"> Launch Tower Loot</div></div></div><button type="submit" class="btn-primary">INITIATE MISSION</button></form></div></div>
 
     <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Error:', err));
+            });
+        }
+    </script>
+
+    <script>
+        // GLOBAL ERROR HANDLER
+        window.onerror = function(msg, url, line) {
+            alert("SYSTEM ERROR: " + msg + "\nLine: " + line);
+            return false;
+        };
+
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v17.1 [STABILITY PATCH] ONLINE...");
+            console.log("🚀 ARC SYSTEM v17.2 [BLUEPRINT RESTORED] ONLINE...");
             
-            // --- CONSTANTS ---
             const REQUIRED_GUILD_ID = "1465694444484427903"; 
-            const MISSION_DURATIONS = { 'Locked Gate': 40, 'default': 30 };
             
-            // --- DEPENDENCY SETUP ---
             try {
                 dayjs.extend(window.dayjs_plugin_utc);
                 dayjs.extend(window.dayjs_plugin_timezone);
@@ -282,20 +296,16 @@
             let isAdmin = false; 
             let isVerified = false;
 
-            // --- NAVIGATION CONTROLLER ---
+            // --- NAV ---
             function navTo(pageId) {
                 console.log(`Navigating to: ${pageId}`);
-                
-                // Hide all sections
-                const sections = ['login','onboarding','dashboard','roster','board', 'locked', 'admin'];
-                sections.forEach(p => {
+                ['login','onboarding','dashboard','roster','board', 'locked', 'admin'].forEach(p => {
                     const el = document.getElementById(p+'-section');
                     if(el) el.classList.add('hidden');
                 });
                 
-                // Special States
                 if (pageId === 'onboarding') {
-                    document.getElementById('onboarding-section').classList.remove('hidden');
+                    document.getElementById(pageId+'-section').classList.remove('hidden');
                     document.getElementById('main-nav').style.display = 'none';
                     return;
                 }
@@ -306,31 +316,27 @@
                     return;
                 }
                 
-                // Active State
                 document.getElementById('main-nav').style.display = 'flex';
                 const target = document.getElementById(pageId+'-section');
                 if(target) target.classList.remove('hidden');
                 
-                // Load Data
                 if(pageId === 'roster') loadRoster();
                 if(pageId === 'board') loadBoard();
                 if(pageId === 'admin') loadAdminTable();
             }
 
-            // --- UI HANDLER ATTACHMENT (SAFE) ---
+            // --- UI HANDLER ATTACHMENT ---
             function attachListener(id, event, handler) {
                 const el = document.getElementById(id);
                 if (el) el.addEventListener(event, handler);
-                else console.warn(`Element ${id} not found for listener.`);
+                else console.warn(`Element ${id} not found.`);
             }
 
-            // Navigation
             attachListener('nav-home', 'click', () => navTo('dashboard'));
             attachListener('nav-roster', 'click', () => navTo('roster'));
             attachListener('nav-board', 'click', () => navTo('board'));
             attachListener('nav-admin', 'click', () => navTo('admin'));
 
-            // Auth Buttons
             const getCleanURL = () => window.location.origin + window.location.pathname;
             
             attachListener('loginBtn', 'click', async () => {
@@ -352,22 +358,18 @@
             attachListener('lockedLogoutBtn', 'click', async () => { await supabaseClient.auth.signOut(); window.location.reload(); });
             attachListener('resetAppBtn', 'click', () => { localStorage.clear(); window.location.reload(); });
 
-            // Roster Filters
             attachListener('roster-search', 'input', loadRoster);
             attachListener('roster-filter-region', 'change', loadRoster);
             attachListener('roster-filter-style', 'change', loadRoster);
             attachListener('roster-show-pending', 'change', loadRoster);
-
-            // Admin Actions
             attachListener('refreshAdminBtn', 'click', () => loadAdminTable());
 
-            // Modal Triggers
             const sModal = document.getElementById('scheduleModal'); 
             const eModal = document.getElementById('eventModal'); 
             const pModal = document.getElementById('profileModal');
 
             attachListener('openScheduleBtn', 'click', () => sModal.classList.remove('hidden'));
-            attachListener('openEventModalBtn', 'click', () => eModal.classList.remove('hidden'));
+            attachListener('openEventModalBtn', 'click', () => eModal.classList.remove('hidden');
             
             attachListener('openProfileModalBtn', 'click', () => {
                 document.getElementById('ep-style').value = document.getElementById('u-playstyle').textContent;
@@ -384,7 +386,7 @@
                 sModal.classList.add('hidden'); eModal.classList.add('hidden'); pModal.classList.add('hidden'); 
             });
 
-            // --- AUTH INIT FLOW ---
+            // --- AUTH & INIT ---
             const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (session) { 
@@ -402,8 +404,6 @@
                     } 
                 }); 
             }
-
-            // --- CORE FUNCTIONS ---
 
             async function performGuildCheck() {
                 const statusEl = document.getElementById('locked-reason');
@@ -484,8 +484,7 @@
                 } else { navTo('onboarding'); }
             }
 
-            // --- ADMIN TABLE LOGIC ---
-            // Exposed to Window for button onclicks
+            // --- ADMIN TABLE ---
             window.loadAdminTable = async function() {
                 if (!isAdmin) return;
                 const tbody = document.getElementById('adminTableBody');
@@ -533,7 +532,7 @@
                 });
             };
 
-            // --- ROSTER LOGIC ---
+            // --- ROSTER ---
             async function loadRoster() {
                 if(!isVerified) return;
                 const grid = document.getElementById('rosterGrid'); 
@@ -603,7 +602,7 @@
                 }
             }
 
-            // --- BOARD LOGIC ---
+            // --- BOARD ---
             async function loadBoard() {
                 if(!isVerified) return;
                 const grid = document.getElementById('eventsGrid'); 
@@ -628,7 +627,7 @@
                     const hostTime = eventTimeUTC.tz(hostTZ);
                     const timerId = `timer-${ev.id}`;
                     
-                    const duration = MISSION_DURATIONS[ev.mission_type] || 30;
+                    const duration = 30; // Default
                     const conditions = ev.conditions || [];
                     const tagsHtml = conditions.map(c => `<span class="condition-tag">${c}</span>`).join('');
 
@@ -675,42 +674,7 @@
                 update(); setInterval(update, 1000);
             }
 
-            // --- HELPERS ---
-            function populateTimezones(selectId) {
-                const select = document.getElementById(selectId); if(!select) return; 
-                select.innerHTML = '';
-                Intl.supportedValuesOf('timeZone').forEach(tz => {
-                    const opt = document.createElement('option'); opt.value = tz; opt.text = tz;
-                    if(tz === userTimezone) opt.selected = true; select.appendChild(opt);
-                });
-            }
-            populateTimezones('ep-timezone'); populateTimezones('p-timezone'); populateTimezones('e-timezone');
-
-            function populateScheduleModal(json) {
-                const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
-                const cont = document.getElementById('daysContainer'); cont.innerHTML = '';
-                days.forEach(d => {
-                    const data = json ? json[d] : {};
-                    const active = data.active || false;
-                    const slots = Array.isArray(data.slots) ? data.slots : (data.start ? [{start:data.start, end:data.end}] : []);
-                    const div = document.createElement('div'); div.className = `day-section ${active?'':'disabled-day'}`;
-                    div.innerHTML = `<div class="day-header"><div class="day-title-group"><input type="checkbox" class="d-check" data-day="${d}" ${active?'checked':''}><strong style="text-transform:uppercase">${d}</strong></div><button type="button" class="add-slot-btn" ${active?'':'disabled'}>+</button></div><div class="slots-container ${active?'':'hidden'}"></div>`;
-                    const sCont = div.querySelector('.slots-container');
-                    slots.forEach(s => addSlotUI(sCont, s.start, s.end));
-                    div.querySelector('.d-check').onchange = (e) => { div.classList.toggle('disabled-day', !e.target.checked); sCont.classList.toggle('hidden', !e.target.checked); div.querySelector('.add-slot-btn').disabled = !e.target.checked; if(e.target.checked && sCont.children.length===0) addSlotUI(sCont); };
-                    div.querySelector('.add-slot-btn').onclick = () => addSlotUI(sCont);
-                    cont.appendChild(div);
-                });
-            }
-
-            function addSlotUI(cont, start="18:00", end="22:00") {
-                const d = document.createElement('div'); d.className='time-slot';
-                d.innerHTML = `<input type="time" class="t-start" value="${start}"> > <input type="time" class="t-end" value="${end}"> <button type="button" class="remove-slot-btn">[x]</button>`;
-                d.querySelector('.remove-slot-btn').onclick = () => d.remove(); cont.appendChild(d);
-            }
-
-            // --- GLOBAL ACTIONS ---
-            // Exposed to Window for OnClick
+            // --- GLOBAL HELPERS (Window Scope) ---
             window.downloadICS = (id, title, startUTC, desc, duration) => {
                 const start = dayjs(startUTC).format('YYYYMMDDTHHmmss') + 'Z';
                 const end = dayjs(startUTC).add(duration, 'minute').format('YYYYMMDDTHHmmss') + 'Z';
@@ -811,15 +775,6 @@
                 if(!error) { eModal.classList.add('hidden'); loadBoard(); } else { alert(error.message); }
             };
         });
-    </script>
-<script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW Registered'))
-                    .catch(err => console.log('SW Error:', err));
-            });
-        }
     </script>
 </body>
 </html>
