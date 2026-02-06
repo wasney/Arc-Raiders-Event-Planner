@@ -23,7 +23,7 @@
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>
 
     <style>
-        :root { --bg-color: #050505; --card-bg: #111111; --accent-color: #ff5500; --text-main: #ffffff; --text-dim: #888888; --border-color: #333333; --success-color: #00ff41; --danger-color: #ff3333; --input-bg: #0a0a0a; --cal-color: #00d9ff; --admin-color: #ff00ea; --locked-color: #ffaa00; }
+        :root { --bg-color: #050505; --card-bg: #111111; --accent-color: #ff5500; --text-main: #ffffff; --text-dim: #888888; --border-color: #333333; --success-color: #00ff41; --danger-color: #ff3333; --input-bg: #0a0a0a; --cal-color: #00d9ff; --admin-color: #ff00ea; --locked-color: #ffaa00; --info-color: #00e5ff; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Share Tech Mono', monospace; background-color: var(--bg-color); color: var(--text-main); padding-bottom: 4rem; overflow-x: hidden; font-size: 18px; font-weight: 500; line-height: 1.5; }
         .scanlines { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1)); background-size: 100% 4px; pointer-events: none; z-index: 9999; opacity: 0.4; }
@@ -67,13 +67,19 @@
         .btn-leave:hover { background: var(--danger-color); color: #000; }
         .btn-sync { background: transparent; border: 1px solid var(--cal-color); color: var(--cal-color); padding: 5px 10px; font-size: 0.8rem; flex: 1; margin-top:10px; }
         .btn-sync:hover { background: var(--cal-color); color: #000; }
+        
         .btn-admin-delete { position: absolute; top: 15px; right: 15px; background: var(--admin-color); color: #000; font-size: 0.8rem; padding: 4px 8px; border: none; }
         .btn-admin-kick { display: block; margin-top: 10px; background: #000; border: 1px solid var(--admin-color); color: var(--admin-color); width: 100%; font-size: 0.8rem; }
         .btn-admin-approve { display: block; margin-top: 10px; background: var(--success-color); color: #000; width: 100%; font-size: 0.9rem; padding: 8px; border: none; }
         .btn-admin-approve:hover { background: #fff; box-shadow: 0 0 10px var(--success-color); }
         
         .form-group { margin-bottom: 1.5rem; }
-        label { display: block; margin-bottom: 0.5rem; color: var(--accent-color); font-size: 1rem; font-weight: bold; }
+        /* UPDATED LABEL STYLE FOR HELP LINKS */
+        label { display: block; margin-bottom: 0.5rem; color: var(--accent-color); font-size: 1rem; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .help-trigger { color: var(--info-color); cursor: help; font-size: 0.9rem; text-decoration: underline; text-underline-offset: 4px; text-decoration-style: dotted; }
+        .help-icon { color: var(--text-dim); cursor: help; font-size: 0.9rem; }
+        .help-icon:hover { color: var(--info-color); }
+
         input, select, textarea { width: 100%; padding: 14px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--text-main); font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; font-weight: 600; }
         .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #080808; padding: 10px; border: 1px solid var(--border-color); }
         .checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
@@ -140,8 +146,11 @@
             <h2 style="color:var(--accent-color); margin-bottom:1rem;">// OPERATOR REGISTRATION</h2>
             <p style="color:var(--text-dim); margin-bottom:1rem;">PROFILE INCOMPLETE. PLEASE UPDATE YOUR CREDENTIALS.</p>
             <form id="profileForm">
-                <div class="form-group"><label>EMBARK ID (OPTIONAL)</label><input id="p-embark-id" placeholder="Name#1234"></div>
-                <div class="form-group"><label>COMBAT PREFERENCE</label><select id="p-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div>
+                <div class="form-group">
+                    <label>EMBARK ID (OPTIONAL) <span class="help-icon" onclick="window.showHelp('embark')">[?]</span></label>
+                    <input id="p-embark-id" placeholder="Name#1234">
+                </div>
+                <div class="form-group"><label>COMBAT PREFERENCE <span class="help-icon" onclick="window.showHelp('playstyle')">[?]</span></label><select id="p-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div>
                 <div class="form-group"><label>DEPLOYMENT REGION</label><select id="p-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option><option value="OTHER">GLOBAL / OTHER</option></select></div>
                 <div class="form-group"><label>LOCAL TIMEZONE</label><select id="p-timezone"></select></div>
                 <button type="submit" class="btn-primary">CREATE ID CARD</button>
@@ -217,15 +226,15 @@
             <div class="config-card">
                 <h3 style="color:var(--text-main); border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:15px;">SYSTEM CONFIGURATION</h3>
                 <div class="form-group">
-                    <label>TARGET GUILD ID</label>
+                    <label class="help-trigger" onclick="window.showHelp('guild_id')">TARGET GUILD ID [?]</label>
                     <input id="cfg-guild-id" placeholder="Discord Server ID">
                 </div>
                 <div class="form-group">
-                    <label>WEBHOOK URL</label>
+                    <label class="help-trigger" onclick="window.showHelp('webhook')">WEBHOOK URL [?]</label>
                     <input id="cfg-webhook" placeholder="https://discord.com/api/webhooks/...">
                 </div>
                 <div class="checkbox-grid">
-                    <label class="checkbox-item"><input type="checkbox" id="cfg-auto-approve"> AUTO-APPROVE NEW RECRUITS</label>
+                    <label class="checkbox-item"><input type="checkbox" id="cfg-auto-approve"> <span class="help-trigger" onclick="window.showHelp('auto_approve')">AUTO-APPROVE NEW RECRUITS [?]</span></label>
                 </div>
                 <button id="saveConfigBtn" class="btn-primary" style="margin-top:15px; width:auto;">SAVE CONFIGURATION</button>
             </div>
@@ -260,14 +269,25 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v19.0 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v19.1 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
+
+    <div id="infoModal" class="modal-overlay hidden">
+        <div class="modal-content" style="border-color:var(--info-color)">
+            <div class="modal-header">
+                <h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3>
+                <button class="close-modal" style="color:var(--info-color)">[X]</button>
+            </div>
+            <div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div>
+            <button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button>
+        </div>
+    </div>
 
     <div id="scheduleModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal">[X]</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form></div></div>
     
     <div id="profileModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>EDIT ID CARD</h3><button class="close-modal">[X]</button></div><form id="editProfileForm">
-        <div class="form-group"><label>EMBARK ID (OPTIONAL)</label><input id="ep-embark-id" placeholder="Name#1234"></div>
-        <div class="form-group"><label>COMBAT PREFERENCE</label><select id="ep-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div>
+        <div class="form-group"><label>EMBARK ID (OPTIONAL) <span class="help-icon" onclick="window.showHelp('embark')">[?]</span></label><input id="ep-embark-id" placeholder="Name#1234"></div>
+        <div class="form-group"><label>COMBAT PREFERENCE <span class="help-icon" onclick="window.showHelp('playstyle')">[?]</span></label><select id="ep-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div>
         <div class="form-group"><label>DEPLOYMENT REGION</label><select id="ep-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option><option value="OTHER">GLOBAL / OTHER</option></select></div>
         <div class="form-group"><label>LOCAL TIMEZONE</label><select id="ep-timezone"></select></div>
         <button type="submit" class="btn-primary">SAVE CHANGES</button>
@@ -280,8 +300,41 @@
     <script>
         window.onerror = function(msg, url, line) { alert("SYSTEM ERROR: " + msg + "\nLine: " + line); return false; };
 
+        // --- HELP SYSTEM ---
+        const HELP_DB = {
+            'guild_id': {
+                title: "TARGET GUILD ID SETUP",
+                text: "To locate this ID:<br>1. Open Discord Settings > Advanced.<br>2. Toggle <strong>Developer Mode</strong> ON.<br>3. Right-click your Server Icon on the left sidebar.<br>4. Select <strong>Copy Server ID</strong>.<br><br>This ensures only members of that specific server can access this tool."
+            },
+            'webhook': {
+                title: "WEBHOOK CONFIGURATION",
+                text: "To create a Webhook:<br>1. Go to Server Settings > Integrations > Webhooks.<br>2. Create a new Webhook.<br>3. Click <strong>Copy Webhook URL</strong>.<br><br>Paste the URL here to automatically post new mission alerts to that channel."
+            },
+            'auto_approve': {
+                title: "AUTO-APPROVAL PROTOCOL",
+                text: "<strong>ENABLED:</strong> Any user who logs in and is confirmed to be a member of the Target Guild will be instantly Verified and granted access.<br><br><strong>DISABLED:</strong> New users will be set to 'Pending' status. An Admin must manually approve them in the Command Center."
+            },
+            'embark': {
+                title: "EMBARK ID FORMAT",
+                text: "Your unique in-game identifier found in the Social menu.<br>Format: <strong>DisplayName#1234</strong><br>This helps squadmates find and invite you in-game."
+            },
+            'playstyle': {
+                title: "COMBAT PREFERENCE",
+                text: "<strong>PvP:</strong> You actively seek hostile engagements.<br><strong>PvE:</strong> You focus on quests and looting, avoiding players.<br><strong>Hybrid:</strong> You adapt to the mission requirements."
+            }
+        };
+
+        window.showHelp = function(key) {
+            const data = HELP_DB[key];
+            if(data) {
+                document.getElementById('infoTitle').innerHTML = data.title;
+                document.getElementById('infoBody').innerHTML = data.text;
+                document.getElementById('infoModal').classList.remove('hidden');
+            }
+        };
+
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v19.0 [ARCHITECT] ONLINE...");
+            console.log("🚀 ARC SYSTEM v19.1 [INTEL OVERLAY] ONLINE...");
             
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); } 
             catch (e) { console.error("Lib Error", e); }
@@ -291,9 +344,8 @@
             let currentUser = null, currentSession = null, profilesMap = {}, userTimezone = dayjs.tz.guess(), isAdmin = false, isVerified = false;
             let APP_SETTINGS = { guild_id: "1465694444484427903", webhook: "", auto_approve: false };
 
-            // --- LOAD SETTINGS (Dynamic Config) ---
+            // --- LOAD SETTINGS ---
             async function loadSettings() {
-                // Fetch basic config (public read)
                 const { data } = await supabaseClient.from('app_config').select('*');
                 if (data) {
                     data.forEach(row => {
@@ -350,16 +402,14 @@
             // --- AUTH ---
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) { 
-                currentSession = session; 
-                currentUser = session.user;
+                currentSession = session; currentUser = session.user;
                 await loadSettings(); 
                 if(session.provider_token) await performGuildCheck(); 
                 await checkProfile(); 
             } else { 
                 supabaseClient.auth.onAuthStateChange(async (e, session) => { 
                     if(session) { 
-                        currentSession = session; 
-                        currentUser = session.user;
+                        currentSession = session; currentUser = session.user;
                         await loadSettings(); 
                         if(session.provider_token) await performGuildCheck(); 
                         await checkProfile(); 
@@ -373,23 +423,12 @@
                     const r = await fetch('https://discord.com/api/users/@me/guilds', { headers: { Authorization: `Bearer ${currentSession.provider_token}` } });
                     if(!r.ok) return;
                     const g = await r.json();
-                    
-                    // CHECK MEMBERSHIP
                     const isMember = g.some(x => x.id === APP_SETTINGS.guild_id);
-                    
                     if(isMember) {
-                        // AUTO APPROVE LOGIC
                         const statusUpdate = APP_SETTINGS.auto_approve ? 'verified' : undefined; 
-                        // Only update if we need to auto-verify, otherwise keep current status (don't downgrade verified users)
-                        if(statusUpdate) {
-                            await supabaseClient.from('profiles').update({ status: 'verified' }).eq('id', currentUser.id);
-                        }
-                        isVerified = true; 
-                        checkProfile();
+                        if(statusUpdate) await supabaseClient.from('profiles').update({ status: 'verified' }).eq('id', currentUser.id);
+                        isVerified = true; checkProfile();
                     } else {
-                        // AUTO LOCKOUT LOGIC
-                        // If they are not in the server, they are blocked immediately.
-                        // Optional: Mark them as discharged in DB? For now, UI lockout is safer.
                         document.getElementById('locked-reason').textContent = "NOT A MEMBER OF TARGET SERVER.";
                         navTo('locked');
                     }
@@ -415,8 +454,6 @@
                         document.getElementById('admin-badge').style.display = 'inline-block';
                         document.getElementById('pending-toggle-label').style.display = 'flex';
                         document.getElementById('nav-admin-li').style.display = 'block'; 
-                        
-                        // Populate Admin Config Form
                         document.getElementById('cfg-guild-id').value = APP_SETTINGS.guild_id;
                         document.getElementById('cfg-webhook').value = APP_SETTINGS.webhook;
                         document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve;
@@ -442,29 +479,15 @@
                     { key: 'discord_webhook_url', value: document.getElementById('cfg-webhook').value },
                     { key: 'auto_approve', value: document.getElementById('cfg-auto-approve').checked ? 'true' : 'false' }
                 ];
-                
-                for (const u of updates) {
-                    await supabaseClient.from('app_config').upsert(u);
-                }
-                alert("Settings Saved. Reloading...");
-                window.location.reload();
+                for (const u of updates) await supabaseClient.from('app_config').upsert(u);
+                alert("Settings Saved. Reloading..."); window.location.reload();
             }
 
-            // --- WEBHOOK SENDER ---
             async function sendWebhook(title, desc, time) {
                 if(!APP_SETTINGS.webhook) return;
                 const payload = {
                     content: "🚨 **NEW MISSION ALERT**",
-                    embeds: [{
-                        title: title,
-                        description: desc,
-                        color: 16733440, // Orange
-                        fields: [
-                            { name: "Time", value: time, inline: true },
-                            { name: "Link", value: window.location.href, inline: true }
-                        ],
-                        footer: { text: "Raider // Signal" }
-                    }]
+                    embeds: [{ title: title, description: desc, color: 16733440, fields: [{ name: "Time", value: time, inline: true }, { name: "Link", value: window.location.href, inline: true }], footer: { text: "Raider // Signal" } }]
                 };
                 fetch(APP_SETTINGS.webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
             }
@@ -621,11 +644,8 @@
                     conditions: conds,
                     host_id: currentUser.id
                 });
-                
-                // TRIGGER WEBHOOK
                 const friendlyTime = dayjs(utc).format('YYYY-MM-DD HH:mm [UTC]');
                 sendWebhook(document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime);
-
                 document.getElementById('eventModal').classList.add('hidden'); loadBoard();
             };
 
