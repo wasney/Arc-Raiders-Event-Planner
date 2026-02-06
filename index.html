@@ -175,7 +175,10 @@
             <h1>COORDINATE // SURVIVE</h1>
             <p style="color:var(--text-dim); margin-bottom: 2rem; font-size: 1.2rem;">SECURE UPLINK REQUIRED FOR GUILD ACCESS</p>
             <button id="loginBtn" class="btn-discord">:: INITIALIZE UPLINK (DISCORD) ::</button>
-            <p id="loading-msg" style="color:var(--accent-color); margin-top:20px; display:none;">> ESTABLISHING CONNECTION...</p>
+            <div id="auth-loading" style="display:none; margin-top:20px;">
+                <p style="color:var(--accent-color); font-weight:bold; font-size:1.2rem;">> ESTABLISHING SECURE CONNECTION...</p>
+                <p style="color:var(--text-dim); font-size:0.9rem;">HANDSHAKE IN PROGRESS</p>
+            </div>
         </section>
 
         <section id="onboarding-section" class="card hidden">
@@ -299,7 +302,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.4 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.5 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -323,8 +326,15 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.4 [FAIL-SAFE] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.5 [HANDSHAKE] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
+
+            // CHECK FOR INCOMING AUTH HASH
+            if (window.location.hash && window.location.hash.includes('access_token')) {
+                // If we have a hash, assume we are logging in. HIDE THE LOGIN BUTTON.
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('auth-loading').style.display = 'block';
+            }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
             const supabaseClient = supabase.createClient(CONFIG.url, CONFIG.key);
@@ -398,25 +408,38 @@
                 loadCommsArray();
             });
 
-            // --- AUTH HANDLING ---
+            // --- AUTH STATE MONITOR (PRIORITY) ---
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                    // Auth successful, proceed
+                    document.getElementById('loginBtn').style.display = 'none';
+                    document.getElementById('auth-loading').style.display = 'block';
+                    currentSession = session; 
+                    currentUser = session.user; 
+                    await loadSettings(); 
+                    if(session.provider_token) await performGuildCheck(); 
+                    await checkProfile(); 
+                } else if (event === 'SIGNED_OUT') {
+                    // Clean reset
+                    currentSession = null;
+                    currentUser = null;
+                    document.getElementById('login-section').classList.remove('hidden');
+                    document.getElementById('dashboard-section').classList.add('hidden');
+                    document.getElementById('main-nav').style.display = 'none';
+                    document.getElementById('loginBtn').style.display = 'inline-block';
+                    document.getElementById('auth-loading').style.display = 'none';
+                }
+            });
+
+            // CHECK SESSION MANUALLY (Backup)
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) { 
+            if (session) {
+                // Already logged in
                 currentSession = session; 
                 currentUser = session.user; 
                 await loadSettings(); 
                 if(session.provider_token) await performGuildCheck(); 
                 await checkProfile(); 
-            } else {
-                // LISTEN FOR OAUTH REDIRECTS
-                supabaseClient.auth.onAuthStateChange(async (event, session) => { 
-                    if (event === 'SIGNED_IN' && session) {
-                        currentSession = session; 
-                        currentUser = session.user; 
-                        await loadSettings(); 
-                        if(session.provider_token) await performGuildCheck(); 
-                        await checkProfile(); 
-                    }
-                });
             }
 
             async function performGuildCheck() {
@@ -573,7 +596,6 @@
 
             async function calculateNotifications(missionId, missionTitle, missionUtcTime) {
                 try {
-                    // Get ALL active users who want alerts
                     const { data: users } = await supabaseClient.from('profiles').select('*').eq('notify_on_match', true).eq('status', 'verified');
                     if(!users) return;
 
@@ -581,41 +603,28 @@
                     const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
 
                     users.forEach(u => {
-                        if(u.id === currentUser.id) return; // Don't notify self
+                        if(u.id === currentUser.id) return;
                         if(!u.availability_json) return;
 
-                        // Convert Mission UTC to User's Timezone
                         const userTz = u.timezone || 'UTC';
                         const localTime = dayjs(missionUtcTime).tz(userTz);
                         const localDay = days[localTime.day()];
                         const localMinutes = (localTime.hour() * 60) + localTime.minute();
 
-                        // Check if they are active on that day
                         if(u.availability_json[localDay] && u.availability_json[localDay].active) {
                             const slots = u.availability_json[localDay].slots || [];
                             const isFree = slots.some(s => {
-                                // Simple parser: "18:00" -> 1080 minutes
                                 const startMin = parseInt(s.start.split(':')[0]) * 60 + parseInt(s.start.split(':')[1]);
                                 const endMin = parseInt(s.end.split(':')[0]) * 60 + parseInt(s.end.split(':')[1]);
-                                
-                                // Handle late night spanning (e.g. 22:00 to 02:00)
-                                if (endMin < startMin) {
-                                    return (localMinutes >= startMin) || (localMinutes <= endMin);
-                                }
+                                if (endMin < startMin) { return (localMinutes >= startMin) || (localMinutes <= endMin); }
                                 return (localMinutes >= startMin && localMinutes <= endMin);
                             });
-
                             if(isFree) matchedUsers.push(u.id);
                         }
                     });
 
                     if(matchedUsers.length > 0) {
-                        const alerts = matchedUsers.map(uid => ({
-                            user_id: uid,
-                            title: "MISSION MATCH FOUND",
-                            message: `Operation "${missionTitle}" matches your availability schedule.`,
-                            action_link: `#nav-board` 
-                        }));
+                        const alerts = matchedUsers.map(uid => ({ user_id: uid, title: "MISSION MATCH FOUND", message: `Operation "${missionTitle}" matches your availability schedule.`, action_link: `#nav-board` }));
                         await supabaseClient.from('notifications').insert(alerts);
                     }
                 } catch(e) { console.error('Notification Calculation Failed', e); }
@@ -626,29 +635,15 @@
                 const utc = dayjs.tz(document.getElementById('e-time').value, document.getElementById('e-timezone').value).utc().format();
                 const conds = []; document.querySelectorAll('input[name="cond"]:checked').forEach(c=>conds.push(c.value));
                 
-                const { data, error } = await supabaseClient.from('events').insert({ 
-                    title: document.getElementById('e-title').value, 
-                    description: document.getElementById('e-desc').value, 
-                    start_time: utc, 
-                    timezone: document.getElementById('e-timezone').value, 
-                    region: document.getElementById('e-region').value, 
-                    mission_type: document.getElementById('e-type').value, 
-                    conditions: conds, 
-                    host_id: currentUser.id 
-                }).select();
+                const { data, error } = await supabaseClient.from('events').insert({ title: document.getElementById('e-title').value, description: document.getElementById('e-desc').value, start_time: utc, timezone: document.getElementById('e-timezone').value, region: document.getElementById('e-region').value, mission_type: document.getElementById('e-type').value, conditions: conds, host_id: currentUser.id }).select();
 
                 if(!error) { 
                     const friendlyTime = dayjs(utc).format('YYYY-MM-DD HH:mm [UTC]'); 
-                    
-                    // Fire-and-forget these (don't await them) so UI updates instantly
                     sendWebhook(document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime); 
                     calculateNotifications(data[0].id, data[0].title, utc);
-
                     document.getElementById('eventModal').classList.add('hidden'); 
                     loadBoard(); 
-                } else { 
-                    alert(error.message); 
-                }
+                } else { alert(error.message); }
             };
 
             function populateTimezones(id) { const s = document.getElementById(id); if(!s) return; Intl.supportedValuesOf('timeZone').forEach(t=>{const o=document.createElement('option');o.value=t;o.text=t;if(t===userTimezone)o.selected=true;s.appendChild(o);}); }
