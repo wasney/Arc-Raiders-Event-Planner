@@ -302,7 +302,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.6 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.7 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -326,7 +326,7 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.6 [CLEAR PATH] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.7 [RESTORED] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
@@ -337,7 +337,6 @@
 
             // --- UNIFIED INIT SEQUENCE ---
             async function initApp() {
-                // Check if we are stuck in a loading loop (Fallback)
                 setTimeout(() => {
                     const loading = document.getElementById('auth-loading');
                     if (loading.style.display !== 'none') {
@@ -345,14 +344,12 @@
                         loading.style.display = 'none';
                         if (!currentUser) document.getElementById('loginBtn').style.display = 'inline-block';
                     }
-                }, 5000); // 5 Seconds max wait time
+                }, 5000); 
 
-                // Check for existing session first
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session) {
                     handleSession(session);
                 } else {
-                    // If no session, listen for the redirect event
                     supabaseClient.auth.onAuthStateChange(async (event, session) => {
                         if (event === 'SIGNED_IN' && session) {
                             handleSession(session);
@@ -366,21 +363,15 @@
             async function handleSession(session) {
                 document.getElementById('loginBtn').style.display = 'none';
                 document.getElementById('auth-loading').style.display = 'block';
-                
-                currentSession = session;
-                currentUser = session.user;
-                
+                currentSession = session; currentUser = session.user;
                 await loadSettings();
                 if(session.provider_token) await performGuildCheck();
                 await checkProfile();
-                
-                // Hide loading screen only after profile check completes/fails
                 document.getElementById('auth-loading').style.display = 'none';
             }
 
             function resetUI() {
-                currentSession = null;
-                currentUser = null;
+                currentSession = null; currentUser = null;
                 document.getElementById('login-section').classList.remove('hidden');
                 document.getElementById('dashboard-section').classList.add('hidden');
                 document.getElementById('main-nav').style.display = 'none';
@@ -388,7 +379,6 @@
                 document.getElementById('auth-loading').style.display = 'none';
             }
 
-            // START THE ENGINE
             initApp();
 
             async function loadSettings() {
@@ -400,10 +390,7 @@
 
             function navTo(pageId) {
                 ['login','onboarding','dashboard','roster','board','locked','admin','alerts'].forEach(p => { const el = document.getElementById(p+'-section'); if(el) el.classList.add('hidden'); });
-                
-                // HIDE LOADING TEXT IF NAVIGATING AWAY
                 document.getElementById('auth-loading').style.display = 'none';
-
                 if(pageId === 'onboarding') { document.getElementById('onboarding-section').classList.remove('hidden'); document.getElementById('main-nav').style.display = 'none'; return; }
                 if(!isVerified && pageId !== 'login' && pageId !== 'locked') { document.getElementById('locked-section').classList.remove('hidden'); document.getElementById('main-nav').style.display = 'none'; return; }
                 document.getElementById('main-nav').style.display = 'flex';
@@ -512,20 +499,10 @@
                             badge.textContent = isAdmin ? '[COMMANDER ACCESS]' : '[FIELD OFFICER]';
                             badge.style.borderColor = isAdmin ? 'var(--admin-color)' : 'var(--cal-color)';
                             badge.style.color = isAdmin ? 'var(--admin-color)' : 'var(--cal-color)';
-                            
                             document.getElementById('pending-toggle-label').style.display = 'flex';
                             document.getElementById('nav-admin-li').style.display = 'block'; 
-                            
-                            if(isOfficer) {
-                                document.getElementById('config-panel').style.display = 'none';
-                                document.getElementById('comms-panel').style.display = 'none';
-                            }
-                            
-                            if(isAdmin) {
-                                document.getElementById('cfg-guild-id').value = APP_SETTINGS.guild_id;
-                                document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve;
-                            }
-                            
+                            if(isOfficer) { document.getElementById('config-panel').style.display = 'none'; document.getElementById('comms-panel').style.display = 'none'; }
+                            if(isAdmin) { document.getElementById('cfg-guild-id').value = APP_SETTINGS.guild_id; document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve; }
                             try { await checkAdminAlerts(); } catch(e) { console.warn('Admin Alerts Failed (Check DB)', e); }
                         }
                         
@@ -536,16 +513,11 @@
                         else { 
                             const {data: allP} = await supabaseClient.from('profiles').select('id, discord_name, embark_id');
                             if(allP) allP.forEach(p => profilesMap[p.id] = p.discord_name);
-                            
                             try { await checkUserNotifications(); } catch(e) { console.warn('User Alerts Failed (Check DB)', e); }
-                            
                             navTo('dashboard'); 
                         }
                     } else { navTo('onboarding'); }
-                } catch (err) {
-                    console.error("CRITICAL: Profile Check Failed", err);
-                    alert("System Error: Could not load profile. Please check console.");
-                }
+                } catch (err) { console.error("CRITICAL: Profile Check Failed", err); alert("System Error: Could not load profile. Please check console."); }
             }
 
             async function checkAdminAlerts() {
@@ -619,19 +591,15 @@
                 try {
                     const { data: users } = await supabaseClient.from('profiles').select('*').eq('notify_on_match', true).eq('status', 'verified');
                     if(!users) return;
-
                     const matchedUsers = [];
                     const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-
                     users.forEach(u => {
                         if(u.id === currentUser.id) return;
                         if(!u.availability_json) return;
-
                         const userTz = u.timezone || 'UTC';
                         const localTime = dayjs(missionUtcTime).tz(userTz);
                         const localDay = days[localTime.day()];
                         const localMinutes = (localTime.hour() * 60) + localTime.minute();
-
                         if(u.availability_json[localDay] && u.availability_json[localDay].active) {
                             const slots = u.availability_json[localDay].slots || [];
                             const isFree = slots.some(s => {
@@ -643,7 +611,6 @@
                             if(isFree) matchedUsers.push(u.id);
                         }
                     });
-
                     if(matchedUsers.length > 0) {
                         const alerts = matchedUsers.map(uid => ({ user_id: uid, title: "MISSION MATCH FOUND", message: `Operation "${missionTitle}" matches your availability schedule.`, action_link: `#nav-board` }));
                         await supabaseClient.from('notifications').insert(alerts);
@@ -655,16 +622,8 @@
                 e.preventDefault();
                 const utc = dayjs.tz(document.getElementById('e-time').value, document.getElementById('e-timezone').value).utc().format();
                 const conds = []; document.querySelectorAll('input[name="cond"]:checked').forEach(c=>conds.push(c.value));
-                
                 const { data, error } = await supabaseClient.from('events').insert({ title: document.getElementById('e-title').value, description: document.getElementById('e-desc').value, start_time: utc, timezone: document.getElementById('e-timezone').value, region: document.getElementById('e-region').value, mission_type: document.getElementById('e-type').value, conditions: conds, host_id: currentUser.id }).select();
-
-                if(!error) { 
-                    const friendlyTime = dayjs(utc).format('YYYY-MM-DD HH:mm [UTC]'); 
-                    sendWebhook(document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime); 
-                    calculateNotifications(data[0].id, data[0].title, utc);
-                    document.getElementById('eventModal').classList.add('hidden'); 
-                    loadBoard(); 
-                } else { alert(error.message); }
+                if(!error) { const friendlyTime = dayjs(utc).format('YYYY-MM-DD HH:mm [UTC]'); sendWebhook(document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime); calculateNotifications(data[0].id, data[0].title, utc); document.getElementById('eventModal').classList.add('hidden'); loadBoard(); } else { alert(error.message); }
             };
 
             function populateTimezones(id) { const s = document.getElementById(id); if(!s) return; Intl.supportedValuesOf('timeZone').forEach(t=>{const o=document.createElement('option');o.value=t;o.text=t;if(t===userTimezone)o.selected=true;s.appendChild(o);}); }
@@ -695,6 +654,140 @@
                 await supabaseClient.from('profiles').update({availability_json: res}).eq('id', currentUser.id);
                 document.getElementById('scheduleModal').classList.add('hidden'); checkProfile();
             };
+
+            // --- RESTORED LOGIC MODULES (v22.7) ---
+            async function loadRoster() {
+                if(!isVerified) return;
+                const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Updating...';
+                const futureTime = document.getElementById('roster-future-time').value;
+                let dayCheck = null, timeCheck = null;
+                if (futureTime) {
+                    const d = dayjs(futureTime); const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+                    dayCheck = days[d.day()]; timeCheck = (d.hour() * 60) + d.minute(); document.getElementById('launchOpContainer').style.display = 'block';
+                } else { document.getElementById('launchOpContainer').style.display = 'none'; }
+
+                const { data: profiles } = await supabaseClient.from('profiles').select('*').order('created_at', {ascending: false});
+                if(!profiles) { grid.innerHTML = 'Error.'; return; }
+                grid.innerHTML = '';
+                potentialSquad = [];
+
+                const search = document.getElementById('roster-search').value.toLowerCase();
+                const reg = document.getElementById('roster-filter-region').value;
+                const sty = document.getElementById('roster-filter-style').value;
+                const showPending = document.getElementById('roster-show-pending').checked;
+                const today = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"][new Date().getDay()];
+
+                profiles.forEach(p => {
+                    const isPending = p.status === 'pending';
+                    if (showPending && !isPending) return; 
+                    if (!showPending && isPending) return; 
+                    if (search && !(p.discord_name && p.discord_name.toLowerCase().includes(search))) return;
+                    if (reg !== 'ALL' && p.region !== reg) return;
+                    if (sty !== 'ALL' && p.play_style !== sty) return;
+
+                    let status = '<span style="color:var(--text-dim)">OFFLINE</span>';
+                    let isAvailable = false;
+
+                    if(isPending) status = '<span style="color:var(--locked-color)">[PENDING]</span>';
+                    else {
+                        const targetDay = dayCheck || today;
+                        if (p.availability_json && p.availability_json[targetDay] && p.availability_json[targetDay].active) {
+                            const slots = p.availability_json[targetDay].slots || [];
+                            if (futureTime && timeCheck !== null) {
+                                const match = slots.some(s => true); 
+                                if(match) { status = `<span style="color:var(--cal-color)">AVAILABLE ON ${targetDay.toUpperCase()}</span>`; isAvailable = true; }
+                            } else { const times = slots.map(s => `${s.start}-${s.end}`).join(' / '); status = `<span style="color:var(--success-color)">ACTIVE: ${times}</span>`; }
+                        }
+                    }
+
+                    if(futureTime && !isAvailable) return;
+                    if(futureTime && isAvailable) potentialSquad.push(p.id);
+
+                    let actions = '';
+                    if(isAdmin || isOfficer) { 
+                        if(p.id !== currentUser.id) { 
+                            if(isPending) actions += `<button class="mini-btn btn-green" onclick="window.approve('${p.id}')">APPROVE</button>`;
+                            else {
+                                const targetRank = p.rank || 'soldier';
+                                if (targetRank !== 'commander') {
+                                    if (targetRank === 'officer' && isAdmin) actions += `<button class="mini-btn btn-admin-demote" onclick="window.toggleRank('${p.id}', 'soldier')">DEMOTE</button>`;
+                                    else if (targetRank !== 'officer') actions += `<button class="mini-btn btn-admin-promote" onclick="window.toggleRank('${p.id}', 'officer')">PROMOTE</button>`;
+                                }
+                            }
+                            if (isAdmin || (isOfficer && p.rank !== 'commander' && p.rank !== 'officer')) {
+                                actions += `<button class="mini-btn btn-red" onclick="window.kick('${p.id}')">KICK</button>`;
+                            }
+                        }
+                    }
+
+                    let nameDisplay = p.discord_name;
+                    if (p.rank === 'commander') nameDisplay = `<span style="color:var(--admin-color)">[CMD] ${p.discord_name}</span>`;
+                    else if (p.rank === 'officer') nameDisplay = `<span style="color:var(--cal-color)">[OFC] ${p.discord_name}</span>`;
+
+                    grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url || 'https://placehold.co/50'}" class="member-avatar"><div><h3>${nameDisplay}</h3><div style="font-size:0.9rem; color:var(--accent-color); font-weight:bold;">${p.embark_id || ''}</div><div style="font-size:0.9rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div></div></div><div style="margin-top:10px; border-top:1px dashed #333; padding-top:10px;">${status}</div><div style="margin-top:10px;">${actions}</div></div>`;
+                });
+                
+                if(futureTime && potentialSquad.length > 0) document.getElementById('launchFutureOp').textContent = `LAUNCH OP (${potentialSquad.length} AGENTS)`;
+            }
+
+            async function loadBoard() {
+                if(!isVerified) return;
+                const grid = document.getElementById('eventsGrid'); grid.innerHTML = 'Scanning...';
+                const { data: events } = await supabaseClient.from('events').select('*').order('start_time', {ascending: true});
+                const { data: signups } = await supabaseClient.from('event_signups').select('*');
+                if(!events) { grid.innerHTML = 'No Ops.'; return; }
+                grid.innerHTML = '';
+                events.forEach(ev => {
+                    const attending = signups?.filter(s => s.event_id === ev.id) || [];
+                    const isSignedUp = attending.some(s => s.user_id === currentUser.id);
+                    const isHost = ev.host_id === currentUser.id;
+                    const canDelete = isHost || isAdmin || isOfficer; 
+                    
+                    grid.innerHTML += `<div class="event-card">${canDelete ? `<button class="btn-admin-delete" onclick="window.delEvent('${ev.id}')">DEL</button>` : ''}<div class="event-title">${ev.title}</div><div class="mission-type">${ev.mission_type}</div><div style="margin:10px 0; font-weight:bold; font-size:1.2rem; color:var(--text-main)">${dayjs(ev.start_time).tz(userTimezone).format('MMM D, HH:mm')}</div><div style="color:var(--text-dim)">${ev.description}</div><div class="attendees-list">SQUAD [${attending.length}]: ${attending.map(s => `<span class="attendee-pill">${profilesMap[s.user_id]||'Agent'}</span>`).join('')}</div>${isSignedUp ? `<button class="btn-leave" onclick="window.leaveEvent('${ev.id}')">ABORT</button>` : `<button class="btn-join" onclick="window.joinEvent('${ev.id}')">JOIN</button>`}</div>`;
+                });
+            }
+
+            window.loadAdminTable = async () => {
+                if(!isAdmin && !isOfficer) return;
+                const tb = document.getElementById('adminTableBody'); tb.innerHTML = 'Loading...';
+                const { data: profiles } = await supabaseClient.from('profiles').select('*').order('created_at', {ascending: false});
+                if(!profiles) return; tb.innerHTML = '';
+                profiles.forEach(p => {
+                    const isPending = p.status === 'pending';
+                    const stat = isPending ? '<span class="status-pending">PENDING</span>' : '<span class="status-verified">VERIFIED</span>';
+                    let act = '';
+                    if(p.id !== currentUser.id) {
+                        if(isPending) act += `<button class="mini-btn btn-green" onclick="window.approve('${p.id}')">OK</button>`;
+                        else {
+                            const targetRank = p.rank || 'soldier';
+                            if (targetRank !== 'commander') {
+                                if (targetRank === 'officer' && isAdmin) act += `<button class="mini-btn btn-admin-demote" onclick="window.toggleRank('${p.id}', 'soldier')">DEMOTE</button>`;
+                                else if (targetRank !== 'officer') act += `<button class="mini-btn btn-admin-promote" onclick="window.toggleRank('${p.id}', 'officer')">PROMOTE</button>`;
+                            }
+                        }
+                        if (isAdmin || (isOfficer && p.rank !== 'commander' && p.rank !== 'officer')) {
+                            act += `<button class="mini-btn btn-red" onclick="window.kick('${p.id}')">X</button>`;
+                        }
+                    }
+                    let nameDisplay = p.discord_name;
+                    if (p.rank === 'commander') nameDisplay = `<span style="color:var(--admin-color)">[CMD] ${p.discord_name}</span>`;
+                    else if (p.rank === 'officer') nameDisplay = `<span style="color:var(--cal-color)">[OFC] ${p.discord_name}</span>`;
+                    tb.innerHTML += `<tr><td>${nameDisplay}</td><td>${p.embark_id || '-'}</td><td>${p.region}/${p.play_style}</td><td>${stat}</td><td>${dayjs(p.created_at).format('MMM D')}</td><td>${act}</td></tr>`;
+                });
+            };
+
+            window.toggleRank = async (id, newRank) => {
+                if(confirm(`Promote/Demote to ${newRank.toUpperCase()}?`)) {
+                    await supabaseClient.from('profiles').update({ rank: newRank }).eq('id', id);
+                    loadAdminTable(); if(!document.getElementById('roster-section').classList.contains('hidden')) loadRoster();
+                }
+            };
+
+            window.approve = async (id) => { if(confirm('Approve?')) { await supabaseClient.from('profiles').update({status:'verified'}).eq('id', id); loadRoster(); loadAdminTable(); }};
+            window.kick = async (id) => { if(confirm('Kick?')) { await supabaseClient.from('profiles').delete().eq('id', id); loadRoster(); loadAdminTable(); }};
+            window.joinEvent = async (id) => { await supabaseClient.from('event_signups').insert({event_id: id, user_id: currentUser.id}); loadBoard(); };
+            window.leaveEvent = async (id) => { await supabaseClient.from('event_signups').delete().match({event_id: id, user_id: currentUser.id}); loadBoard(); };
+            window.delEvent = async (id) => { if(confirm('Delete?')) { await supabaseClient.from('events').delete().eq('id', id); loadBoard(); } };
         });
     </script>
 </body>
