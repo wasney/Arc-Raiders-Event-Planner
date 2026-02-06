@@ -43,7 +43,15 @@
         .config-card { border-left-color: var(--admin-color); }
         .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-top: 2rem; }
         .event-card { border-left-color: var(--accent-color); }
-        .locked-screen { text-align: center; padding: 4rem; border: 2px solid var(--locked-color); background: rgba(255, 170, 0, 0.05); color: var(--locked-color); margin-top: 2rem; }
+        
+        /* LOCKED SCREEN STYLES */
+        .locked-screen { text-align: center; padding: 4rem; border: 2px solid var(--locked-color); background: rgba(255, 170, 0, 0.05); color: var(--locked-color); margin-top: 2rem; transition: all 0.3s; }
+        .locked-icon { font-size: 4rem; margin-bottom: 1rem; display: block; }
+        
+        /* State: Pending (Orange/Yellow) */
+        .state-pending { border-color: var(--locked-color); color: var(--locked-color); background: rgba(255, 170, 0, 0.05); }
+        /* State: Denied (Red) */
+        .state-denied { border-color: var(--danger-color); color: var(--danger-color); background: rgba(255, 51, 51, 0.05); }
         
         .countdown-timer { font-size: 1.5rem; color: var(--success-color); font-weight: bold; background: rgba(0, 255, 65, 0.1); padding: 5px 10px; display: inline-block; border: 1px solid var(--success-color); margin-bottom: 10px; }
         .time-display-group { background: #080808; padding: 10px; border: 1px solid var(--border-color); margin: 10px 0; }
@@ -192,14 +200,17 @@
         </section>
 
         <section id="locked-section" class="hidden">
-            <div class="locked-screen">
-                <div class="locked-icon">🔒</div>
-                <h2>ACCESS DENIED // VERIFICATION FAILED</h2>
-                <p id="locked-reason" style="margin-top:20px; font-size:1.1rem; color:var(--danger-color);">TOKEN EXPIRED OR MISSING.</p>
+            <div class="locked-screen" id="locked-box">
+                <div class="locked-icon" id="locked-icon">🔒</div>
+                <h2 id="locked-title">ACCESS DENIED // VERIFICATION FAILED</h2>
+                <p id="locked-reason" style="margin-top:20px; font-size:1.1rem; color:inherit;">TOKEN EXPIRED OR MISSING.</p>
+                
                 <div id="scan-progress" style="display:none; margin:20px 0; color:var(--success-color);">[==== SCANNING GUILD LIST ====]</div>
-                <p style="color:var(--text-dim); margin-top:20px;">YOU MUST BE IN THE GUILD DISCORD TO ACCESS THIS TOOL.</p>
+                
+                <p id="locked-subtext" style="color:var(--text-dim); margin-top:20px;">YOU MUST BE IN THE GUILD DISCORD TO ACCESS THIS TOOL.</p>
+                
                 <button id="retryScanBtn" class="btn-primary" style="margin-top:20px; width:auto; display:inline-block;">RE-AUTHENTICATE (DISCORD)</button>
-                <button id="lockedLogoutBtn" class="btn-secondary" style="border-color:var(--danger-color); color:var(--danger-color); margin-left:10px; width:auto; display:inline-block;">LOGOUT</button>
+                <button id="lockedLogoutBtn" class="btn-secondary" style="border-color:currentColor; color:currentColor; margin-left:10px; width:auto; display:inline-block;">LOGOUT</button>
             </div>
         </section>
 
@@ -317,7 +328,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v19.6 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v19.7 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden">
@@ -394,7 +405,7 @@
         };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v19.6 [MODAL FIX] ONLINE...");
+            console.log("🚀 ARC SYSTEM v19.7 [PENDING FIX] ONLINE...");
             
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); } 
             catch (e) { console.error("Lib Error", e); }
@@ -432,11 +443,17 @@
             document.body.addEventListener('click', function(e) {
                 const target = e.target.closest('.help-btn');
                 if (target) {
-                    e.preventDefault(); 
-                    e.stopPropagation(); 
+                    e.preventDefault(); e.stopPropagation(); 
                     const key = target.dataset.key; 
                     window.showHelp(key);
                 }
+            });
+
+            // --- TARGETED CLOSE MODAL LOGIC ---
+            document.querySelectorAll('.close-modal').forEach(b => {
+                b.onclick = function() { 
+                    this.closest('.modal-overlay').classList.add('hidden'); 
+                }; 
             });
 
             // --- HANDLERS ---
@@ -466,13 +483,6 @@
                 document.getElementById('profileModal').classList.remove('hidden');
             });
             if(document.getElementById('repairProfileBtn')) attach('repairProfileBtn', 'click', () => navTo('onboarding'));
-            
-            // --- UPDATED CLOSE MODAL LOGIC (TARGETED) ---
-            document.querySelectorAll('.close-modal').forEach(b => {
-                b.onclick = function() { 
-                    this.closest('.modal-overlay').classList.add('hidden'); 
-                }; 
-            });
 
             let currentUserProfile = null;
 
@@ -506,10 +516,45 @@
                         if(statusUpdate) await supabaseClient.from('profiles').update({ status: 'verified' }).eq('id', currentUser.id);
                         isVerified = true; checkProfile();
                     } else {
-                        document.getElementById('locked-reason').textContent = "NOT A MEMBER OF TARGET SERVER.";
+                        // DENIED: NOT IN SERVER
+                        setLockedState('denied');
                         navTo('locked');
                     }
                 } catch(e) { console.error(e); }
+            }
+
+            // --- LOCKED SCREEN MANAGER (NEW) ---
+            function setLockedState(type) {
+                const box = document.getElementById('locked-box');
+                const title = document.getElementById('locked-title');
+                const reason = document.getElementById('locked-reason');
+                const sub = document.getElementById('locked-subtext');
+                const icon = document.getElementById('locked-icon');
+                const retry = document.getElementById('retryScanBtn');
+
+                // RESET
+                box.className = 'locked-screen';
+                retry.style.display = 'inline-block';
+
+                if (type === 'pending') {
+                    box.classList.add('state-pending');
+                    icon.textContent = '⏳';
+                    title.textContent = 'ACCESS PENDING // STANDBY';
+                    reason.textContent = 'IDENTITY CONFIRMED. AWAITING COMMANDER APPROVAL.';
+                    sub.textContent = 'YOU ARE A MEMBER OF THE SERVER, BUT YOUR FILE IS UNDER REVIEW.';
+                    retry.style.display = 'none'; // No need to retry scan if valid
+                } else if (type === 'denied') {
+                    box.classList.add('state-denied');
+                    icon.textContent = '🔒';
+                    title.textContent = 'ACCESS DENIED // HOSTILE';
+                    reason.textContent = 'NOT A MEMBER OF TARGET SERVER.';
+                    sub.textContent = 'YOU MUST BE IN THE GUILD DISCORD TO ACCESS THIS TOOL.';
+                } else {
+                    // Default
+                    icon.textContent = '🔒';
+                    title.textContent = 'ACCESS DENIED';
+                    reason.textContent = 'TOKEN EXPIRED OR MISSING.';
+                }
             }
 
             async function checkProfile() {
@@ -539,7 +584,12 @@
                     userTimezone = data.timezone || dayjs.tz.guess();
                     if(data.availability_json) populateScheduleModal(data.availability_json); else populateScheduleModal(null);
 
-                    if (!isVerified) navTo('locked');
+                    if (!isVerified) {
+                        // CHECK STATUS FOR MESSAGE
+                        if (data.status === 'pending') setLockedState('pending');
+                        else setLockedState('denied');
+                        navTo('locked');
+                    }
                     else { 
                         const {data: allP} = await supabaseClient.from('profiles').select('id, discord_name, embark_id');
                         if(allP) allP.forEach(p => profilesMap[p.id] = p.discord_name);
