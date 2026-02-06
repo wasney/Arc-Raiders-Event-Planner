@@ -1,9 +1,20 @@
 RAIDER // SIGNAL
 Tactical Coordination Suite for Arc Raiders
 
-RAIDER // SIGNAL is a web-based "Command & Control" dashboard designed to help gaming guilds coordinate missions, manage rosters, and synchronize raid times across global time zones.
+RAIDER // SIGNAL is a "Command & Control" dashboard designed to help gaming guilds coordinate missions, manage rosters, and synchronize raid times across global time zones.
 
-It serves as a secure, external extension of a Discord community, allowing for persistent event planning and squad composition management outside of chat logs.
+It functions as a Progressive Web App (PWA), meaning it can be installed natively on desktop and mobile devices for an immersive, full-screen experience without requiring an app store download.
+📱 Field Deployment (PWA)
+
+This tool is Install-Ready. It utilizes a Service Worker with a "Network First" strategy to ensure operators always see live roster data while maintaining app-like performance.
+
+    Desktop (Chrome/Edge): Look for the Install Icon ( ⊕ ) in the right side of the address bar.
+
+    Mobile (iOS): Tap Share → Add to Home Screen.
+
+    Mobile (Android): Tap Menu (⋮) → Install App or Add to Home Screen.
+
+Once installed, RAIDER // SIGNAL launches in a standalone window, removing browser UI elements for a dedicated tactical interface.
 📡 Core Capabilities
 
     Secure Uplink (Auth): Users authenticate via Discord OAuth2.
@@ -24,7 +35,9 @@ This project utilizes a "Serverless" architecture, running entirely in the brows
 
     Frontend: Vanilla JavaScript (ES6+), HTML5, CSS3.
 
-        Design Philosophy: High-contrast, cyberpunk terminal aesthetic with scanline effects.
+        PWA: manifest.json & sw.js for native installation and asset caching.
+
+        Design: High-contrast, cyberpunk terminal aesthetic with scanline effects.
 
     Database & Auth: Supabase (PostgreSQL).
 
@@ -61,6 +74,8 @@ This tool operates on a "Trust No One" (Zero Trust) database model:
 This project is designed to be hosted on GitHub Pages or any static hosting service (Vercel, Netlify).
 
     Clone the repository.
+
+    Ensure index.html, manifest.json, sw.js, and the icon files (icon-192.png, icon-512.png) are in the root directory.
 
     Update the REQUIRED_GUILD_ID in index.html to your Discord Server ID.
 
