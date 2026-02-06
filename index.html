@@ -89,6 +89,8 @@
         .btn-admin-kick { display: block; margin-top: 10px; background: #000; border: 1px solid var(--admin-color); color: var(--admin-color); width: 100%; font-size: 0.8rem; }
         .btn-admin-approve { display: block; margin-top: 10px; background: var(--success-color); color: #000; width: 100%; font-size: 0.9rem; padding: 8px; border: none; }
         .btn-admin-approve:hover { background: #fff; box-shadow: 0 0 10px var(--success-color); }
+        .btn-admin-promote { margin-right:5px; border:1px solid var(--cal-color); color:var(--cal-color); background:transparent; }
+        .btn-admin-demote { margin-right:5px; border:1px solid var(--text-dim); color:var(--text-dim); background:transparent; }
         
         .sitrep-banner { background: rgba(255, 170, 0, 0.1); border: 2px solid var(--locked-color); color: var(--locked-color); padding: 15px; margin-bottom: 20px; font-weight: bold; text-align: center; cursor: pointer; display: none; }
         .sitrep-banner:hover { background: var(--locked-color); color: #000; }
@@ -133,7 +135,6 @@
         .add-slot-btn { background: #111; border: 1px solid var(--success-color); color: var(--success-color); width: 30px; height: 30px; }
         .disabled-day { opacity: 0.3; }
         
-        /* COMMS ARRAY STYLES */
         .webhook-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
         .webhook-item { background: #080808; border: 1px solid var(--border-color); padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .webhook-info h4 { color: var(--text-main); margin: 0; font-size: 1rem; }
@@ -213,7 +214,7 @@
                 REGION: <strong id="u-region" style="color:var(--text-main)">-</strong> //
                 TZ: <strong id="u-timezone" style="color:var(--accent-color)">-</strong>
             </div>
-            <div id="admin-badge" style="display:none; color:var(--admin-color); font-weight:bold; margin-bottom:20px; border:1px solid var(--admin-color); padding:5px; display:inline-block;">[COMMANDER ACCESS GRANTED]</div>
+            <div id="admin-badge" style="display:none; color:var(--admin-color); font-weight:bold; margin-bottom:20px; border:1px solid var(--admin-color); padding:5px; display:inline-block;"></div>
             
             <div id="admin-sitrep" class="sitrep-banner"></div>
 
@@ -251,17 +252,17 @@
 
         <section id="admin-section" class="hidden">
             <h2 style="color:var(--admin-color)">// COMMAND CENTER</h2>
-            <div class="config-card">
+            
+            <div id="config-panel" class="config-card">
                 <h3 style="color:var(--text-main); border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:15px;">SYSTEM CONFIGURATION</h3>
                 <div class="form-group"><div class="label-row"><label>TARGET GUILD ID</label><button type="button" class="help-btn" data-key="guild_id">?</button></div><input id="cfg-guild-id" placeholder="Discord Server ID"></div>
                 <div class="checkbox-grid"><div style="display:flex; align-items:center; gap:10px;"><input type="checkbox" id="cfg-auto-approve" style="width:20px; height:20px;"> <label for="cfg-auto-approve" style="margin:0;">AUTO-APPROVE RECRUITS</label><button type="button" class="help-btn" data-key="auto_approve">?</button></div></div>
                 <button id="saveConfigBtn" class="btn-primary" style="margin-top:15px; width:auto;">SAVE CONFIGURATION</button>
             </div>
 
-            <div class="config-card" style="border-left-color: var(--cal-color);">
+            <div id="comms-panel" class="config-card" style="border-left-color: var(--cal-color);">
                 <h3 style="color:var(--cal-color); border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:15px;">COMMS ARRAY // WEBHOOKS</h3>
                 <div id="comms-list" class="webhook-list"></div>
-                
                 <div style="background:#0a0a0a; padding:15px; border:1px solid var(--border-color);">
                     <h4 style="color:var(--text-dim); margin-bottom:10px;">ADD NEW UPLINK</h4>
                     <div class="form-group"><input id="new-wh-label" placeholder="Label (e.g. My Private Server)"></div>
@@ -298,7 +299,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.0 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.2 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -322,12 +323,12 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.0 [COMMS ARRAY] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.2 [CHAIN OF COMMAND] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
             const supabaseClient = supabase.createClient(CONFIG.url, CONFIG.key);
-            let currentUser = null, currentSession = null, profilesMap = {}, userTimezone = dayjs.tz.guess(), isAdmin = false, isVerified = false;
+            let currentUser = null, currentSession = null, profilesMap = {}, userTimezone = dayjs.tz.guess(), isAdmin = false, isOfficer = false, isVerified = false;
             let APP_SETTINGS = { guild_id: "1465694444484427903", auto_approve: false };
             let potentialSquad = [];
 
@@ -344,7 +345,7 @@
                 const t = document.getElementById(pageId+'-section'); if(t) t.classList.remove('hidden');
                 if(pageId === 'roster') loadRoster();
                 if(pageId === 'board') loadBoard();
-                if(pageId === 'admin') { loadAdminTable(); loadCommsArray(); }
+                if(pageId === 'admin') { loadAdminTable(); if(isAdmin) loadCommsArray(); }
                 if(pageId === 'alerts') loadAlerts();
             }
 
@@ -379,14 +380,12 @@
             });
             if(document.getElementById('repairProfileBtn')) attach('repairProfileBtn', 'click', () => navTo('onboarding'));
             
-            // FUTURE LOOKUP
             attach('runFutureCheck', 'click', loadRoster);
             attach('launchFutureOp', 'click', () => {
                 const targetTime = document.getElementById('roster-future-time').value;
                 if(targetTime) { document.getElementById('e-time').value = targetTime; document.getElementById('eventModal').classList.remove('hidden'); }
             });
 
-            // COMMS ARRAY
             attach('addWebhookBtn', 'click', async () => {
                 const label = document.getElementById('new-wh-label').value;
                 const url = document.getElementById('new-wh-url').value;
@@ -428,8 +427,12 @@
                 if (data) {
                     currentUserProfile = data; 
                     if (!data.discord_name) { navTo('onboarding'); return; }
-                    isAdmin = data.is_admin || false;
-                    isVerified = (data.status === 'verified') || isAdmin;
+                    
+                    // PERMISSION LOGIC
+                    const rank = data.rank || 'soldier';
+                    isAdmin = (rank === 'commander');
+                    isOfficer = (rank === 'officer');
+                    isVerified = (data.status === 'verified') || isAdmin || isOfficer;
 
                     document.getElementById('u-name').textContent = data.discord_name;
                     document.getElementById('u-embark-display').textContent = data.embark_id ? `ID: ${data.embark_id}` : '';
@@ -438,12 +441,26 @@
                     document.getElementById('u-region').textContent = data.region;
                     document.getElementById('u-timezone').textContent = data.timezone || userTimezone;
                     
-                    if(isAdmin) {
-                        document.getElementById('admin-badge').style.display = 'inline-block';
+                    if(isAdmin || isOfficer) {
+                        const badge = document.getElementById('admin-badge');
+                        badge.style.display = 'inline-block';
+                        badge.textContent = isAdmin ? '[COMMANDER ACCESS]' : '[FIELD OFFICER]';
+                        badge.style.borderColor = isAdmin ? 'var(--admin-color)' : 'var(--cal-color)';
+                        badge.style.color = isAdmin ? 'var(--admin-color)' : 'var(--cal-color)';
+                        
                         document.getElementById('pending-toggle-label').style.display = 'flex';
                         document.getElementById('nav-admin-li').style.display = 'block'; 
-                        document.getElementById('cfg-guild-id').value = APP_SETTINGS.guild_id;
-                        document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve;
+                        
+                        // HIDE SENSITIVE PANELS FOR OFFICERS
+                        if(isOfficer) {
+                            document.getElementById('config-panel').style.display = 'none';
+                            document.getElementById('comms-panel').style.display = 'none';
+                        }
+                        
+                        if(isAdmin) {
+                            document.getElementById('cfg-guild-id').value = APP_SETTINGS.guild_id;
+                            document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve;
+                        }
                         await checkAdminAlerts();
                     }
                     
@@ -461,7 +478,7 @@
             }
 
             async function checkAdminAlerts() {
-                if(!isAdmin) return;
+                if(!isAdmin && !isOfficer) return;
                 const { count } = await supabaseClient.from('profiles').select('*', { count: 'exact', head: true }).eq('status', 'pending');
                 if (count > 0) {
                     const nav = document.getElementById('nav-admin'); nav.textContent = `COMMAND [${count}]`; nav.style.color = 'var(--locked-color)';
@@ -496,7 +513,6 @@
                 alert("Settings Saved. Reloading..."); window.location.reload();
             }
 
-            // --- COMMS ARRAY LOGIC ---
             async function loadCommsArray() {
                 if(!isAdmin) return;
                 const list = document.getElementById('comms-list'); list.innerHTML = 'Loading Webhooks...';
@@ -505,20 +521,7 @@
                 list.innerHTML = '';
                 data.forEach(wh => {
                     const statusColor = wh.is_active ? 'var(--success-color)' : 'var(--danger-color)';
-                    list.innerHTML += `
-                        <div class="webhook-item">
-                            <div class="webhook-info">
-                                <div style="display:flex; align-items:center; gap:5px;">
-                                    <span class="webhook-badge badge-${wh.type}">${wh.type.toUpperCase()}</span>
-                                    <h4>${wh.label}</h4>
-                                </div>
-                                <span>${wh.url.substring(0, 30)}...</span>
-                            </div>
-                            <div style="display:flex; gap:5px;">
-                                <button class="mini-btn" style="border-color:${statusColor}; color:${statusColor}" onclick="window.toggleWebhook('${wh.id}', ${!wh.is_active})">${wh.is_active ? 'ON' : 'OFF'}</button>
-                                <button class="mini-btn btn-red" onclick="window.deleteWebhook('${wh.id}')">DEL</button>
-                            </div>
-                        </div>`;
+                    list.innerHTML += `<div class="webhook-item"><div class="webhook-info"><div style="display:flex; align-items:center; gap:5px;"><span class="webhook-badge badge-${wh.type}">${wh.type.toUpperCase()}</span><h4>${wh.label}</h4></div><span>${wh.url.substring(0, 30)}...</span></div><div style="display:flex; gap:5px;"><button class="mini-btn" style="border-color:${statusColor}; color:${statusColor}" onclick="window.toggleWebhook('${wh.id}', ${!wh.is_active})">${wh.is_active ? 'ON' : 'OFF'}</button><button class="mini-btn btn-red" onclick="window.deleteWebhook('${wh.id}')">DEL</button></div></div>`;
                 });
             }
 
@@ -526,7 +529,6 @@
             window.deleteWebhook = async (id) => { if(confirm('Delete Uplink?')) { await supabaseClient.from('webhook_endpoints').delete().eq('id', id); loadCommsArray(); }};
 
             async function sendWebhook(title, desc, time) {
-                // Get all active webhooks for missions or debug
                 const { data } = await supabaseClient.from('webhook_endpoints').select('url').in('type', ['general', 'debug']).eq('is_active', true);
                 if(!data) return;
                 const payload = { content: "🚨 **NEW MISSION ALERT**", embeds: [{ title: title, description: desc, color: 16733440, fields: [{ name: "Time", value: time, inline: true }, { name: "Link", value: window.location.href, inline: true }], footer: { text: "Raider // Signal" } }] };
@@ -610,19 +612,40 @@
                     if(futureTime && isAvailable) potentialSquad.push(p.id);
 
                     let actions = '';
-                    if(isAdmin && p.id !== currentUser.id) {
-                        if(isPending) actions += `<button class="mini-btn btn-green" onclick="window.approve('${p.id}')">APPROVE</button>`;
-                        actions += `<button class="mini-btn btn-red" onclick="window.kick('${p.id}')">KICK</button>`;
+                    if(isAdmin || isOfficer) { // Logic for both Commanders and Officers
+                        if(p.id !== currentUser.id) { // Don't act on self
+                            if(isPending) actions += `<button class="mini-btn btn-green" onclick="window.approve('${p.id}')">APPROVE</button>`;
+                            else {
+                                // Promotion Logic
+                                const targetRank = p.rank || 'soldier';
+                                if (targetRank === 'commander') {
+                                    // NO ONE touches Commander except maybe another Commander (out of scope, safest to lock)
+                                } else if (targetRank === 'officer') {
+                                    if(isAdmin) actions += `<button class="mini-btn btn-admin-demote" onclick="window.toggleRank('${p.id}', 'soldier')">DEMOTE</button>`;
+                                } else {
+                                    // Target is Soldier
+                                    actions += `<button class="mini-btn btn-admin-promote" onclick="window.toggleRank('${p.id}', 'officer')">PROMOTE</button>`;
+                                }
+                            }
+                            // Kick Logic - Commanders/Officers can kick soldiers. Commanders can kick officers.
+                            if (isAdmin || (isOfficer && p.rank !== 'commander' && p.rank !== 'officer')) {
+                                actions += `<button class="mini-btn btn-red" onclick="window.kick('${p.id}')">KICK</button>`;
+                            }
+                        }
                     }
 
-                    grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url || 'https://placehold.co/50'}" class="member-avatar"><div><h3>${p.discord_name}</h3><div style="font-size:0.9rem; color:var(--accent-color); font-weight:bold;">${p.embark_id || ''}</div><div style="font-size:0.9rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div></div></div><div style="margin-top:10px; border-top:1px dashed #333; padding-top:10px;">${status}</div><div style="margin-top:10px;">${actions}</div></div>`;
+                    let nameDisplay = p.discord_name;
+                    if (p.rank === 'commander') nameDisplay = `<span style="color:var(--admin-color)">[CMD] ${p.discord_name}</span>`;
+                    else if (p.rank === 'officer') nameDisplay = `<span style="color:var(--cal-color)">[OFC] ${p.discord_name}</span>`;
+
+                    grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url || 'https://placehold.co/50'}" class="member-avatar"><div><h3>${nameDisplay}</h3><div style="font-size:0.9rem; color:var(--accent-color); font-weight:bold;">${p.embark_id || ''}</div><div style="font-size:0.9rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div></div></div><div style="margin-top:10px; border-top:1px dashed #333; padding-top:10px;">${status}</div><div style="margin-top:10px;">${actions}</div></div>`;
                 });
                 
                 if(futureTime && potentialSquad.length > 0) document.getElementById('launchFutureOp').textContent = `LAUNCH OP (${potentialSquad.length} AGENTS)`;
             }
 
             window.loadAdminTable = async () => {
-                if(!isAdmin) return;
+                if(!isAdmin && !isOfficer) return;
                 const tb = document.getElementById('adminTableBody'); tb.innerHTML = 'Loading...';
                 const { data: profiles } = await supabaseClient.from('profiles').select('*').order('created_at', {ascending: false});
                 if(!profiles) return; tb.innerHTML = '';
@@ -630,12 +653,40 @@
                     const isPending = p.status === 'pending';
                     const stat = isPending ? '<span class="status-pending">PENDING</span>' : '<span class="status-verified">VERIFIED</span>';
                     let act = '';
+                    
+                    // Admin Table Logic mirrors Roster Logic
                     if(p.id !== currentUser.id) {
                         if(isPending) act += `<button class="mini-btn btn-green" onclick="window.approve('${p.id}')">OK</button>`;
-                        act += `<button class="mini-btn btn-red" onclick="window.kick('${p.id}')">X</button>`;
+                        else {
+                            const targetRank = p.rank || 'soldier';
+                            if (targetRank !== 'commander') {
+                                if (targetRank === 'officer') {
+                                    if(isAdmin) act += `<button class="mini-btn btn-admin-demote" onclick="window.toggleRank('${p.id}', 'soldier')">DEMOTE</button>`;
+                                } else {
+                                    // Soldier
+                                    act += `<button class="mini-btn btn-admin-promote" onclick="window.toggleRank('${p.id}', 'officer')">PROMOTE</button>`;
+                                }
+                            }
+                        }
+                        if (isAdmin || (isOfficer && p.rank !== 'commander' && p.rank !== 'officer')) {
+                            act += `<button class="mini-btn btn-red" onclick="window.kick('${p.id}')">X</button>`;
+                        }
                     }
-                    tb.innerHTML += `<tr><td>${p.discord_name}</td><td>${p.embark_id || '-'}</td><td>${p.region}/${p.play_style}</td><td>${stat}</td><td>${dayjs(p.created_at).format('MMM D')}</td><td>${act}</td></tr>`;
+                    
+                    let nameDisplay = p.discord_name;
+                    if (p.rank === 'commander') nameDisplay = `<span style="color:var(--admin-color)">[CMD] ${p.discord_name}</span>`;
+                    else if (p.rank === 'officer') nameDisplay = `<span style="color:var(--cal-color)">[OFC] ${p.discord_name}</span>`;
+                    
+                    tb.innerHTML += `<tr><td>${nameDisplay}</td><td>${p.embark_id || '-'}</td><td>${p.region}/${p.play_style}</td><td>${stat}</td><td>${dayjs(p.created_at).format('MMM D')}</td><td>${act}</td></tr>`;
                 });
+            };
+
+            window.toggleRank = async (id, newRank) => {
+                if(confirm(`Promote/Demote to ${newRank.toUpperCase()}?`)) {
+                    await supabaseClient.from('profiles').update({ rank: newRank }).eq('id', id);
+                    loadAdminTable();
+                    if(!document.getElementById('roster-section').classList.contains('hidden')) loadRoster();
+                }
             };
 
             window.approve = async (id) => { if(confirm('Approve?')) { await supabaseClient.from('profiles').update({status:'verified'}).eq('id', id); loadRoster(); loadAdminTable(); }};
@@ -652,7 +703,9 @@
                     const attending = signups?.filter(s => s.event_id === ev.id) || [];
                     const isSignedUp = attending.some(s => s.user_id === currentUser.id);
                     const isHost = ev.host_id === currentUser.id;
-                    grid.innerHTML += `<div class="event-card">${(isHost||isAdmin) ? `<button class="btn-admin-delete" onclick="window.delEvent('${ev.id}')">DEL</button>` : ''}<div class="event-title">${ev.title}</div><div class="mission-type">${ev.mission_type}</div><div style="margin:10px 0; font-weight:bold; font-size:1.2rem; color:var(--text-main)">${dayjs(ev.start_time).tz(userTimezone).format('MMM D, HH:mm')}</div><div style="color:var(--text-dim)">${ev.description}</div><div class="attendees-list">SQUAD [${attending.length}]: ${attending.map(s => `<span class="attendee-pill">${profilesMap[s.user_id]||'Agent'}</span>`).join('')}</div>${isSignedUp ? `<button class="btn-leave" onclick="window.leaveEvent('${ev.id}')">ABORT</button>` : `<button class="btn-join" onclick="window.joinEvent('${ev.id}')">JOIN</button>`}</div>`;
+                    const canDelete = isHost || isAdmin || isOfficer; // Chain of Command Logic
+                    
+                    grid.innerHTML += `<div class="event-card">${canDelete ? `<button class="btn-admin-delete" onclick="window.delEvent('${ev.id}')">DEL</button>` : ''}<div class="event-title">${ev.title}</div><div class="mission-type">${ev.mission_type}</div><div style="margin:10px 0; font-weight:bold; font-size:1.2rem; color:var(--text-main)">${dayjs(ev.start_time).tz(userTimezone).format('MMM D, HH:mm')}</div><div style="color:var(--text-dim)">${ev.description}</div><div class="attendees-list">SQUAD [${attending.length}]: ${attending.map(s => `<span class="attendee-pill">${profilesMap[s.user_id]||'Agent'}</span>`).join('')}</div>${isSignedUp ? `<button class="btn-leave" onclick="window.leaveEvent('${ev.id}')">ABORT</button>` : `<button class="btn-join" onclick="window.joinEvent('${ev.id}')">JOIN</button>`}</div>`;
                 });
             }
 
