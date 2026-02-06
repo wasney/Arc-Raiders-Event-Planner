@@ -97,3 +97,22 @@ insert into app_config (key, value) values
   ('discord_webhook_url', ''),
   ('admin_webhook_url', ''),
   ('auto_approve', 'false');
+
+*Note: You must also enable Row Level Security (RLS) policies on all tables to secure user data.*
+
+## 🚀 Deployment
+
+1.  **Clone the Repo:** Download the files to your machine.
+2.  **Upload Icons:** Ensure `icon-192.png` and `icon-512.png` are in the root folder (for PWA support).
+3.  **Configure Supabase:**
+    * Create a project at [Supabase.com](https://supabase.com).
+    * Run the SQL above.
+    * Enable Discord OAuth in Supabase Authentication settings.
+4.  **Connect the App:**
+    * Open `index.html`.
+    * Update the `CONFIG` object with your Supabase URL and Anon Key.
+5.  **Launch:** Host on GitHub Pages, Netlify, or Vercel.
+
+---
+*Disclaimer: This is a fan-made tool for community organization and is not affiliated with Embark Studio
+s.*
