@@ -302,7 +302,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.5 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.6 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -326,21 +326,70 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.5 [HANDSHAKE] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.6 [CLEAR PATH] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
-
-            // CHECK FOR INCOMING AUTH HASH
-            if (window.location.hash && window.location.hash.includes('access_token')) {
-                // If we have a hash, assume we are logging in. HIDE THE LOGIN BUTTON.
-                document.getElementById('loginBtn').style.display = 'none';
-                document.getElementById('auth-loading').style.display = 'block';
-            }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
             const supabaseClient = supabase.createClient(CONFIG.url, CONFIG.key);
             let currentUser = null, currentSession = null, profilesMap = {}, userTimezone = dayjs.tz.guess(), isAdmin = false, isOfficer = false, isVerified = false;
             let APP_SETTINGS = { guild_id: "1465694444484427903", auto_approve: false };
             let potentialSquad = [];
+
+            // --- UNIFIED INIT SEQUENCE ---
+            async function initApp() {
+                // Check if we are stuck in a loading loop (Fallback)
+                setTimeout(() => {
+                    const loading = document.getElementById('auth-loading');
+                    if (loading.style.display !== 'none') {
+                        console.warn("Forcing UI Reset due to timeout");
+                        loading.style.display = 'none';
+                        if (!currentUser) document.getElementById('loginBtn').style.display = 'inline-block';
+                    }
+                }, 5000); // 5 Seconds max wait time
+
+                // Check for existing session first
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    handleSession(session);
+                } else {
+                    // If no session, listen for the redirect event
+                    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                        if (event === 'SIGNED_IN' && session) {
+                            handleSession(session);
+                        } else if (event === 'SIGNED_OUT') {
+                            resetUI();
+                        }
+                    });
+                }
+            }
+
+            async function handleSession(session) {
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('auth-loading').style.display = 'block';
+                
+                currentSession = session;
+                currentUser = session.user;
+                
+                await loadSettings();
+                if(session.provider_token) await performGuildCheck();
+                await checkProfile();
+                
+                // Hide loading screen only after profile check completes/fails
+                document.getElementById('auth-loading').style.display = 'none';
+            }
+
+            function resetUI() {
+                currentSession = null;
+                currentUser = null;
+                document.getElementById('login-section').classList.remove('hidden');
+                document.getElementById('dashboard-section').classList.add('hidden');
+                document.getElementById('main-nav').style.display = 'none';
+                document.getElementById('loginBtn').style.display = 'inline-block';
+                document.getElementById('auth-loading').style.display = 'none';
+            }
+
+            // START THE ENGINE
+            initApp();
 
             async function loadSettings() {
                 try {
@@ -351,6 +400,10 @@
 
             function navTo(pageId) {
                 ['login','onboarding','dashboard','roster','board','locked','admin','alerts'].forEach(p => { const el = document.getElementById(p+'-section'); if(el) el.classList.add('hidden'); });
+                
+                // HIDE LOADING TEXT IF NAVIGATING AWAY
+                document.getElementById('auth-loading').style.display = 'none';
+
                 if(pageId === 'onboarding') { document.getElementById('onboarding-section').classList.remove('hidden'); document.getElementById('main-nav').style.display = 'none'; return; }
                 if(!isVerified && pageId !== 'login' && pageId !== 'locked') { document.getElementById('locked-section').classList.remove('hidden'); document.getElementById('main-nav').style.display = 'none'; return; }
                 document.getElementById('main-nav').style.display = 'flex';
@@ -370,7 +423,11 @@
             attach('nav-roster', 'click', () => navTo('roster'));
             attach('nav-board', 'click', () => navTo('board'));
             attach('nav-admin', 'click', () => navTo('admin'));
-            attach('loginBtn', 'click', async () => { await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin + window.location.pathname, scopes: 'guilds' } }); });
+            attach('loginBtn', 'click', async () => { 
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('auth-loading').style.display = 'block';
+                await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin + window.location.pathname, scopes: 'guilds' } }); 
+            });
             attach('retryScanBtn', 'click', async () => { await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin + window.location.pathname, scopes: 'guilds' } }); });
             attach('logoutBtn', 'click', async () => { await supabaseClient.auth.signOut(); window.location.reload(); });
             attach('lockedLogoutBtn', 'click', async () => { await supabaseClient.auth.signOut(); window.location.reload(); });
@@ -407,40 +464,6 @@
                 document.getElementById('new-wh-label').value = ''; document.getElementById('new-wh-url').value = '';
                 loadCommsArray();
             });
-
-            // --- AUTH STATE MONITOR (PRIORITY) ---
-            supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                if (event === 'SIGNED_IN' && session) {
-                    // Auth successful, proceed
-                    document.getElementById('loginBtn').style.display = 'none';
-                    document.getElementById('auth-loading').style.display = 'block';
-                    currentSession = session; 
-                    currentUser = session.user; 
-                    await loadSettings(); 
-                    if(session.provider_token) await performGuildCheck(); 
-                    await checkProfile(); 
-                } else if (event === 'SIGNED_OUT') {
-                    // Clean reset
-                    currentSession = null;
-                    currentUser = null;
-                    document.getElementById('login-section').classList.remove('hidden');
-                    document.getElementById('dashboard-section').classList.add('hidden');
-                    document.getElementById('main-nav').style.display = 'none';
-                    document.getElementById('loginBtn').style.display = 'inline-block';
-                    document.getElementById('auth-loading').style.display = 'none';
-                }
-            });
-
-            // CHECK SESSION MANUALLY (Backup)
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                // Already logged in
-                currentSession = session; 
-                currentUser = session.user; 
-                await loadSettings(); 
-                if(session.provider_token) await performGuildCheck(); 
-                await checkProfile(); 
-            }
 
             async function performGuildCheck() {
                 if(!currentSession?.provider_token) return;
@@ -503,7 +526,6 @@
                                 document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve;
                             }
                             
-                            // SAFE CALL TO ALERTS
                             try { await checkAdminAlerts(); } catch(e) { console.warn('Admin Alerts Failed (Check DB)', e); }
                         }
                         
@@ -515,7 +537,6 @@
                             const {data: allP} = await supabaseClient.from('profiles').select('id, discord_name, embark_id');
                             if(allP) allP.forEach(p => profilesMap[p.id] = p.discord_name);
                             
-                            // SAFE CALL TO USER ALERTS
                             try { await checkUserNotifications(); } catch(e) { console.warn('User Alerts Failed (Check DB)', e); }
                             
                             navTo('dashboard'); 
