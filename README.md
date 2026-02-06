@@ -3,62 +3,97 @@
 
 **RAIDER // SIGNAL** is a "Command & Control" dashboard designed to help gaming guilds coordinate missions, manage rosters, and synchronize raid times across global time zones.
 
-It functions as a **Progressive Web App (PWA)**, meaning it can be installed natively on desktop and mobile devices for an immersive, full-screen experience without requiring an app store download.
-
-## 📱 Field Deployment (PWA)
-
-This tool is **Install-Ready**. It utilizes a Service Worker with a "Network First" strategy to ensure operators always see live roster data while maintaining app-like performance.
-
-* **Desktop (Chrome/Edge):** Look for the **Install Icon** ( ⊕ ) in the right side of the address bar.
-* **Mobile (iOS):** Tap **Share** → **Add to Home Screen**.
-* **Mobile (Android):** Tap **Menu (⋮)** → **Install App** or **Add to Home Screen**.
-
-Once installed, **RAIDER // SIGNAL** launches in a standalone window, removing browser UI elements for a dedicated tactical interface.
+It functions as a **Progressive Web App (PWA)**, offering a native app-like experience on mobile and desktop with offline caching and "Install to Home Screen" capabilities.
 
 ## 📡 Core Capabilities
 
 * **Secure Uplink (Auth):** Users authenticate via **Discord OAuth2**.
-* **The Gatekeeper:** An automated security protocol that scans the user's Discord server list. Access is strictly denied unless the user is a verified member of the target Guild.
-* **Global Chronometer:** Automatic time zone normalization. A user in Tokyo sees mission times in JST, while a user in New York sees the same mission in EST.
-* **Tactical Roster:** A filtered database of agents, searchable by **Region** (NA/EU/Global), **Playstyle** (PvP/PvE), and **Active Status**.
-* **Mission Board:** Create, edit, and join raids. Includes countdown timers and "Add to Calendar" (.ics/Google) integration.
-* **Command Center:** A hidden administrative dashboard for managing personnel, approving new recruits, and discharging agents.
+* **The Gatekeeper:** Automated security protocol. Access is denied unless the user is a verified member of the target Guild. Includes "Pending" states for admin approval.
+* **Tactical Forecaster (Roster):** "Time Machine" lookup allows admins to check squad availability for future dates/times across all time zones.
+* **The Headhunter (Auto-Match):** When a mission is scheduled, the system automatically identifies available agents and pushes internal **Tactical Alerts** to their dashboard.
+* **Mission Board:** Create, edit, and join raids. Includes countdown timers, conditions, and ".ics/Google Calendar" export.
+* **Command Center:** A hidden administrative dashboard for managing personnel, approving recruits, and configuring system settings (Webhooks, Auto-Approve) without touching code.
 
-## 🛠️ Tech Stack & Services
+## 📱 Field Deployment (PWA)
 
-This project utilizes a "Serverless" architecture, running entirely in the browser while leveraging powerful APIs for backend logic.
+This tool is **Install-Ready**. It utilizes a Service Worker with a "Network First" strategy to ensure operators always see live data.
+
+* **Desktop:** Look for the **Install Icon** ( ⊕ ) in the address bar.
+* **Mobile (iOS/Android):** Tap **Share** → **Add to Home Screen**.
+* **Mobile Optimized:** Features a horizontal-scroll navigation bar and touch-optimized tooltips.
+
+## 🛠️ Tech Stack & Architecture
 
 * **Frontend:** Vanilla JavaScript (ES6+), HTML5, CSS3.
-    * **PWA:** `manifest.json` & `sw.js` for native installation and asset caching.
-    * **Design:** High-contrast, cyberpunk terminal aesthetic with scanline effects.
-* **Database & Auth:** **[Supabase](https://supabase.com/)** (PostgreSQL).
-    * Handles user sessions, profile storage, and event management.
-    * Security is enforced via Row Level Security (RLS) policies.
-* **Authentication Provider:** **Discord**.
-    * Used for identity verification and avatar retrieval.
-* **Time Management:** **[Day.js](https://day.js.org/)**.
-    * Handles complex UTC conversions and relative time formatting.
+    * *No Build Steps:* Runs directly in the browser.
+* **Backend:** **[Supabase](https://supabase.com/)** (PostgreSQL).
+    * Handles Auth, Database, and Real-time subscriptions.
+* **Integrations:**
+    * **Discord Webhooks:** Broadcasts mission briefings to public channels and "Pending Recruit" alerts to private admin channels.
 
-## 🔒 Security Model
+## 🗄️ Database Schema (Required)
 
-This tool operates on a "Trust No One" (Zero Trust) database model:
+To deploy this yourself, run these SQL commands in your Supabase SQL Editor to set up the required tables:
 
-1.  **Public Client:** The website source code contains public configuration keys (Supabase Anon Key, Discord Client ID). These are safe to expose.
-2.  **Database Gates (RLS):** Actual data access is controlled by the PostgreSQL database engine.
-    * **Unverified Users:** Can only read/write their *own* onboarding data.
-    * **Verified Agents:** Can read the roster and event board.
-    * **Admins:** Have full modification rights.
-3.  **Verification Loop:** Upon login, the client validates the user's Discord Guild membership. If the user leaves the Discord server, their access to this tool is revoked automatically upon their next session refresh.
+```sql
 
-## 🚀 Deployment
+-- 1. PROFILES (User Data)
+create table profiles (
+  id uuid references auth.users primary key,
+  discord_name text,
+  avatar_url text,
+  region text,
+  play_style text,
+  timezone text,
+  embark_id text,
+  status text default 'pending', -- 'verified', 'pending'
+  is_admin boolean default false,
+  notify_on_match boolean default true,
+  availability_json jsonb,
+  created_at timestamp with time zone default now()
+);
 
-This project is designed to be hosted on **GitHub Pages** or any static hosting service (Vercel, Netlify).
+-- 2. EVENTS (Missions)
+create table events (
+  id uuid default uuid_generate_v4() primary key,
+  title text,
+  description text,
+  start_time timestamp with time zone,
+  region text,
+  timezone text,
+  mission_type text,
+  conditions text[],
+  host_id uuid references profiles(id),
+  created_at timestamp with time zone default now()
+);
 
-1.  Clone the repository.
-2.  Ensure `index.html`, `manifest.json`, `sw.js`, and the icon files (`icon-192.png`, `icon-512.png`) are in the root directory.
-3.  Update the `REQUIRED_GUILD_ID` in `index.html` to your Discord Server ID.
-4.  Configure your Supabase URL and Key.
-5.  Deploy.
+-- 3. SIGNUPS (Attendance)
+create table event_signups (
+  event_id uuid references events(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
+  primary key (event_id, user_id)
+);
 
----
-*Disclaimer: This is a fan-made tool for community organization and is not affiliated with Embark Studios.*
+-- 4. NOTIFICATIONS (Headhunter System)
+create table notifications (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references auth.users not null,
+  title text not null,
+  message text,
+  action_link text,
+  is_read boolean default false,
+  created_at timestamp with time zone default now()
+);
+
+-- 5. APP CONFIG (Dynamic Settings)
+create table app_config (
+  key text primary key,
+  value text
+);
+
+-- 6. DEFAULT SETTINGS (Update these in the Admin Dashboard later)
+insert into app_config (key, value) values
+  ('required_guild_id', 'YOUR_DISCORD_SERVER_ID'),
+  ('discord_webhook_url', ''),
+  ('admin_webhook_url', ''),
+  ('auto_approve', 'false');
