@@ -127,7 +127,7 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; justify-content: center; align-items: center; }
         .modal-content { background: #000; width: 95%; max-width: 600px; padding: 2.5rem; border: 3px solid var(--accent-color); box-shadow: 0 0 40px rgba(255, 85, 0, 0.2); max-height: 90vh; overflow-y: auto; position: relative; z-index: 10001; }
         
-        /* --- NEW: INFO MODAL Z-INDEX OVERRIDE --- */
+        /* INFO MODAL PRIORITY */
         #infoModal { z-index: 20000 !important; }
         #infoModal .modal-content { z-index: 20001 !important; }
 
@@ -317,7 +317,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v19.5 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v19.6 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden">
@@ -394,7 +394,7 @@
         };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v19.5 [MODAL FIX] ONLINE...");
+            console.log("🚀 ARC SYSTEM v19.6 [MODAL FIX] ONLINE...");
             
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); } 
             catch (e) { console.error("Lib Error", e); }
@@ -466,7 +466,13 @@
                 document.getElementById('profileModal').classList.remove('hidden');
             });
             if(document.getElementById('repairProfileBtn')) attach('repairProfileBtn', 'click', () => navTo('onboarding'));
-            document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden')); });
+            
+            // --- UPDATED CLOSE MODAL LOGIC (TARGETED) ---
+            document.querySelectorAll('.close-modal').forEach(b => {
+                b.onclick = function() { 
+                    this.closest('.modal-overlay').classList.add('hidden'); 
+                }; 
+            });
 
             let currentUserProfile = null;
 
