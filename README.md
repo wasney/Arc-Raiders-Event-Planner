@@ -98,6 +98,8 @@ insert into app_config (key, value) values
   ('admin_webhook_url', ''),
   ('auto_approve', 'false');
 
+```
+
 *Note: You must also enable Row Level Security (RLS) policies on all tables to secure user data.*
 
 ## 🚀 Deployment
