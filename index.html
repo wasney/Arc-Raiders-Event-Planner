@@ -299,7 +299,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.3 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.4 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -323,7 +323,7 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.3 [HEADHUNTER] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.4 [FAIL-SAFE] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
@@ -333,8 +333,10 @@
             let potentialSquad = [];
 
             async function loadSettings() {
-                const { data } = await supabaseClient.from('app_config').select('*');
-                if (data) data.forEach(row => { if(row.key === 'required_guild_id') APP_SETTINGS.guild_id = row.value; if(row.key === 'auto_approve') APP_SETTINGS.auto_approve = (row.value === 'true'); });
+                try {
+                    const { data } = await supabaseClient.from('app_config').select('*');
+                    if (data) data.forEach(row => { if(row.key === 'required_guild_id') APP_SETTINGS.guild_id = row.value; if(row.key === 'auto_approve') APP_SETTINGS.auto_approve = (row.value === 'true'); });
+                } catch(e) { console.error('Settings load failed', e); }
             }
 
             function navTo(pageId) {
@@ -396,9 +398,26 @@
                 loadCommsArray();
             });
 
+            // --- AUTH HANDLING ---
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) { currentSession = session; currentUser = session.user; await loadSettings(); if(session.provider_token) await performGuildCheck(); await checkProfile(); } 
-            else { supabaseClient.auth.onAuthStateChange(async (e, session) => { if(session) { currentSession = session; currentUser = session.user; await loadSettings(); if(session.provider_token) await performGuildCheck(); await checkProfile(); } }); }
+            if (session) { 
+                currentSession = session; 
+                currentUser = session.user; 
+                await loadSettings(); 
+                if(session.provider_token) await performGuildCheck(); 
+                await checkProfile(); 
+            } else {
+                // LISTEN FOR OAUTH REDIRECTS
+                supabaseClient.auth.onAuthStateChange(async (event, session) => { 
+                    if (event === 'SIGNED_IN' && session) {
+                        currentSession = session; 
+                        currentUser = session.user; 
+                        await loadSettings(); 
+                        if(session.provider_token) await performGuildCheck(); 
+                        await checkProfile(); 
+                    }
+                });
+            }
 
             async function performGuildCheck() {
                 if(!currentSession?.provider_token) return;
@@ -423,56 +442,66 @@
             }
 
             async function checkProfile() {
-                const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
-                if (data) {
-                    currentUserProfile = data; 
-                    if (!data.discord_name) { navTo('onboarding'); return; }
-                    
-                    const rank = data.rank || 'soldier';
-                    isAdmin = (rank === 'commander');
-                    isOfficer = (rank === 'officer');
-                    isVerified = (data.status === 'verified') || isAdmin || isOfficer;
+                try {
+                    const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
+                    if (data) {
+                        currentUserProfile = data; 
+                        if (!data.discord_name) { navTo('onboarding'); return; }
+                        
+                        const rank = data.rank || 'soldier';
+                        isAdmin = (rank === 'commander');
+                        isOfficer = (rank === 'officer');
+                        isVerified = (data.status === 'verified') || isAdmin || isOfficer;
 
-                    document.getElementById('u-name').textContent = data.discord_name;
-                    document.getElementById('u-embark-display').textContent = data.embark_id ? `ID: ${data.embark_id}` : '';
-                    document.getElementById('u-avatar').src = data.avatar_url || 'https://placehold.co/50';
-                    document.getElementById('u-playstyle').textContent = data.play_style;
-                    document.getElementById('u-region').textContent = data.region;
-                    document.getElementById('u-timezone').textContent = data.timezone || userTimezone;
-                    
-                    if(isAdmin || isOfficer) {
-                        const badge = document.getElementById('admin-badge');
-                        badge.style.display = 'inline-block';
-                        badge.textContent = isAdmin ? '[COMMANDER ACCESS]' : '[FIELD OFFICER]';
-                        badge.style.borderColor = isAdmin ? 'var(--admin-color)' : 'var(--cal-color)';
-                        badge.style.color = isAdmin ? 'var(--admin-color)' : 'var(--cal-color)';
+                        document.getElementById('u-name').textContent = data.discord_name;
+                        document.getElementById('u-embark-display').textContent = data.embark_id ? `ID: ${data.embark_id}` : '';
+                        document.getElementById('u-avatar').src = data.avatar_url || 'https://placehold.co/50';
+                        document.getElementById('u-playstyle').textContent = data.play_style;
+                        document.getElementById('u-region').textContent = data.region;
+                        document.getElementById('u-timezone').textContent = data.timezone || userTimezone;
                         
-                        document.getElementById('pending-toggle-label').style.display = 'flex';
-                        document.getElementById('nav-admin-li').style.display = 'block'; 
-                        
-                        if(isOfficer) {
-                            document.getElementById('config-panel').style.display = 'none';
-                            document.getElementById('comms-panel').style.display = 'none';
+                        if(isAdmin || isOfficer) {
+                            const badge = document.getElementById('admin-badge');
+                            badge.style.display = 'inline-block';
+                            badge.textContent = isAdmin ? '[COMMANDER ACCESS]' : '[FIELD OFFICER]';
+                            badge.style.borderColor = isAdmin ? 'var(--admin-color)' : 'var(--cal-color)';
+                            badge.style.color = isAdmin ? 'var(--admin-color)' : 'var(--cal-color)';
+                            
+                            document.getElementById('pending-toggle-label').style.display = 'flex';
+                            document.getElementById('nav-admin-li').style.display = 'block'; 
+                            
+                            if(isOfficer) {
+                                document.getElementById('config-panel').style.display = 'none';
+                                document.getElementById('comms-panel').style.display = 'none';
+                            }
+                            
+                            if(isAdmin) {
+                                document.getElementById('cfg-guild-id').value = APP_SETTINGS.guild_id;
+                                document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve;
+                            }
+                            
+                            // SAFE CALL TO ALERTS
+                            try { await checkAdminAlerts(); } catch(e) { console.warn('Admin Alerts Failed (Check DB)', e); }
                         }
                         
-                        if(isAdmin) {
-                            document.getElementById('cfg-guild-id').value = APP_SETTINGS.guild_id;
-                            document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve;
-                        }
-                        await checkAdminAlerts();
-                    }
-                    
-                    userTimezone = data.timezone || dayjs.tz.guess();
-                    if(data.availability_json) populateScheduleModal(data.availability_json); else populateScheduleModal(null);
+                        userTimezone = data.timezone || dayjs.tz.guess();
+                        if(data.availability_json) populateScheduleModal(data.availability_json); else populateScheduleModal(null);
 
-                    if (!isVerified) { if (data.status === 'pending') setLockedState('pending'); else setLockedState('denied'); navTo('locked'); }
-                    else { 
-                        const {data: allP} = await supabaseClient.from('profiles').select('id, discord_name, embark_id');
-                        if(allP) allP.forEach(p => profilesMap[p.id] = p.discord_name);
-                        await checkUserNotifications();
-                        navTo('dashboard'); 
-                    }
-                } else { navTo('onboarding'); }
+                        if (!isVerified) { if (data.status === 'pending') setLockedState('pending'); else setLockedState('denied'); navTo('locked'); }
+                        else { 
+                            const {data: allP} = await supabaseClient.from('profiles').select('id, discord_name, embark_id');
+                            if(allP) allP.forEach(p => profilesMap[p.id] = p.discord_name);
+                            
+                            // SAFE CALL TO USER ALERTS
+                            try { await checkUserNotifications(); } catch(e) { console.warn('User Alerts Failed (Check DB)', e); }
+                            
+                            navTo('dashboard'); 
+                        }
+                    } else { navTo('onboarding'); }
+                } catch (err) {
+                    console.error("CRITICAL: Profile Check Failed", err);
+                    alert("System Error: Could not load profile. Please check console.");
+                }
             }
 
             async function checkAdminAlerts() {
@@ -493,13 +522,15 @@
 
             async function loadAlerts() {
                 const grid = document.getElementById('notifications-list'); grid.innerHTML = 'Fetching Intel...';
-                const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', {ascending: false});
-                if(!data || data.length === 0) { grid.innerHTML = '<div style="color:var(--text-dim); text-align:center;">NO NEW ALERTS.</div>'; return; }
-                grid.innerHTML = '';
-                data.forEach(n => {
-                    const isRead = n.is_read ? 'opacity:0.5;' : 'border-color:var(--cal-color);';
-                    grid.innerHTML += `<div class="notification-card" style="${isRead}"><h3 style="color:var(--cal-color)">${n.title}</h3><p style="margin:10px 0;">${n.message}</p><div style="display:flex; gap:10px;">${n.action_link ? `<button class="btn-sync" onclick="window.location.href='${n.action_link}'">VIEW MISSION</button>` : ''}${!n.is_read ? `<button class="btn-secondary" onclick="window.markRead('${n.id}')">DISMISS</button>` : '<span style="color:var(--text-dim)">READ</span>'}</div></div>`;
-                });
+                try {
+                    const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', {ascending: false});
+                    if(!data || data.length === 0) { grid.innerHTML = '<div style="color:var(--text-dim); text-align:center;">NO NEW ALERTS.</div>'; return; }
+                    grid.innerHTML = '';
+                    data.forEach(n => {
+                        const isRead = n.is_read ? 'opacity:0.5;' : 'border-color:var(--cal-color);';
+                        grid.innerHTML += `<div class="notification-card" style="${isRead}"><h3 style="color:var(--cal-color)">${n.title}</h3><p style="margin:10px 0;">${n.message}</p><div style="display:flex; gap:10px;">${n.action_link ? `<button class="btn-sync" onclick="window.location.href='${n.action_link}'">VIEW MISSION</button>` : ''}${!n.is_read ? `<button class="btn-secondary" onclick="window.markRead('${n.id}')">DISMISS</button>` : '<span style="color:var(--text-dim)">READ</span>'}</div></div>`;
+                    });
+                } catch(e) { grid.innerHTML = 'Error loading alerts.'; }
             }
 
             window.markRead = async (id) => { await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); loadAlerts(); checkUserNotifications(); };
@@ -541,51 +572,53 @@
             }
 
             async function calculateNotifications(missionId, missionTitle, missionUtcTime) {
-                // Get ALL active users who want alerts
-                const { data: users } = await supabaseClient.from('profiles').select('*').eq('notify_on_match', true).eq('status', 'verified');
-                if(!users) return;
+                try {
+                    // Get ALL active users who want alerts
+                    const { data: users } = await supabaseClient.from('profiles').select('*').eq('notify_on_match', true).eq('status', 'verified');
+                    if(!users) return;
 
-                const matchedUsers = [];
-                const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+                    const matchedUsers = [];
+                    const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
 
-                users.forEach(u => {
-                    if(u.id === currentUser.id) return; // Don't notify self
-                    if(!u.availability_json) return;
+                    users.forEach(u => {
+                        if(u.id === currentUser.id) return; // Don't notify self
+                        if(!u.availability_json) return;
 
-                    // Convert Mission UTC to User's Timezone
-                    const userTz = u.timezone || 'UTC';
-                    const localTime = dayjs(missionUtcTime).tz(userTz);
-                    const localDay = days[localTime.day()];
-                    const localMinutes = (localTime.hour() * 60) + localTime.minute();
+                        // Convert Mission UTC to User's Timezone
+                        const userTz = u.timezone || 'UTC';
+                        const localTime = dayjs(missionUtcTime).tz(userTz);
+                        const localDay = days[localTime.day()];
+                        const localMinutes = (localTime.hour() * 60) + localTime.minute();
 
-                    // Check if they are active on that day
-                    if(u.availability_json[localDay] && u.availability_json[localDay].active) {
-                        const slots = u.availability_json[localDay].slots || [];
-                        const isFree = slots.some(s => {
-                            // Simple parser: "18:00" -> 1080 minutes
-                            const startMin = parseInt(s.start.split(':')[0]) * 60 + parseInt(s.start.split(':')[1]);
-                            const endMin = parseInt(s.end.split(':')[0]) * 60 + parseInt(s.end.split(':')[1]);
-                            
-                            // Handle late night spanning (e.g. 22:00 to 02:00)
-                            if (endMin < startMin) {
-                                return (localMinutes >= startMin) || (localMinutes <= endMin);
-                            }
-                            return (localMinutes >= startMin && localMinutes <= endMin);
-                        });
+                        // Check if they are active on that day
+                        if(u.availability_json[localDay] && u.availability_json[localDay].active) {
+                            const slots = u.availability_json[localDay].slots || [];
+                            const isFree = slots.some(s => {
+                                // Simple parser: "18:00" -> 1080 minutes
+                                const startMin = parseInt(s.start.split(':')[0]) * 60 + parseInt(s.start.split(':')[1]);
+                                const endMin = parseInt(s.end.split(':')[0]) * 60 + parseInt(s.end.split(':')[1]);
+                                
+                                // Handle late night spanning (e.g. 22:00 to 02:00)
+                                if (endMin < startMin) {
+                                    return (localMinutes >= startMin) || (localMinutes <= endMin);
+                                }
+                                return (localMinutes >= startMin && localMinutes <= endMin);
+                            });
 
-                        if(isFree) matchedUsers.push(u.id);
+                            if(isFree) matchedUsers.push(u.id);
+                        }
+                    });
+
+                    if(matchedUsers.length > 0) {
+                        const alerts = matchedUsers.map(uid => ({
+                            user_id: uid,
+                            title: "MISSION MATCH FOUND",
+                            message: `Operation "${missionTitle}" matches your availability schedule.`,
+                            action_link: `#nav-board` 
+                        }));
+                        await supabaseClient.from('notifications').insert(alerts);
                     }
-                });
-
-                if(matchedUsers.length > 0) {
-                    const alerts = matchedUsers.map(uid => ({
-                        user_id: uid,
-                        title: "MISSION MATCH FOUND",
-                        message: `Operation "${missionTitle}" matches your availability schedule.`,
-                        action_link: `#nav-board` 
-                    }));
-                    await supabaseClient.from('notifications').insert(alerts);
-                }
+                } catch(e) { console.error('Notification Calculation Failed', e); }
             }
 
             document.getElementById('eventForm').onsubmit = async (e) => {
@@ -606,10 +639,10 @@
 
                 if(!error) { 
                     const friendlyTime = dayjs(utc).format('YYYY-MM-DD HH:mm [UTC]'); 
-                    sendWebhook(document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime); 
                     
-                    // NEW: Run the calculation on EVERY mission create
-                    await calculateNotifications(data[0].id, data[0].title, utc);
+                    // Fire-and-forget these (don't await them) so UI updates instantly
+                    sendWebhook(document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime); 
+                    calculateNotifications(data[0].id, data[0].title, utc);
 
                     document.getElementById('eventModal').classList.add('hidden'); 
                     loadBoard(); 
