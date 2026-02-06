@@ -67,17 +67,34 @@
         .btn-leave:hover { background: var(--danger-color); color: #000; }
         .btn-sync { background: transparent; border: 1px solid var(--cal-color); color: var(--cal-color); padding: 5px 10px; font-size: 0.8rem; flex: 1; margin-top:10px; }
         .btn-sync:hover { background: var(--cal-color); color: #000; }
+        
         .btn-admin-delete { position: absolute; top: 15px; right: 15px; background: var(--admin-color); color: #000; font-size: 0.8rem; padding: 4px 8px; border: none; }
         .btn-admin-kick { display: block; margin-top: 10px; background: #000; border: 1px solid var(--admin-color); color: var(--admin-color); width: 100%; font-size: 0.8rem; }
         .btn-admin-approve { display: block; margin-top: 10px; background: var(--success-color); color: #000; width: 100%; font-size: 0.9rem; padding: 8px; border: none; }
         .btn-admin-approve:hover { background: #fff; box-shadow: 0 0 10px var(--success-color); }
         
         .form-group { margin-bottom: 1.5rem; }
-        /* LABELS & TOOLTIPS (UPDATED FOR MOBILE) */
-        label { display: block; margin-bottom: 0.5rem; color: var(--accent-color); font-size: 1rem; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .help-trigger { color: var(--info-color); cursor: help; font-size: 0.9rem; text-decoration: underline; text-underline-offset: 4px; text-decoration-style: dotted; padding: 5px; /* Added padding for touch targets */ }
-        .help-icon { color: var(--text-dim); cursor: pointer; font-size: 1rem; padding: 5px 10px; /* Larger hit area */ background: rgba(0,229,255,0.1); border-radius: 4px; }
-        .help-icon:hover, .help-icon:active { color: var(--info-color); background: rgba(0,229,255,0.2); }
+        
+        /* --- NEW: LABEL ROW LAYOUT --- */
+        .label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+        label { color: var(--accent-color); font-size: 1rem; font-weight: bold; margin: 0; }
+        
+        /* --- NEW: TOUCH-FRIENDLY HELP BUTTONS --- */
+        .help-btn { 
+            background: rgba(0, 229, 255, 0.15); 
+            border: 1px solid var(--info-color); 
+            color: var(--info-color); 
+            width: 30px; 
+            height: 30px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 0.9rem; 
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .help-btn:hover, .help-btn:active { background: var(--info-color); color: #000; }
 
         input, select, textarea { width: 100%; padding: 14px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--text-main); font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; font-weight: 600; }
         .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #080808; padding: 10px; border: 1px solid var(--border-color); }
@@ -106,7 +123,7 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; display: flex; justify-content: center; align-items: center; }
         .modal-content { background: #000; width: 95%; max-width: 600px; padding: 2.5rem; border: 3px solid var(--accent-color); box-shadow: 0 0 40px rgba(255, 85, 0, 0.2); max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .close-modal { background: none; border: none; color: var(--accent-color); font-size: 2rem; }
+        .close-modal { background: none; border: none; color: var(--accent-color); font-size: 2rem; cursor: pointer; }
         .day-section { border: 2px solid var(--border-color); padding: 15px; margin-bottom: 15px; background: #080808; }
         .day-header { display: flex; align-items: center; justify-content: space-between; }
         .time-slot { margin-top: 10px; display: flex; gap: 10px; align-items: center; padding-left: 20px; }
@@ -146,10 +163,19 @@
             <p style="color:var(--text-dim); margin-bottom:1rem;">PROFILE INCOMPLETE. PLEASE UPDATE YOUR CREDENTIALS.</p>
             <form id="profileForm">
                 <div class="form-group">
-                    <label>EMBARK ID (OPTIONAL) <span class="help-icon" onclick="event.preventDefault(); event.stopPropagation(); window.showHelp('embark')">[?]</span></label>
+                    <div class="label-row">
+                        <label>EMBARK ID (OPTIONAL)</label>
+                        <button type="button" class="help-btn" onclick="window.showHelp('embark')">?</button>
+                    </div>
                     <input id="p-embark-id" placeholder="Name#1234">
                 </div>
-                <div class="form-group"><label>COMBAT PREFERENCE <span class="help-icon" onclick="event.preventDefault(); event.stopPropagation(); window.showHelp('playstyle')">[?]</span></label><select id="p-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div>
+                <div class="form-group">
+                    <div class="label-row">
+                        <label>COMBAT PREFERENCE</label>
+                        <button type="button" class="help-btn" onclick="window.showHelp('playstyle')">?</button>
+                    </div>
+                    <select id="p-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select>
+                </div>
                 <div class="form-group"><label>DEPLOYMENT REGION</label><select id="p-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option><option value="OTHER">GLOBAL / OTHER</option></select></div>
                 <div class="form-group"><label>LOCAL TIMEZONE</label><select id="p-timezone"></select></div>
                 <button type="submit" class="btn-primary">CREATE ID CARD</button>
@@ -224,17 +250,31 @@
             
             <div class="config-card">
                 <h3 style="color:var(--text-main); border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:15px;">SYSTEM CONFIGURATION</h3>
+                
                 <div class="form-group">
-                    <label class="help-trigger" onclick="event.preventDefault(); event.stopPropagation(); window.showHelp('guild_id')">TARGET GUILD ID [?]</label>
+                    <div class="label-row">
+                        <label>TARGET GUILD ID</label>
+                        <button type="button" class="help-btn" onclick="window.showHelp('guild_id')">?</button>
+                    </div>
                     <input id="cfg-guild-id" placeholder="Discord Server ID">
                 </div>
+                
                 <div class="form-group">
-                    <label class="help-trigger" onclick="event.preventDefault(); event.stopPropagation(); window.showHelp('webhook')">WEBHOOK URL [?]</label>
+                    <div class="label-row">
+                        <label>WEBHOOK URL</label>
+                        <button type="button" class="help-btn" onclick="window.showHelp('webhook')">?</button>
+                    </div>
                     <input id="cfg-webhook" placeholder="https://discord.com/api/webhooks/...">
                 </div>
+                
                 <div class="checkbox-grid">
-                    <label class="checkbox-item"><input type="checkbox" id="cfg-auto-approve"> <span class="help-trigger" onclick="event.preventDefault(); event.stopPropagation(); window.showHelp('auto_approve')">AUTO-APPROVE NEW RECRUITS [?]</span></label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" id="cfg-auto-approve" style="width:20px; height:20px;"> 
+                        <label for="cfg-auto-approve" style="margin:0;">AUTO-APPROVE RECRUITS</label>
+                        <button type="button" class="help-btn" onclick="window.showHelp('auto_approve')">?</button>
+                    </div>
                 </div>
+                
                 <button id="saveConfigBtn" class="btn-primary" style="margin-top:15px; width:auto;">SAVE CONFIGURATION</button>
             </div>
 
@@ -268,7 +308,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v19.2 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v19.3 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden">
@@ -285,8 +325,20 @@
     <div id="scheduleModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal">[X]</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form></div></div>
     
     <div id="profileModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>EDIT ID CARD</h3><button class="close-modal">[X]</button></div><form id="editProfileForm">
-        <div class="form-group"><label>EMBARK ID (OPTIONAL) <span class="help-icon" onclick="event.preventDefault(); event.stopPropagation(); window.showHelp('embark')">[?]</span></label><input id="ep-embark-id" placeholder="Name#1234"></div>
-        <div class="form-group"><label>COMBAT PREFERENCE <span class="help-icon" onclick="event.preventDefault(); event.stopPropagation(); window.showHelp('playstyle')">[?]</span></label><select id="ep-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div>
+        <div class="form-group">
+            <div class="label-row">
+                <label>EMBARK ID (OPTIONAL)</label>
+                <button type="button" class="help-btn" onclick="window.showHelp('embark')">?</button>
+            </div>
+            <input id="ep-embark-id" placeholder="Name#1234">
+        </div>
+        <div class="form-group">
+            <div class="label-row">
+                <label>COMBAT PREFERENCE</label>
+                <button type="button" class="help-btn" onclick="window.showHelp('playstyle')">?</button>
+            </div>
+            <select id="ep-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select>
+        </div>
         <div class="form-group"><label>DEPLOYMENT REGION</label><select id="ep-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option><option value="OTHER">GLOBAL / OTHER</option></select></div>
         <div class="form-group"><label>LOCAL TIMEZONE</label><select id="ep-timezone"></select></div>
         <button type="submit" class="btn-primary">SAVE CHANGES</button>
@@ -333,7 +385,7 @@
         };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v19.2 [MOBILE PATCH] ONLINE...");
+            console.log("🚀 ARC SYSTEM v19.3 [TOUCH FIX] ONLINE...");
             
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); } 
             catch (e) { console.error("Lib Error", e); }
