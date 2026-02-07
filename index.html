@@ -724,6 +724,58 @@
                 document.getElementById('scheduleModal').classList.add('hidden'); checkProfile();
             };
 
+            document.getElementById('profileForm').onsubmit = async (e) => {
+                e.preventDefault();
+                try {
+                    const profileData = {
+                        id: currentUser.id,
+                        discord_name: currentUser.user_metadata?.full_name || currentUser.email,
+                        avatar_url: currentUser.user_metadata?.avatar_url || '',
+                        embark_id: document.getElementById('p-embark-id').value || null,
+                        play_style: document.getElementById('p-style').value,
+                        region: document.getElementById('p-region').value,
+                        timezone: document.getElementById('p-timezone').value,
+                        status: APP_SETTINGS.auto_approve ? 'verified' : 'pending',
+                        rank: 'soldier',
+                        notify_on_match: true
+                    };
+                    
+                    const { error } = await supabaseClient.from('profiles').upsert(profileData);
+                    if (error) throw error;
+                    
+                    if (!APP_SETTINGS.auto_approve) {
+                        sendAdminAlert(profileData.discord_name, profileData.embark_id);
+                    }
+                    
+                    await checkProfile();
+                } catch (err) {
+                    alert('Profile creation failed: ' + err.message);
+                    console.error(err);
+                }
+            };
+
+            document.getElementById('editProfileForm').onsubmit = async (e) => {
+                e.preventDefault();
+                try {
+                    const updateData = {
+                        embark_id: document.getElementById('ep-embark-id').value || null,
+                        play_style: document.getElementById('ep-style').value,
+                        region: document.getElementById('ep-region').value,
+                        timezone: document.getElementById('ep-timezone').value,
+                        notify_on_match: document.getElementById('ep-notify').checked
+                    };
+                    
+                    const { error } = await supabaseClient.from('profiles').update(updateData).eq('id', currentUser.id);
+                    if (error) throw error;
+                    
+                    document.getElementById('profileModal').classList.add('hidden');
+                    await checkProfile();
+                } catch (err) {
+                    alert('Profile update failed: ' + err.message);
+                    console.error(err);
+                }
+            };
+
             async function loadRoster() {
                 if(!isVerified) return;
                 const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Updating...';
