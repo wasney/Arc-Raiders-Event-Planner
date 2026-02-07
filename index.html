@@ -302,7 +302,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.9 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.10 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -326,7 +326,7 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.9 [GRACEFUL] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.10 [DEBUG] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
@@ -495,8 +495,9 @@
             async function checkProfile() {
                 try {
                     // CRITICAL FIX: .maybeSingle() prevents crash on missing profile
-                    const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-                    
+                    const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+                    if (error) throw error; // Catch db errors (network/permissions) but NOT missing data
+
                     if (data) {
                         currentUserProfile = data; 
                         if (!data.discord_name) { navTo('onboarding'); return; }
@@ -537,13 +538,12 @@
                             navTo('dashboard'); 
                         }
                     } else { 
-                        // No profile found -> Send to onboarding without error
                         navTo('onboarding'); 
                     }
                 } catch (err) { 
                     console.error("CRITICAL: Profile Check Failed", err); 
-                    // Only alert if it's a real system error, not just a missing profile
-                    alert("System Error: Could not load profile. Please check console for details."); 
+                    // GRANULAR ERROR REPORTING
+                    alert("System Error: " + (err.message || "Unknown profile load error")); 
                 }
             }
 
@@ -646,7 +646,7 @@
                 if(!error) { const friendlyTime = dayjs(utc).format('YYYY-MM-DD HH:mm [UTC]'); sendWebhook(document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime); calculateNotifications(data[0].id, data[0].title, utc); document.getElementById('eventModal').classList.add('hidden'); loadBoard(); } else { alert(error.message); }
             };
 
-            // --- RESTORED LOGIC MODULES ---
+            // --- RESTORED LOGIC MODULES (v22.7) ---
             async function loadRoster() {
                 if(!isVerified) return;
                 const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Updating...';
