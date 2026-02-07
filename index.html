@@ -41,6 +41,7 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
         .hidden { display: none !important; }
+        .modal-overlay.hidden { visibility: hidden !important; pointer-events: none !important; }
         .hero { text-align: center; padding: 6rem 1rem; }
         .hero h1 { font-size: 3.5rem; margin-bottom: 1rem; font-weight: 700; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
         
@@ -185,10 +186,41 @@
             <h2 style="color:var(--accent-color); margin-bottom:1rem;">// OPERATOR REGISTRATION</h2>
             <p style="color:var(--text-dim); margin-bottom:1rem;">PROFILE INCOMPLETE. PLEASE UPDATE YOUR CREDENTIALS.</p>
             <form id="profileForm">
-                <div class="form-group"><div class="label-row"><label>EMBARK ID (OPTIONAL)</label><button type="button" class="help-btn" data-key="embark">?</button></div><input id="p-embark-id" placeholder="Name#1234"></div>
-                <div class="form-group"><div class="label-row"><label>COMBAT PREFERENCE</label><button type="button" class="help-btn" data-key="playstyle">?</button></div><select id="p-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div>
-                <div class="form-group"><label>DEPLOYMENT REGION</label><select id="p-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option><option value="OTHER">GLOBAL / OTHER</option></select></div>
-                <div class="form-group"><label>LOCAL TIMEZONE</label><select id="p-timezone"></select></div>
+                <div class="form-group">
+                    <div class="label-row">
+                        <label>EMBARK ID (OPTIONAL)</label>
+                        <button type="button" class="help-btn" data-key="embark">?</button>
+                    </div>
+                    <input id="p-embark-id" placeholder="Name#1234">
+                </div>
+                
+                <div class="form-group">
+                    <div class="label-row">
+                        <label>COMBAT PREFERENCE</label>
+                        <button type="button" class="help-btn" data-key="playstyle">?</button>
+                    </div>
+                    <select id="p-style">
+                        <option value="PvP">PvP (HOSTILE)</option>
+                        <option value="PvE">PvE (ENVIRONMENT)</option>
+                        <option value="Hybrid">HYBRID</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>DEPLOYMENT REGION</label>
+                    <select id="p-region">
+                        <option value="NA">NORTH AMERICA</option>
+                        <option value="EU">EUROPE</option>
+                        <option value="ASIA">ASIA</option>
+                        <option value="OTHER">GLOBAL / OTHER</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>LOCAL TIMEZONE</label>
+                    <select id="p-timezone"></select>
+                </div>
+                
                 <button type="submit" class="btn-primary">CREATE ID CARD</button>
             </form>
         </section>
@@ -217,7 +249,7 @@
                 REGION: <strong id="u-region" style="color:var(--text-main)">-</strong> //
                 TZ: <strong id="u-timezone" style="color:var(--accent-color)">-</strong>
             </div>
-            <div id="admin-badge" style="display:none; color:var(--admin-color); font-weight:bold; margin-bottom:20px; border:1px solid var(--admin-color); padding:5px; display:inline-block;">[COMMANDER ACCESS GRANTED]</div>
+            <div id="admin-badge" style="display:none; color:var(--admin-color); font-weight:bold; margin-bottom:20px; border:1px solid var(--admin-color); padding:5px;">[COMMANDER ACCESS GRANTED]</div>
             
             <div id="admin-sitrep" class="sitrep-banner"></div>
 
