@@ -724,6 +724,89 @@
                 document.getElementById('scheduleModal').classList.add('hidden'); checkProfile();
             };
 
+            document.getElementById('profileForm').onsubmit = async (e) => {
+                e.preventDefault();
+                try {
+                    // Disable the submit button to prevent double-clicks
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'CREATING...';
+                    
+                    const profileData = {
+                        id: currentUser.id,
+                        discord_name: currentUser.user_metadata?.full_name || currentUser.email,
+                        avatar_url: currentUser.user_metadata?.avatar_url || '',
+                        embark_id: document.getElementById('p-embark-id').value || null,
+                        play_style: document.getElementById('p-style').value,
+                        region: document.getElementById('p-region').value,
+                        timezone: document.getElementById('p-timezone').value,
+                        status: APP_SETTINGS.auto_approve ? 'verified' : 'pending',
+                        rank: 'soldier',
+                        notify_on_match: true
+                    };
+                    
+                    // Use .select() to get the inserted data back
+                    const { data, error } = await supabaseClient.from('profiles').upsert(profileData).select();
+                    if (error) throw error;
+                    
+                    // Verify the data was actually written
+                    if (!data || data.length === 0) {
+                        throw new Error('Profile was not created. Please try again.');
+                    }
+                    
+                    if (!APP_SETTINGS.auto_approve) {
+                        sendAdminAlert(profileData.discord_name, profileData.embark_id);
+                    }
+                    
+                    // Small delay to ensure database consistency
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Now check the profile
+                    await checkProfile();
+                } catch (err) {
+                    alert('Profile creation failed: ' + err.message);
+                    console.error(err);
+                    // Re-enable the button on error
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'CREATE ID CARD';
+                }
+            };
+
+            document.getElementById('editProfileForm').onsubmit = async (e) => {
+                e.preventDefault();
+                try {
+                    // Disable the submit button to prevent double-clicks
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'SAVING...';
+                    
+                    const updateData = {
+                        embark_id: document.getElementById('ep-embark-id').value || null,
+                        play_style: document.getElementById('ep-style').value,
+                        region: document.getElementById('ep-region').value,
+                        timezone: document.getElementById('ep-timezone').value,
+                        notify_on_match: document.getElementById('ep-notify').checked
+                    };
+                    
+                    const { error } = await supabaseClient.from('profiles').update(updateData).eq('id', currentUser.id).select();
+                    if (error) throw error;
+                    
+                    // Small delay to ensure database consistency
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    document.getElementById('profileModal').classList.add('hidden');
+                    await checkProfile();
+                } catch (err) {
+                    alert('Profile update failed: ' + err.message);
+                    console.error(err);
+                    // Re-enable the button on error
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'SAVE CHANGES';
+                }
+            };
+
             async function loadRoster() {
                 if(!isVerified) return;
                 const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Updating...';
