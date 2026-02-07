@@ -302,7 +302,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.7 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.8 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -326,7 +326,7 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.7 [RESTORED] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.8 [RELIABILITY] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
@@ -426,7 +426,32 @@
             attach('refreshAdminBtn', 'click', () => loadAdminTable());
             attach('openScheduleBtn', 'click', () => document.getElementById('scheduleModal').classList.remove('hidden'));
             attach('openEventModalBtn', 'click', () => { document.getElementById('e-time').value = ''; potentialSquad = []; document.getElementById('eventModal').classList.remove('hidden'); });
-            attach('saveConfigBtn', 'click', saveConfig);
+            
+            // IMPROVED SAVE CONFIG WITH ERROR CHECKING
+            attach('saveConfigBtn', 'click', async () => {
+                if(!isAdmin) return;
+                const btn = document.getElementById('saveConfigBtn');
+                const originalText = btn.textContent;
+                btn.textContent = "SAVING...";
+                btn.disabled = true;
+
+                const updates = [ 
+                    { key: 'required_guild_id', value: document.getElementById('cfg-guild-id').value }, 
+                    { key: 'auto_approve', value: document.getElementById('cfg-auto-approve').checked ? 'true' : 'false' } 
+                ];
+                
+                try {
+                    const { error } = await supabaseClient.from('app_config').upsert(updates);
+                    if (error) throw error;
+                    alert("Settings Saved. Reloading..."); 
+                    window.location.reload();
+                } catch (e) {
+                    alert("SAVE FAILED: " + e.message + "\nCheck Database Permissions.");
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            });
+
             attach('openProfileModalBtn', 'click', () => {
                 document.getElementById('ep-style').value = document.getElementById('u-playstyle').textContent;
                 document.getElementById('ep-region').value = document.getElementById('u-region').textContent;
@@ -551,13 +576,6 @@
 
             window.markRead = async (id) => { await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); loadAlerts(); checkUserNotifications(); };
 
-            async function saveConfig() {
-                if(!isAdmin) return;
-                const updates = [ { key: 'required_guild_id', value: document.getElementById('cfg-guild-id').value }, { key: 'auto_approve', value: document.getElementById('cfg-auto-approve').checked ? 'true' : 'false' } ];
-                for (const u of updates) await supabaseClient.from('app_config').upsert(u);
-                alert("Settings Saved. Reloading..."); window.location.reload();
-            }
-
             async function loadCommsArray() {
                 if(!isAdmin) return;
                 const list = document.getElementById('comms-list'); list.innerHTML = 'Loading Webhooks...';
@@ -624,35 +642,6 @@
                 const conds = []; document.querySelectorAll('input[name="cond"]:checked').forEach(c=>conds.push(c.value));
                 const { data, error } = await supabaseClient.from('events').insert({ title: document.getElementById('e-title').value, description: document.getElementById('e-desc').value, start_time: utc, timezone: document.getElementById('e-timezone').value, region: document.getElementById('e-region').value, mission_type: document.getElementById('e-type').value, conditions: conds, host_id: currentUser.id }).select();
                 if(!error) { const friendlyTime = dayjs(utc).format('YYYY-MM-DD HH:mm [UTC]'); sendWebhook(document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime); calculateNotifications(data[0].id, data[0].title, utc); document.getElementById('eventModal').classList.add('hidden'); loadBoard(); } else { alert(error.message); }
-            };
-
-            function populateTimezones(id) { const s = document.getElementById(id); if(!s) return; Intl.supportedValuesOf('timeZone').forEach(t=>{const o=document.createElement('option');o.value=t;o.text=t;if(t===userTimezone)o.selected=true;s.appendChild(o);}); }
-            populateTimezones('p-timezone'); populateTimezones('ep-timezone'); populateTimezones('e-timezone');
-            
-            function populateScheduleModal(json) {
-                const con = document.getElementById('daysContainer'); con.innerHTML = '';
-                ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"].forEach(d => {
-                    const active = json?.[d]?.active;
-                    const div = document.createElement('div'); div.className = `day-section ${active?'':'disabled-day'}`;
-                    div.innerHTML = `<div class="day-header"><label><input type="checkbox" class="d-check" data-day="${d}" ${active?'checked':''}> <strong>${d.toUpperCase()}</strong></label> <button type="button" class="add-slot-btn">+</button></div><div class="slots-container"></div>`;
-                    const slotCon = div.querySelector('.slots-container');
-                    (json?.[d]?.slots || []).forEach(s => addSlotUI(slotCon, s.start, s.end));
-                    div.querySelector('.add-slot-btn').onclick = () => addSlotUI(slotCon);
-                    div.querySelector('.d-check').onchange = (e) => div.classList.toggle('disabled-day', !e.target.checked);
-                    con.appendChild(div);
-                });
-            }
-            function addSlotUI(con, s='18:00', e='22:00') { const d = document.createElement('div'); d.className='time-slot'; d.innerHTML = `<input type="time" class="t-start" value="${s}"> to <input type="time" class="t-end" value="${e}"> <button type="button" onclick="this.parentElement.remove()">X</button>`; con.appendChild(d); }
-            document.getElementById('scheduleForm').onsubmit = async (e) => {
-                e.preventDefault();
-                const res = {};
-                document.querySelectorAll('.d-check').forEach(c => {
-                    const day = c.dataset.day; const slots = [];
-                    if(c.checked) c.closest('.day-section').querySelectorAll('.time-slot').forEach(s => slots.push({start:s.querySelector('.t-start').value, end:s.querySelector('.t-end').value}));
-                    res[day] = {active: c.checked, slots};
-                });
-                await supabaseClient.from('profiles').update({availability_json: res}).eq('id', currentUser.id);
-                document.getElementById('scheduleModal').classList.add('hidden'); checkProfile();
             };
 
             // --- RESTORED LOGIC MODULES (v22.7) ---
