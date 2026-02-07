@@ -302,7 +302,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.12 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.13 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -326,7 +326,7 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.12 [STABLE ROLLBACK] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.13 [STABLE] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
@@ -335,12 +335,30 @@
             let APP_SETTINGS = { guild_id: "1465694444484427903", auto_approve: false };
             let potentialSquad = [];
 
-            // --- HELPER FUNCTIONS HOISTED ---
-            function populateTimezones(id) { const s = document.getElementById(id); if(!s) return; Intl.supportedValuesOf('timeZone').forEach(t=>{const o=document.createElement('option');o.value=t;o.text=t;if(t===userTimezone)o.selected=true;s.appendChild(o);}); }
-            function addSlotUI(con, s='18:00', e='22:00') { const d = document.createElement('div'); d.className='time-slot'; d.innerHTML = `<input type="time" class="t-start" value="${s}"> to <input type="time" class="t-end" value="${e}"> <button type="button" onclick="this.parentElement.remove()">X</button>`; con.appendChild(d); }
+            // --- HELPER FUNCTIONS HOISTED TO TOP (CRITICAL FIX) ---
+            function populateTimezones(id) { 
+                const s = document.getElementById(id); 
+                if(!s) return; 
+                Intl.supportedValuesOf('timeZone').forEach(t=>{
+                    const o=document.createElement('option');
+                    o.value=t; o.text=t;
+                    if(t===userTimezone)o.selected=true;
+                    s.appendChild(o);
+                }); 
+            }
+            
+            function addSlotUI(con, s='18:00', e='22:00') { 
+                const d = document.createElement('div'); 
+                d.className='time-slot'; 
+                d.innerHTML = `<input type="time" class="t-start" value="${s}"> to <input type="time" class="t-end" value="${e}"> <button type="button" onclick="this.parentElement.remove()">X</button>`; 
+                con.appendChild(d); 
+            }
+
             function populateScheduleModal(json) {
-                const con = document.getElementById('daysContainer'); con.innerHTML = '';
-                ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"].forEach(d => {
+                const con = document.getElementById('daysContainer'); 
+                con.innerHTML = '';
+                const dayList = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+                dayList.forEach(d => {
                     const active = json?.[d]?.active;
                     const div = document.createElement('div'); div.className = `day-section ${active?'':'disabled-day'}`;
                     div.innerHTML = `<div class="day-header"><label><input type="checkbox" class="d-check" data-day="${d}" ${active?'checked':''}> <strong>${d.toUpperCase()}</strong></label> <button type="button" class="add-slot-btn">+</button></div><div class="slots-container"></div>`;
@@ -354,7 +372,7 @@
             
             populateTimezones('p-timezone'); populateTimezones('ep-timezone'); populateTimezones('e-timezone');
 
-            // --- AUTH LOGIC (v22.6) ---
+            // --- AUTH LOGIC ---
             async function initApp() {
                 setTimeout(() => {
                     const loading = document.getElementById('auth-loading');
@@ -389,7 +407,7 @@
                 document.getElementById('auth-loading').style.display = 'none';
             }
 
-            initApp(); // BOOT
+            initApp();
 
             async function loadSettings() {
                 try {
@@ -535,17 +553,17 @@
                             document.getElementById('pending-toggle-label').style.display = 'flex';
                             document.getElementById('nav-admin-li').style.display = 'block'; 
                             if(isOfficer) { document.getElementById('config-panel').style.display = 'none'; document.getElementById('comms-panel').style.display = 'none'; }
-                            
-                            // AUTO APPROVE CHECKBOX FIX
-                            if(isAdmin) { 
-                                document.getElementById('cfg-guild-id').value = APP_SETTINGS.guild_id; 
-                                document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve; 
-                            }
+                            if(isAdmin) { document.getElementById('cfg-guild-id').value = APP_SETTINGS.guild_id; document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve; }
                             try { await checkAdminAlerts(); } catch(e) { console.warn('Admin Alerts Failed', e); }
                         }
                         
                         userTimezone = data.timezone || dayjs.tz.guess();
-                        if(data.availability_json) populateScheduleModal(data.availability_json); else populateScheduleModal(null);
+                        // SAFE SCHEDULE LOADING
+                        if(data.availability_json && typeof populateScheduleModal === 'function') {
+                            populateScheduleModal(data.availability_json); 
+                        } else if (typeof populateScheduleModal === 'function') {
+                            populateScheduleModal(null);
+                        }
 
                         if (!isVerified) { if (data.status === 'pending') setLockedState('pending'); else setLockedState('denied'); navTo('locked'); }
                         else { 
@@ -674,7 +692,6 @@
                 document.getElementById('scheduleModal').classList.add('hidden'); checkProfile();
             };
 
-            // --- RESTORED LOGIC MODULES (v22.7) ---
             async function loadRoster() {
                 if(!isVerified) return;
                 const grid = document.getElementById('rosterGrid'); grid.innerHTML = 'Updating...';
