@@ -302,7 +302,7 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.11 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.12 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -326,7 +326,7 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.11 [HOISTED] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.12 [STABLE ROLLBACK] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
@@ -335,13 +335,12 @@
             let APP_SETTINGS = { guild_id: "1465694444484427903", auto_approve: false };
             let potentialSquad = [];
 
-            // --- HELPER FUNCTIONS HOISTED TO TOP ---
+            // --- HELPER FUNCTIONS HOISTED ---
             function populateTimezones(id) { const s = document.getElementById(id); if(!s) return; Intl.supportedValuesOf('timeZone').forEach(t=>{const o=document.createElement('option');o.value=t;o.text=t;if(t===userTimezone)o.selected=true;s.appendChild(o);}); }
-            
+            function addSlotUI(con, s='18:00', e='22:00') { const d = document.createElement('div'); d.className='time-slot'; d.innerHTML = `<input type="time" class="t-start" value="${s}"> to <input type="time" class="t-end" value="${e}"> <button type="button" onclick="this.parentElement.remove()">X</button>`; con.appendChild(d); }
             function populateScheduleModal(json) {
                 const con = document.getElementById('daysContainer'); con.innerHTML = '';
-                const dayList = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
-                dayList.forEach(d => {
+                ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"].forEach(d => {
                     const active = json?.[d]?.active;
                     const div = document.createElement('div'); div.className = `day-section ${active?'':'disabled-day'}`;
                     div.innerHTML = `<div class="day-header"><label><input type="checkbox" class="d-check" data-day="${d}" ${active?'checked':''}> <strong>${d.toUpperCase()}</strong></label> <button type="button" class="add-slot-btn">+</button></div><div class="slots-container"></div>`;
@@ -352,12 +351,138 @@
                     con.appendChild(div);
                 });
             }
-
-            function addSlotUI(con, s='18:00', e='22:00') { const d = document.createElement('div'); d.className='time-slot'; d.innerHTML = `<input type="time" class="t-start" value="${s}"> to <input type="time" class="t-end" value="${e}"> <button type="button" onclick="this.parentElement.remove()">X</button>`; con.appendChild(d); }
-
+            
             populateTimezones('p-timezone'); populateTimezones('ep-timezone'); populateTimezones('e-timezone');
 
-            // --- CORE LOGIC ---
+            // --- AUTH LOGIC (v22.6) ---
+            async function initApp() {
+                setTimeout(() => {
+                    const loading = document.getElementById('auth-loading');
+                    if (loading.style.display !== 'none') {
+                        console.warn("Forcing UI Reset due to timeout");
+                        loading.style.display = 'none';
+                        if (!currentUser) document.getElementById('loginBtn').style.display = 'inline-block';
+                    }
+                }, 5000); 
+
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) { handleSession(session); } 
+                else { supabaseClient.auth.onAuthStateChange(async (event, session) => { if (event === 'SIGNED_IN' && session) { handleSession(session); } else if (event === 'SIGNED_OUT') { resetUI(); } }); }
+            }
+
+            async function handleSession(session) {
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('auth-loading').style.display = 'block';
+                currentSession = session; currentUser = session.user;
+                await loadSettings();
+                if(session.provider_token) await performGuildCheck();
+                await checkProfile();
+                document.getElementById('auth-loading').style.display = 'none';
+            }
+
+            function resetUI() {
+                currentSession = null; currentUser = null;
+                document.getElementById('login-section').classList.remove('hidden');
+                document.getElementById('dashboard-section').classList.add('hidden');
+                document.getElementById('main-nav').style.display = 'none';
+                document.getElementById('loginBtn').style.display = 'inline-block';
+                document.getElementById('auth-loading').style.display = 'none';
+            }
+
+            initApp(); // BOOT
+
+            async function loadSettings() {
+                try {
+                    const { data } = await supabaseClient.from('app_config').select('*');
+                    if (data) data.forEach(row => { 
+                        if(row.key === 'required_guild_id') APP_SETTINGS.guild_id = row.value; 
+                        if(row.key === 'auto_approve') APP_SETTINGS.auto_approve = (row.value === 'true'); 
+                    });
+                } catch(e) { console.error('Settings load failed', e); }
+            }
+
+            function navTo(pageId) {
+                ['login','onboarding','dashboard','roster','board','locked','admin','alerts'].forEach(p => { const el = document.getElementById(p+'-section'); if(el) el.classList.add('hidden'); });
+                document.getElementById('auth-loading').style.display = 'none';
+                if(pageId === 'onboarding') { document.getElementById('onboarding-section').classList.remove('hidden'); document.getElementById('main-nav').style.display = 'none'; return; }
+                if(!isVerified && pageId !== 'login' && pageId !== 'locked') { document.getElementById('locked-section').classList.remove('hidden'); document.getElementById('main-nav').style.display = 'none'; return; }
+                document.getElementById('main-nav').style.display = 'flex';
+                const t = document.getElementById(pageId+'-section'); if(t) t.classList.remove('hidden');
+                if(pageId === 'roster') loadRoster();
+                if(pageId === 'board') loadBoard();
+                if(pageId === 'admin') { loadAdminTable(); if(isAdmin) loadCommsArray(); }
+                if(pageId === 'alerts') loadAlerts();
+            }
+
+            document.body.addEventListener('click', function(e) { const target = e.target.closest('.help-btn'); if (target) { e.preventDefault(); e.stopPropagation(); window.showHelp(target.dataset.key); } });
+            document.querySelectorAll('.close-modal').forEach(b => { b.onclick = function() { this.closest('.modal-overlay').classList.add('hidden'); }; });
+
+            function attach(id, evt, fn) { const el = document.getElementById(id); if(el) el.addEventListener(evt, fn); }
+            attach('nav-home', 'click', () => navTo('dashboard'));
+            attach('nav-alerts', 'click', () => navTo('alerts'));
+            attach('nav-roster', 'click', () => navTo('roster'));
+            attach('nav-board', 'click', () => navTo('board'));
+            attach('nav-admin', 'click', () => navTo('admin'));
+            attach('loginBtn', 'click', async () => { 
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('auth-loading').style.display = 'block';
+                await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin + window.location.pathname, scopes: 'guilds' } }); 
+            });
+            attach('retryScanBtn', 'click', async () => { await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin + window.location.pathname, scopes: 'guilds' } }); });
+            attach('logoutBtn', 'click', async () => { await supabaseClient.auth.signOut(); window.location.reload(); });
+            attach('lockedLogoutBtn', 'click', async () => { await supabaseClient.auth.signOut(); window.location.reload(); });
+            attach('resetAppBtn', 'click', () => { localStorage.clear(); window.location.reload(); });
+            attach('roster-search', 'input', loadRoster);
+            attach('roster-filter-region', 'change', loadRoster);
+            attach('roster-filter-style', 'change', loadRoster);
+            attach('roster-show-pending', 'change', loadRoster);
+            attach('refreshAdminBtn', 'click', () => loadAdminTable());
+            attach('openScheduleBtn', 'click', () => document.getElementById('scheduleModal').classList.remove('hidden'));
+            attach('openEventModalBtn', 'click', () => { document.getElementById('e-time').value = ''; potentialSquad = []; document.getElementById('eventModal').classList.remove('hidden'); });
+            
+            attach('saveConfigBtn', 'click', async () => {
+                if(!isAdmin) return;
+                const btn = document.getElementById('saveConfigBtn');
+                const originalText = btn.textContent;
+                btn.textContent = "SAVING...";
+                btn.disabled = true;
+                const updates = [ { key: 'required_guild_id', value: document.getElementById('cfg-guild-id').value }, { key: 'auto_approve', value: document.getElementById('cfg-auto-approve').checked ? 'true' : 'false' } ];
+                try {
+                    const { error } = await supabaseClient.from('app_config').upsert(updates);
+                    if (error) throw error;
+                    alert("Settings Saved. Reloading..."); window.location.reload();
+                } catch (e) {
+                    alert("SAVE FAILED: " + e.message + "\nCheck Database Permissions.");
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            });
+
+            attach('openProfileModalBtn', 'click', () => {
+                document.getElementById('ep-style').value = document.getElementById('u-playstyle').textContent;
+                document.getElementById('ep-region').value = document.getElementById('u-region').textContent;
+                document.getElementById('ep-timezone').value = document.getElementById('u-timezone').textContent;
+                if(currentUserProfile) { document.getElementById('ep-embark-id').value = currentUserProfile.embark_id || ''; document.getElementById('ep-notify').checked = currentUserProfile.notify_on_match !== false; }
+                document.getElementById('profileModal').classList.remove('hidden');
+            });
+            if(document.getElementById('repairProfileBtn')) attach('repairProfileBtn', 'click', () => navTo('onboarding'));
+            
+            attach('runFutureCheck', 'click', loadRoster);
+            attach('launchFutureOp', 'click', () => {
+                const targetTime = document.getElementById('roster-future-time').value;
+                if(targetTime) { document.getElementById('e-time').value = targetTime; document.getElementById('eventModal').classList.remove('hidden'); }
+            });
+
+            attach('addWebhookBtn', 'click', async () => {
+                const label = document.getElementById('new-wh-label').value;
+                const url = document.getElementById('new-wh-url').value;
+                const type = document.getElementById('new-wh-type').value;
+                if(!label || !url) return alert('Label and URL required');
+                await supabaseClient.from('webhook_endpoints').insert({ label, url, type });
+                document.getElementById('new-wh-label').value = ''; document.getElementById('new-wh-url').value = '';
+                loadCommsArray();
+            });
+
             async function performGuildCheck() {
                 if(!currentSession?.provider_token) return;
                 try {
@@ -410,15 +535,17 @@
                             document.getElementById('pending-toggle-label').style.display = 'flex';
                             document.getElementById('nav-admin-li').style.display = 'block'; 
                             if(isOfficer) { document.getElementById('config-panel').style.display = 'none'; document.getElementById('comms-panel').style.display = 'none'; }
-                            if(isAdmin) { document.getElementById('cfg-guild-id').value = APP_SETTINGS.guild_id; document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve; }
+                            
+                            // AUTO APPROVE CHECKBOX FIX
+                            if(isAdmin) { 
+                                document.getElementById('cfg-guild-id').value = APP_SETTINGS.guild_id; 
+                                document.getElementById('cfg-auto-approve').checked = APP_SETTINGS.auto_approve; 
+                            }
                             try { await checkAdminAlerts(); } catch(e) { console.warn('Admin Alerts Failed', e); }
                         }
                         
                         userTimezone = data.timezone || dayjs.tz.guess();
-                        // CALLING HOISTED FUNCTION
-                        if(typeof populateScheduleModal === 'function') {
-                            if(data.availability_json) populateScheduleModal(data.availability_json); else populateScheduleModal(null);
-                        }
+                        if(data.availability_json) populateScheduleModal(data.availability_json); else populateScheduleModal(null);
 
                         if (!isVerified) { if (data.status === 'pending') setLockedState('pending'); else setLockedState('denied'); navTo('locked'); }
                         else { 
@@ -466,13 +593,6 @@
             }
 
             window.markRead = async (id) => { await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); loadAlerts(); checkUserNotifications(); };
-
-            async function saveConfig() {
-                if(!isAdmin) return;
-                const updates = [ { key: 'required_guild_id', value: document.getElementById('cfg-guild-id').value }, { key: 'auto_approve', value: document.getElementById('cfg-auto-approve').checked ? 'true' : 'false' } ];
-                for (const u of updates) await supabaseClient.from('app_config').upsert(u);
-                alert("Settings Saved. Reloading..."); window.location.reload();
-            }
 
             async function loadCommsArray() {
                 if(!isAdmin) return;
@@ -540,6 +660,18 @@
                 const conds = []; document.querySelectorAll('input[name="cond"]:checked').forEach(c=>conds.push(c.value));
                 const { data, error } = await supabaseClient.from('events').insert({ title: document.getElementById('e-title').value, description: document.getElementById('e-desc').value, start_time: utc, timezone: document.getElementById('e-timezone').value, region: document.getElementById('e-region').value, mission_type: document.getElementById('e-type').value, conditions: conds, host_id: currentUser.id }).select();
                 if(!error) { const friendlyTime = dayjs(utc).format('YYYY-MM-DD HH:mm [UTC]'); sendWebhook(document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime); calculateNotifications(data[0].id, data[0].title, utc); document.getElementById('eventModal').classList.add('hidden'); loadBoard(); } else { alert(error.message); }
+            };
+
+            document.getElementById('scheduleForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const res = {};
+                document.querySelectorAll('.d-check').forEach(c => {
+                    const day = c.dataset.day; const slots = [];
+                    if(c.checked) c.closest('.day-section').querySelectorAll('.time-slot').forEach(s => slots.push({start:s.querySelector('.t-start').value, end:s.querySelector('.t-end').value}));
+                    res[day] = {active: c.checked, slots};
+                });
+                await supabaseClient.from('profiles').update({availability_json: res}).eq('id', currentUser.id);
+                document.getElementById('scheduleModal').classList.add('hidden'); checkProfile();
             };
 
             // --- RESTORED LOGIC MODULES (v22.7) ---
@@ -675,21 +807,6 @@
             window.joinEvent = async (id) => { await supabaseClient.from('event_signups').insert({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.leaveEvent = async (id) => { await supabaseClient.from('event_signups').delete().match({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.delEvent = async (id) => { if(confirm('Delete?')) { await supabaseClient.from('events').delete().eq('id', id); loadBoard(); } };
-            
-            document.getElementById('scheduleForm').onsubmit = async (e) => {
-                e.preventDefault();
-                const res = {};
-                document.querySelectorAll('.d-check').forEach(c => {
-                    const day = c.dataset.day; const slots = [];
-                    if(c.checked) c.closest('.day-section').querySelectorAll('.time-slot').forEach(s => slots.push({start:s.querySelector('.t-start').value, end:s.querySelector('.t-end').value}));
-                    res[day] = {active: c.checked, slots};
-                });
-                await supabaseClient.from('profiles').update({availability_json: res}).eq('id', currentUser.id);
-                document.getElementById('scheduleModal').classList.add('hidden'); checkProfile();
-            };
-
-            // START THE ENGINE
-            initApp();
         });
     </script>
 </body>
