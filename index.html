@@ -188,6 +188,14 @@
             <form id="profileForm">
                 <div class="form-group">
                     <div class="label-row">
+                        <label>DISPLAY NAME (OPTIONAL)</label>
+                        <button type="button" class="help-btn" data-key="displayname">?</button>
+                    </div>
+                    <input id="p-display-name" placeholder="Leave blank to use Discord Username">
+                </div>
+
+                <div class="form-group">
+                    <div class="label-row">
                         <label>EMBARK ID (OPTIONAL)</label>
                         <button type="button" class="help-btn" data-key="embark">?</button>
                     </div>
@@ -339,12 +347,12 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.15 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.16 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
     <div id="scheduleModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal">[X]</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form></div></div>
-    <div id="profileModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>EDIT ID CARD</h3><button class="close-modal">[X]</button></div><form id="editProfileForm"><div class="form-group"><div class="label-row"><label>EMBARK ID (OPTIONAL)</label><button type="button" class="help-btn" data-key="embark">?</button></div><input id="ep-embark-id" placeholder="Name#1234"></div><div class="form-group"><div class="label-row"><label>COMBAT PREFERENCE</label><button type="button" class="help-btn" data-key="playstyle">?</button></div><select id="ep-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div><div class="form-group"><label>DEPLOYMENT REGION</label><select id="ep-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option><option value="OTHER">GLOBAL / OTHER</option></select></div><div class="form-group"><label>LOCAL TIMEZONE</label><select id="ep-timezone"></select></div><div class="checkbox-grid" style="margin-top:20px;"><div class="checkbox-item"><input type="checkbox" id="ep-notify"> RECEIVE TACTICAL ALERTS</div></div><button type="submit" class="btn-primary">SAVE CHANGES</button></form></div></div>
+    <div id="profileModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>EDIT ID CARD</h3><button class="close-modal">[X]</button></div><form id="editProfileForm"><div class="form-group"><div class="label-row"><label>DISPLAY NAME (OPTIONAL)</label><button type="button" class="help-btn" data-key="displayname">?</button></div><input id="ep-display-name" placeholder="Leave blank to use Discord Username"></div><div class="form-group"><div class="label-row"><label>EMBARK ID (OPTIONAL)</label><button type="button" class="help-btn" data-key="embark">?</button></div><input id="ep-embark-id" placeholder="Name#1234"></div><div class="form-group"><div class="label-row"><label>COMBAT PREFERENCE</label><button type="button" class="help-btn" data-key="playstyle">?</button></div><select id="ep-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div><div class="form-group"><label>DEPLOYMENT REGION</label><select id="ep-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option><option value="OTHER">GLOBAL / OTHER</option></select></div><div class="form-group"><label>LOCAL TIMEZONE</label><select id="ep-timezone"></select></div><div class="checkbox-grid" style="margin-top:20px;"><div class="checkbox-item"><input type="checkbox" id="ep-notify"> RECEIVE TACTICAL ALERTS</div></div><button type="submit" class="btn-primary">SAVE CHANGES</button></form></div></div>
     <div id="eventModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>MISSION BRIEFING</h3><button class="close-modal">[X]</button></div><form id="eventForm"><div class="form-group"><label>OPERATION NAME</label><input id="e-title" required></div><div class="form-group"><label>MISSION TYPE</label><select id="e-type"><option value="Standard Raid">Standard Raid (30m)</option><option value="Locked Gate">Locked Gate (40m)</option><option value="Hidden Bunker">Hidden Bunker (30m)</option><option value="Matriarch">Matriarch Boss (30m)</option><option value="Harvester">Harvester (30m)</option></select></div><div class="form-group"><label>DETAILS</label><textarea id="e-desc" rows="3"></textarea></div><div class="form-group"><label>T-MINUS (TIME)</label><input id="e-time" type="datetime-local" required></div><div class="form-group"><label>MISSION TIMEZONE</label><select id="e-timezone"></select></div><div class="form-group"><label>THEATER</label><select id="e-region"><option>NA</option><option>EU</option><option>OTHER</option></select></div><div class="form-group"><label>CONDITIONS</label><div class="checkbox-grid"><div class="checkbox-item"><input type="checkbox" name="cond" value="Bird City"> Bird City</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Night Raid"> Night Raid</div><div class="checkbox-item"><input type="checkbox" name="cond" value="EM Storm"> EM Storm</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Lush Blooms"> Lush Blooms</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Husk Graveyard"> Husk Graveyard</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Uncovered Caches"> Uncovered Caches</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Launch Tower"> Launch Tower Loot</div></div></div><button type="submit" class="btn-primary">INITIATE MISSION</button></form></div></div>
 
     <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(e=>console.log(e));});}</script>
@@ -357,13 +365,14 @@
             'webhook': { title: "WEBHOOK CONFIGURATION", text: "Go to the <strong>COMMS ARRAY</strong> card below to manage your webhooks.<br><br>Add multiple endpoints (e.g. Guild Chat, Officer Chat, Test Server) and assign them types to control what alerts they receive." },
             'auto_approve': { title: "AUTO-APPROVAL PROTOCOL", text: "<strong>ENABLED:</strong> Any user who logs in and is confirmed to be a member of the Target Guild will be instantly Verified.<br><br><strong>DISABLED:</strong> New users will be set to 'Pending'. An Admin must manually approve them." },
             'embark': { title: "EMBARK ID FORMAT", text: "Your unique in-game identifier found in the Social menu.<br>Format: <strong>DisplayName#1234</strong><br>This helps squadmates find you." },
-            'playstyle': { title: "COMBAT PREFERENCE", text: "<strong>PvP:</strong> You actively seek hostile engagements.<br><strong>PvE:</strong> You focus on quests/looting.<br><strong>Hybrid:</strong> You adapt to the mission." }
+            'playstyle': { title: "COMBAT PREFERENCE", text: "<strong>PvP:</strong> You actively seek hostile engagements.<br><strong>PvE:</strong> You focus on quests/looting.<br><strong>Hybrid:</strong> You adapt to the mission." },
+            'displayname': { title: "DISPLAY NAME OVERRIDE", text: "If set, this name will be shown in the Roster, Missions, and Notifications instead of your Discord username.<br><br>Useful if your Discord name is different from your in-game name." }
         };
 
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.15 [STABLE] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.16 [STABLE] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
@@ -500,13 +509,11 @@
                 loadBoard();
             });
 
-            // --- UPDATED NEW OP BUTTON ---
             attach('openEventModalBtn', 'click', () => { 
                 document.getElementById('e-time').value = ''; 
                 potentialSquad = []; 
                 document.getElementById('eventForm').reset();
                 
-                // FORCE PROFILE TIMEZONE IF EXISTS
                 if (currentUserProfile && currentUserProfile.timezone) {
                     document.getElementById('e-timezone').value = currentUserProfile.timezone;
                 } else {
@@ -540,7 +547,11 @@
                 document.getElementById('ep-style').value = document.getElementById('u-playstyle').textContent;
                 document.getElementById('ep-region').value = document.getElementById('u-region').textContent;
                 document.getElementById('ep-timezone').value = document.getElementById('u-timezone').textContent;
-                if(currentUserProfile) { document.getElementById('ep-embark-id').value = currentUserProfile.embark_id || ''; document.getElementById('ep-notify').checked = currentUserProfile.notify_on_match !== false; }
+                if(currentUserProfile) { 
+                    document.getElementById('ep-embark-id').value = currentUserProfile.embark_id || ''; 
+                    document.getElementById('ep-display-name').value = currentUserProfile.display_name || ''; 
+                    document.getElementById('ep-notify').checked = currentUserProfile.notify_on_match !== false; 
+                }
                 document.getElementById('profileModal').classList.remove('hidden');
             });
             if(document.getElementById('repairProfileBtn')) attach('repairProfileBtn', 'click', () => navTo('onboarding'));
@@ -597,7 +608,10 @@
                         isOfficer = (rank === 'officer');
                         isVerified = (data.status === 'verified') || isAdmin || isOfficer;
 
-                        document.getElementById('u-name').textContent = data.discord_name;
+                        // DISPLAY NAME LOGIC
+                        const displayName = data.display_name || data.discord_name;
+                        document.getElementById('u-name').textContent = displayName;
+                        
                         document.getElementById('u-embark-display').textContent = data.embark_id ? `ID: ${data.embark_id}` : '';
                         document.getElementById('u-avatar').src = data.avatar_url || 'https://placehold.co/50';
                         document.getElementById('u-playstyle').textContent = data.play_style;
@@ -627,10 +641,19 @@
 
                         if (!isVerified) { if (data.status === 'pending') setLockedState('pending'); else setLockedState('denied'); navTo('locked'); }
                         else { 
-                            const {data: allP} = await supabaseClient.from('profiles').select('id, discord_name, embark_id');
-                            if(allP) allP.forEach(p => profilesMap[p.id] = p.discord_name);
+                            const {data: allP} = await supabaseClient.from('profiles').select('id, discord_name, display_name, embark_id');
+                            // MAP USERS TO DISPLAY NAME IF AVAILABLE
+                            if(allP) allP.forEach(p => profilesMap[p.id] = p.display_name || p.discord_name);
                             try { await checkUserNotifications(); } catch(e) { console.warn('User Alerts Failed', e); }
-                            navTo('dashboard'); 
+                            
+                            // DEEP LINK CHECK
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const missionId = urlParams.get('mission');
+                            if(missionId) {
+                                navTo('board', missionId);
+                            } else {
+                                navTo('dashboard'); 
+                            }
                         }
                     } else { 
                         navTo('onboarding'); 
@@ -698,17 +721,36 @@
             window.toggleWebhook = async (id, status) => { await supabaseClient.from('webhook_endpoints').update({ is_active: status }).eq('id', id); loadCommsArray(); };
             window.deleteWebhook = async (id) => { if(confirm('Delete Uplink?')) { await supabaseClient.from('webhook_endpoints').delete().eq('id', id); loadCommsArray(); }};
 
-            async function sendWebhook(title, desc, time) {
-                const { data } = await supabaseClient.from('webhook_endpoints').select('url').in('type', ['general', 'debug']).eq('is_active', true);
+            async function sendWebhook(type, title, desc, time, missionId, creatorName, creatorEmbark) {
+                const { data } = await supabaseClient.from('webhook_endpoints').select('url').in('type', [type, 'debug']).eq('is_active', true);
                 if(!data) return;
-                const payload = { content: "🚨 **NEW MISSION ALERT**", embeds: [{ title: title, description: desc, color: 16733440, fields: [{ name: "Time", value: time, inline: true }, { name: "Link", value: window.location.href, inline: true }], footer: { text: "Raider // Signal" } }] };
+                
+                // DEEP LINK GENERATION
+                const appLink = `${window.location.origin}${window.location.pathname}?mission=${missionId}`;
+                const tag = `[${type.toUpperCase()}]`;
+                
+                // EMBED CONSTRUCTION
+                const payload = { 
+                    content: `🚨 **NEW MISSION ALERT ${tag}**`, 
+                    embeds: [{ 
+                        title: title, 
+                        description: desc, 
+                        color: 16733440, 
+                        fields: [
+                            { name: "Time", value: time, inline: true }, 
+                            { name: "Host", value: `${creatorName} (${creatorEmbark || 'N/A'})`, inline: true },
+                            { name: "Secure Link", value: `[View Mission Parameters](${appLink})`, inline: false }
+                        ], 
+                        footer: { text: "Raider // Signal" } 
+                    }] 
+                };
                 data.forEach(wh => fetch(wh.url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) }));
             }
 
             async function sendAdminAlert(username, embarkId) {
                 const { data } = await supabaseClient.from('webhook_endpoints').select('url').in('type', ['admin', 'debug']).eq('is_active', true);
                 if(!data) return;
-                const payload = { content: `⚠️ **NEW RECRUIT PENDING**\n**Agent:** ${username}\n**ID:** ${embarkId || 'N/A'}\n[Open Command Center](${window.location.href})` };
+                const payload = { content: `⚠️ **NEW RECRUIT PENDING [ADMIN]**\n**Agent:** ${username}\n**ID:** ${embarkId || 'N/A'}\n[Open Command Center](${window.location.href})` };
                 data.forEach(wh => fetch(wh.url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) }));
             }
 
@@ -753,7 +795,16 @@
                 const utc = dayjs.tz(document.getElementById('e-time').value, document.getElementById('e-timezone').value).utc().format();
                 const conds = []; document.querySelectorAll('input[name="cond"]:checked').forEach(c=>conds.push(c.value));
                 const { data, error } = await supabaseClient.from('events').insert({ title: document.getElementById('e-title').value, description: document.getElementById('e-desc').value, start_time: utc, timezone: document.getElementById('e-timezone').value, region: document.getElementById('e-region').value, mission_type: document.getElementById('e-type').value, conditions: conds, host_id: currentUser.id }).select();
-                if(!error) { const friendlyTime = dayjs(utc).format('YYYY-MM-DD HH:mm [UTC]'); sendWebhook(document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime); calculateNotifications(data[0].id, data[0].title, utc); document.getElementById('eventModal').classList.add('hidden'); loadBoard(); } else { alert(error.message); }
+                
+                if(!error) { 
+                    const friendlyTime = dayjs(utc).format('YYYY-MM-DD HH:mm [UTC]'); 
+                    // PASS HOST DETAILS TO WEBHOOK
+                    const hostName = currentUserProfile.display_name || currentUserProfile.discord_name;
+                    sendWebhook('general', document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime, data[0].id, hostName, currentUserProfile.embark_id); 
+                    calculateNotifications(data[0].id, data[0].title, utc); 
+                    document.getElementById('eventModal').classList.add('hidden'); 
+                    loadBoard(); 
+                } else { alert(error.message); }
             };
 
             document.getElementById('scheduleForm').onsubmit = async (e) => {
@@ -778,6 +829,7 @@
                     const profileData = {
                         id: currentUser.id,
                         discord_name: currentUser.user_metadata?.full_name || currentUser.email,
+                        display_name: document.getElementById('p-display-name').value || null, // NEW FIELD
                         avatar_url: currentUser.user_metadata?.avatar_url || '',
                         embark_id: document.getElementById('p-embark-id').value || null,
                         play_style: document.getElementById('p-style').value,
@@ -796,7 +848,7 @@
                     }
                     
                     if (!APP_SETTINGS.auto_approve) {
-                        sendAdminAlert(profileData.discord_name, profileData.embark_id);
+                        sendAdminAlert(profileData.display_name || profileData.discord_name, profileData.embark_id);
                     }
                     await new Promise(resolve => setTimeout(resolve, 500));
                     await checkProfile();
@@ -818,6 +870,7 @@
                     
                     const updateData = {
                         embark_id: document.getElementById('ep-embark-id').value || null,
+                        display_name: document.getElementById('ep-display-name').value || null, // NEW FIELD
                         play_style: document.getElementById('ep-style').value,
                         region: document.getElementById('ep-region').value,
                         timezone: document.getElementById('ep-timezone').value,
@@ -864,7 +917,9 @@
                     const isPending = p.status === 'pending';
                     if (showPending && !isPending) return; 
                     if (!showPending && isPending) return; 
-                    if (search && !(p.discord_name && p.discord_name.toLowerCase().includes(search))) return;
+                    // USE DISPLAY NAME OR DISCORD NAME
+                    const name = p.display_name || p.discord_name;
+                    if (search && !(name && name.toLowerCase().includes(search))) return;
                     if (reg !== 'ALL' && p.region !== reg) return;
                     if (sty !== 'ALL' && p.play_style !== sty) return;
 
@@ -903,9 +958,9 @@
                         }
                     }
 
-                    let nameDisplay = p.discord_name;
-                    if (p.rank === 'commander') nameDisplay = `<span style="color:var(--admin-color)">[CMD] ${p.discord_name}</span>`;
-                    else if (p.rank === 'officer') nameDisplay = `<span style="color:var(--cal-color)">[OFC] ${p.discord_name}</span>`;
+                    let nameDisplay = name;
+                    if (p.rank === 'commander') nameDisplay = `<span style="color:var(--admin-color)">[CMD] ${name}</span>`;
+                    else if (p.rank === 'officer') nameDisplay = `<span style="color:var(--cal-color)">[OFC] ${name}</span>`;
 
                     grid.innerHTML += `<div class="member-card"><div class="member-header"><img src="${p.avatar_url || 'https://placehold.co/50'}" class="member-avatar"><div><h3>${nameDisplay}</h3><div style="font-size:0.9rem; color:var(--accent-color); font-weight:bold;">${p.embark_id || ''}</div><div style="font-size:0.9rem; color:var(--text-dim)">${p.play_style} :: ${p.region}</div></div></div><div style="margin-top:10px; border-top:1px dashed #333; padding-top:10px;">${status}</div><div style="margin-top:10px;">${actions}</div></div>`;
                 });
@@ -968,9 +1023,10 @@
                             act += `<button class="mini-btn btn-red" onclick="window.kick('${p.id}')">X</button>`;
                         }
                     }
-                    let nameDisplay = p.discord_name;
-                    if (p.rank === 'commander') nameDisplay = `<span style="color:var(--admin-color)">[CMD] ${p.discord_name}</span>`;
-                    else if (p.rank === 'officer') nameDisplay = `<span style="color:var(--cal-color)">[OFC] ${p.discord_name}</span>`;
+                    const name = p.display_name || p.discord_name;
+                    let nameDisplay = name;
+                    if (p.rank === 'commander') nameDisplay = `<span style="color:var(--admin-color)">[CMD] ${name}</span>`;
+                    else if (p.rank === 'officer') nameDisplay = `<span style="color:var(--cal-color)">[OFC] ${name}</span>`;
                     tb.innerHTML += `<tr><td>${nameDisplay}</td><td>${p.embark_id || '-'}</td><td>${p.region}/${p.play_style}</td><td>${stat}</td><td>${dayjs(p.created_at).format('MMM D')}</td><td>${act}</td></tr>`;
                 });
             };
