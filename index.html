@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arc Raiders Guild Tool</title>
+    <title>Raider Signal</title>
     
     <meta property="og:title" content="RAIDER // SIGNAL">
     <meta property="og:description" content="Tactical Coordination Suite.">
@@ -327,14 +327,19 @@
 
         <section id="board-section" class="hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border-color); padding-bottom:1rem;">
-                <h2>// MISSION PARAMETERS</h2><button id="openEventModalBtn" class="btn-primary" style="width:auto">+ NEW OP</button>
+                <h2>// MISSION PARAMETERS</h2>
+                <button id="clearMissionFilter" class="btn-secondary" style="display:none; font-size:0.8rem; padding:5px 10px;">SHOW ALL</button>
+                <button id="openEventModalBtn" class="btn-primary" style="width:auto">+ NEW OP</button>
+            </div>
+             <div class="roster-toolbar" style="border-left: 3px solid var(--accent-color);">
+                <div class="toolbar-group"><input type="text" id="board-search" placeholder="FILTER MISSIONS..."></div>
             </div>
             <div id="eventsGrid" class="grid-view"></div>
         </section>
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.13 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.15 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -358,7 +363,7 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.13 [STABLE] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.15 [STABLE] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
@@ -367,7 +372,7 @@
             let APP_SETTINGS = { guild_id: "1465694444484427903", auto_approve: false };
             let potentialSquad = [];
 
-            // --- HELPER FUNCTIONS HOISTED TO TOP (CRITICAL FIX) ---
+            // --- HELPER FUNCTIONS ---
             function populateTimezones(id) { 
                 const s = document.getElementById(id); 
                 if(!s) return; 
@@ -451,7 +456,7 @@
                 } catch(e) { console.error('Settings load failed', e); }
             }
 
-            function navTo(pageId) {
+            function navTo(pageId, filterId = null) {
                 ['login','onboarding','dashboard','roster','board','locked','admin','alerts'].forEach(p => { const el = document.getElementById(p+'-section'); if(el) el.classList.add('hidden'); });
                 document.getElementById('auth-loading').style.display = 'none';
                 if(pageId === 'onboarding') { document.getElementById('onboarding-section').classList.remove('hidden'); document.getElementById('main-nav').style.display = 'none'; return; }
@@ -459,7 +464,7 @@
                 document.getElementById('main-nav').style.display = 'flex';
                 const t = document.getElementById(pageId+'-section'); if(t) t.classList.remove('hidden');
                 if(pageId === 'roster') loadRoster();
-                if(pageId === 'board') loadBoard();
+                if(pageId === 'board') loadBoard(filterId);
                 if(pageId === 'admin') { loadAdminTable(); if(isAdmin) loadCommsArray(); }
                 if(pageId === 'alerts') loadAlerts();
             }
@@ -488,7 +493,30 @@
             attach('roster-show-pending', 'change', loadRoster);
             attach('refreshAdminBtn', 'click', () => loadAdminTable());
             attach('openScheduleBtn', 'click', () => document.getElementById('scheduleModal').classList.remove('hidden'));
-            attach('openEventModalBtn', 'click', () => { document.getElementById('e-time').value = ''; potentialSquad = []; document.getElementById('eventModal').classList.remove('hidden'); });
+            
+            attach('board-search', 'input', () => loadBoard());
+            attach('clearMissionFilter', 'click', () => {
+                document.getElementById('board-search').value = '';
+                loadBoard();
+            });
+
+            // --- UPDATED NEW OP BUTTON ---
+            attach('openEventModalBtn', 'click', () => { 
+                document.getElementById('e-time').value = ''; 
+                potentialSquad = []; 
+                document.getElementById('eventForm').reset();
+                
+                // FORCE PROFILE TIMEZONE IF EXISTS
+                if (currentUserProfile && currentUserProfile.timezone) {
+                    document.getElementById('e-timezone').value = currentUserProfile.timezone;
+                } else {
+                    document.getElementById('e-timezone').value = userTimezone; 
+                }
+
+                document.querySelector('#eventForm button[type="submit"]').style.display = 'block';
+                document.querySelector('#eventModal .modal-header h3').textContent = "MISSION BRIEFING";
+                document.getElementById('eventModal').classList.remove('hidden'); 
+            });
             
             attach('saveConfigBtn', 'click', async () => {
                 if(!isAdmin) return;
@@ -637,12 +665,23 @@
                     grid.innerHTML = '';
                     data.forEach(n => {
                         const isRead = n.is_read ? 'opacity:0.5;' : 'border-color:var(--cal-color);';
-                        grid.innerHTML += `<div class="notification-card" style="${isRead}"><h3 style="color:var(--cal-color)">${n.title}</h3><p style="margin:10px 0;">${n.message}</p><div style="display:flex; gap:10px;">${n.action_link ? `<button class="btn-sync" onclick="window.location.href='${n.action_link}'">VIEW MISSION</button>` : ''}${!n.is_read ? `<button class="btn-secondary" onclick="window.markRead('${n.id}')">DISMISS</button>` : '<span style="color:var(--text-dim)">READ</span>'}</div></div>`;
+                        let actionBtn = '';
+                        if(n.action_link) {
+                            if(n.action_link.startsWith('mission:')) {
+                                const mId = n.action_link.split(':')[1];
+                                actionBtn = `<button class="btn-sync" onclick="window.navTo('board', '${mId}')">VIEW MISSION</button>`;
+                            } else {
+                                actionBtn = `<button class="btn-sync" onclick="window.location.href='${n.action_link}'">OPEN LINK</button>`;
+                            }
+                        }
+                        
+                        grid.innerHTML += `<div class="notification-card" style="${isRead}"><h3 style="color:var(--cal-color)">${n.title}</h3><p style="margin:10px 0;">${n.message}</p><div style="display:flex; gap:10px;">${actionBtn}${!n.is_read ? `<button class="btn-secondary" onclick="window.markRead('${n.id}')">DISMISS</button>` : '<span style="color:var(--text-dim)">READ</span>'}</div></div>`;
                     });
-                } catch(e) { grid.innerHTML = 'Error loading alerts.'; }
+                } catch(e) { console.error(e); grid.innerHTML = 'Error loading alerts.'; }
             }
 
             window.markRead = async (id) => { await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); loadAlerts(); checkUserNotifications(); };
+            window.navTo = navTo; 
 
             async function loadCommsArray() {
                 if(!isAdmin) return;
@@ -698,7 +737,12 @@
                         }
                     });
                     if(matchedUsers.length > 0) {
-                        const alerts = matchedUsers.map(uid => ({ user_id: uid, title: "MISSION MATCH FOUND", message: `Operation "${missionTitle}" matches your availability schedule.`, action_link: `#nav-board` }));
+                        const alerts = matchedUsers.map(uid => ({ 
+                            user_id: uid, 
+                            title: "MISSION MATCH FOUND", 
+                            message: `Operation "${missionTitle}" matches your availability schedule.`, 
+                            action_link: `mission:${missionId}`
+                        }));
                         await supabaseClient.from('notifications').insert(alerts);
                     }
                 } catch(e) { console.error('Notification Calculation Failed', e); }
@@ -727,7 +771,6 @@
             document.getElementById('profileForm').onsubmit = async (e) => {
                 e.preventDefault();
                 try {
-                    // Disable the submit button to prevent double-clicks
                     const submitBtn = e.target.querySelector('button[type="submit"]');
                     submitBtn.disabled = true;
                     submitBtn.textContent = 'CREATING...';
@@ -745,11 +788,9 @@
                         notify_on_match: true
                     };
                     
-                    // Use .select() to get the inserted data back
                     const { data, error } = await supabaseClient.from('profiles').upsert(profileData).select();
                     if (error) throw error;
                     
-                    // Verify the data was actually written
                     if (!data || data.length === 0) {
                         throw new Error('Profile was not created. Please try again.');
                     }
@@ -757,16 +798,11 @@
                     if (!APP_SETTINGS.auto_approve) {
                         sendAdminAlert(profileData.discord_name, profileData.embark_id);
                     }
-                    
-                    // Small delay to ensure database consistency
                     await new Promise(resolve => setTimeout(resolve, 500));
-                    
-                    // Now check the profile
                     await checkProfile();
                 } catch (err) {
                     alert('Profile creation failed: ' + err.message);
                     console.error(err);
-                    // Re-enable the button on error
                     const submitBtn = e.target.querySelector('button[type="submit"]');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'CREATE ID CARD';
@@ -776,7 +812,6 @@
             document.getElementById('editProfileForm').onsubmit = async (e) => {
                 e.preventDefault();
                 try {
-                    // Disable the submit button to prevent double-clicks
                     const submitBtn = e.target.querySelector('button[type="submit"]');
                     submitBtn.disabled = true;
                     submitBtn.textContent = 'SAVING...';
@@ -791,8 +826,6 @@
                     
                     const { error } = await supabaseClient.from('profiles').update(updateData).eq('id', currentUser.id).select();
                     if (error) throw error;
-                    
-                    // Small delay to ensure database consistency
                     await new Promise(resolve => setTimeout(resolve, 300));
                     
                     document.getElementById('profileModal').classList.add('hidden');
@@ -800,7 +833,6 @@
                 } catch (err) {
                     alert('Profile update failed: ' + err.message);
                     console.error(err);
-                    // Re-enable the button on error
                     const submitBtn = e.target.querySelector('button[type="submit"]');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'SAVE CHANGES';
@@ -881,14 +913,30 @@
                 if(futureTime && potentialSquad.length > 0) document.getElementById('launchFutureOp').textContent = `LAUNCH OP (${potentialSquad.length} AGENTS)`;
             }
 
-            async function loadBoard() {
+            async function loadBoard(filterId = null) {
                 if(!isVerified) return;
                 const grid = document.getElementById('eventsGrid'); grid.innerHTML = 'Scanning...';
+                
+                let searchText = document.getElementById('board-search').value.toLowerCase();
+                
+                if (filterId) {
+                   document.getElementById('board-search').value = "ID: " + filterId;
+                   document.getElementById('clearMissionFilter').style.display = 'inline-block';
+                } else if (searchText) {
+                   document.getElementById('clearMissionFilter').style.display = 'inline-block';
+                } else {
+                   document.getElementById('clearMissionFilter').style.display = 'none';
+                }
+
                 const { data: events } = await supabaseClient.from('events').select('*').order('start_time', {ascending: true});
                 const { data: signups } = await supabaseClient.from('event_signups').select('*');
                 if(!events) { grid.innerHTML = 'No Ops.'; return; }
                 grid.innerHTML = '';
+                
                 events.forEach(ev => {
+                    if(filterId && ev.id !== filterId) return;
+                    if(!filterId && searchText && !ev.title.toLowerCase().includes(searchText) && !ev.mission_type.toLowerCase().includes(searchText)) return;
+
                     const attending = signups?.filter(s => s.event_id === ev.id) || [];
                     const isSignedUp = attending.some(s => s.user_id === currentUser.id);
                     const isHost = ev.host_id === currentUser.id;
