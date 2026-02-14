@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arc Raiders Guild Tool</title>
-    
-    <meta property="og:title" content="RAIDER // SIGNAL">
+    <title>Raider Signal</title> <meta property="og:title" content="RAIDER // SIGNAL">
     <meta property="og:description" content="Tactical Coordination Suite.">
     <meta name="theme-color" content="#ff5500">
 
@@ -327,14 +325,19 @@
 
         <section id="board-section" class="hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border-color); padding-bottom:1rem;">
-                <h2>// MISSION PARAMETERS</h2><button id="openEventModalBtn" class="btn-primary" style="width:auto">+ NEW OP</button>
+                <h2>// MISSION PARAMETERS</h2>
+                <button id="clearMissionFilter" class="btn-secondary" style="display:none; font-size:0.8rem; padding:5px 10px;">SHOW ALL</button>
+                <button id="openEventModalBtn" class="btn-primary" style="width:auto">+ NEW OP</button>
+            </div>
+            <div class="roster-toolbar" style="border-left: 3px solid var(--accent-color);">
+                <div class="toolbar-group"><input type="text" id="board-search" placeholder="FILTER MISSIONS..."></div>
             </div>
             <div id="eventsGrid" class="grid-view"></div>
         </section>
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.13 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.14 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -358,7 +361,7 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.13 [STABLE] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.14 [STABLE] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
@@ -401,37 +404,6 @@
                     con.appendChild(div);
                 });
             }
-
-            // --- NEW: VIEW MISSION HELPER ---
-            window.viewMission = async (id) => {
-                const { data: ev, error } = await supabaseClient.from('events').select('*').eq('id', id).maybeSingle();
-                if(error || !ev) { alert('Mission not found or deleted.'); return; }
-                
-                // Populate form fields
-                document.getElementById('e-title').value = ev.title;
-                document.getElementById('e-type').value = ev.mission_type;
-                document.getElementById('e-desc').value = ev.description;
-                document.getElementById('e-region').value = ev.region;
-                document.getElementById('e-timezone').value = ev.timezone;
-                // Convert UTC time to Mission Timezone for the input display
-                document.getElementById('e-time').value = dayjs(ev.start_time).tz(ev.timezone).format('YYYY-MM-DDTHH:mm');
-                
-                // Set Conditions
-                document.querySelectorAll('input[name="cond"]').forEach(c => c.checked = false);
-                if(ev.conditions) {
-                    ev.conditions.forEach(cond => {
-                        const cb = document.querySelector(`input[name="cond"][value="${cond}"]`);
-                        if(cb) cb.checked = true;
-                    });
-                }
-
-                // UI State for "View Mode" (Hide Submit Button)
-                const btn = document.querySelector('#eventForm button[type="submit"]');
-                if(btn) btn.style.display = 'none';
-                
-                document.querySelector('#eventModal .modal-header h3').textContent = "MISSION DETAILS (READ ONLY)";
-                document.getElementById('eventModal').classList.remove('hidden');
-            };
             
             populateTimezones('p-timezone'); populateTimezones('ep-timezone'); populateTimezones('e-timezone');
 
@@ -482,7 +454,8 @@
                 } catch(e) { console.error('Settings load failed', e); }
             }
 
-            function navTo(pageId) {
+            // UPDATED: NAVTO TO HANDLE FILTERS
+            function navTo(pageId, filterId = null) {
                 ['login','onboarding','dashboard','roster','board','locked','admin','alerts'].forEach(p => { const el = document.getElementById(p+'-section'); if(el) el.classList.add('hidden'); });
                 document.getElementById('auth-loading').style.display = 'none';
                 if(pageId === 'onboarding') { document.getElementById('onboarding-section').classList.remove('hidden'); document.getElementById('main-nav').style.display = 'none'; return; }
@@ -490,7 +463,8 @@
                 document.getElementById('main-nav').style.display = 'flex';
                 const t = document.getElementById(pageId+'-section'); if(t) t.classList.remove('hidden');
                 if(pageId === 'roster') loadRoster();
-                if(pageId === 'board') loadBoard();
+                // PASS FILTER ID TO LOADBOARD
+                if(pageId === 'board') loadBoard(filterId);
                 if(pageId === 'admin') { loadAdminTable(); if(isAdmin) loadCommsArray(); }
                 if(pageId === 'alerts') loadAlerts();
             }
@@ -520,12 +494,18 @@
             attach('refreshAdminBtn', 'click', () => loadAdminTable());
             attach('openScheduleBtn', 'click', () => document.getElementById('scheduleModal').classList.remove('hidden'));
             
-            // --- UPDATED: RESET MODAL FOR NEW MISSION ---
+            // --- EVENT FILTERS ---
+            attach('board-search', 'input', () => loadBoard());
+            attach('clearMissionFilter', 'click', () => {
+                document.getElementById('board-search').value = '';
+                // Clear the internal filter by reloading without args
+                loadBoard();
+            });
+
             attach('openEventModalBtn', 'click', () => { 
                 document.getElementById('e-time').value = ''; 
                 potentialSquad = []; 
                 document.getElementById('eventForm').reset();
-                // Ensure submit button is visible for creating new events
                 document.querySelector('#eventForm button[type="submit"]').style.display = 'block';
                 document.querySelector('#eventModal .modal-header h3').textContent = "MISSION BRIEFING";
                 document.getElementById('eventModal').classList.remove('hidden'); 
@@ -683,7 +663,8 @@
                         if(n.action_link) {
                             if(n.action_link.startsWith('mission:')) {
                                 const mId = n.action_link.split(':')[1];
-                                actionBtn = `<button class="btn-sync" onclick="window.viewMission('${mId}')">VIEW MISSION</button>`;
+                                // CHANGED: CALL NAVTO WITH FILTER ID
+                                actionBtn = `<button class="btn-sync" onclick="window.navTo('board', '${mId}')">VIEW MISSION</button>`;
                             } else {
                                 actionBtn = `<button class="btn-sync" onclick="window.location.href='${n.action_link}'">OPEN LINK</button>`;
                             }
@@ -695,6 +676,7 @@
             }
 
             window.markRead = async (id) => { await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); loadAlerts(); checkUserNotifications(); };
+            window.navTo = navTo; // EXPOSE TO WINDOW FOR BUTTON CLICKS
 
             async function loadCommsArray() {
                 if(!isAdmin) return;
@@ -750,7 +732,6 @@
                         }
                     });
                     if(matchedUsers.length > 0) {
-                        // CHANGED: Use 'mission:[ID]' protocol instead of hash link
                         const alerts = matchedUsers.map(uid => ({ 
                             user_id: uid, 
                             title: "MISSION MATCH FOUND", 
@@ -927,14 +908,35 @@
                 if(futureTime && potentialSquad.length > 0) document.getElementById('launchFutureOp').textContent = `LAUNCH OP (${potentialSquad.length} AGENTS)`;
             }
 
-            async function loadBoard() {
+            // UPDATED: LOADBOARD HANDLES FILTERS
+            async function loadBoard(filterId = null) {
                 if(!isVerified) return;
                 const grid = document.getElementById('eventsGrid'); grid.innerHTML = 'Scanning...';
+                
+                // HANDLE SEARCH INPUT FILTER
+                let searchText = document.getElementById('board-search').value.toLowerCase();
+                
+                // IF FILTER ID IS PASSED, SET IT TO SEARCH BOX TO PERSIST STATE
+                if (filterId) {
+                   // Optional: If you want to show filtering in the UI
+                   document.getElementById('board-search').value = "ID: " + filterId;
+                   document.getElementById('clearMissionFilter').style.display = 'inline-block';
+                } else if (searchText) {
+                   document.getElementById('clearMissionFilter').style.display = 'inline-block';
+                } else {
+                   document.getElementById('clearMissionFilter').style.display = 'none';
+                }
+
                 const { data: events } = await supabaseClient.from('events').select('*').order('start_time', {ascending: true});
                 const { data: signups } = await supabaseClient.from('event_signups').select('*');
                 if(!events) { grid.innerHTML = 'No Ops.'; return; }
                 grid.innerHTML = '';
+                
                 events.forEach(ev => {
+                    // FILTER LOGIC
+                    if(filterId && ev.id !== filterId) return;
+                    if(!filterId && searchText && !ev.title.toLowerCase().includes(searchText) && !ev.mission_type.toLowerCase().includes(searchText)) return;
+
                     const attending = signups?.filter(s => s.event_id === ev.id) || [];
                     const isSignedUp = attending.some(s => s.user_id === currentUser.id);
                     const isHost = ev.host_id === currentUser.id;
