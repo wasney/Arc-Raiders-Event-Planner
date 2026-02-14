@@ -485,7 +485,10 @@
             attach('nav-home', 'click', () => navTo('dashboard'));
             attach('nav-alerts', 'click', () => navTo('alerts'));
             attach('nav-roster', 'click', () => navTo('roster'));
-            attach('nav-board', 'click', () => navTo('board'));
+            attach('nav-board', 'click', () => { 
+    document.getElementById('board-search').value = ''; 
+    navTo('board'); 
+});
             attach('nav-admin', 'click', () => navTo('admin'));
             attach('loginBtn', 'click', async () => { 
                 document.getElementById('loginBtn').style.display = 'none';
