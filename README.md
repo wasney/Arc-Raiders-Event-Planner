@@ -8,13 +8,14 @@ It functions as a **Progressive Web App (PWA)**, offering a native app-like expe
 ## 📡 Core Capabilities
 
 * **Secure Uplink (Auth):** Users authenticate via **Discord OAuth2**.
+* **Identity Masking:** Users can set a custom **Display Name** to override their Discord username for operational privacy or roleplay.
 * **Chain of Command (Ranks):**
     * 👑 **Commander:** Full system access. Can configure webhooks, auto-approve settings, and promote/demote anyone.
     * 🛡️ **Field Officer:** Can approve recruits, delete spam missions, and manage Soldiers. Cannot access system configs.
     * ⚔️ **Soldier:** Standard operator. Can join/create missions and manage their schedule.
 * **The Headhunter (Auto-Match):** When a mission is created, the system calculates which operators are available (converting UTC to local time) and pushes internal **Tactical Alerts** to their dashboard.
-* **Comms Array (Webhooks):** Dynamic routing for Discord alerts.
-    * *General:* Mission briefings.
+* **Comms Array (Webhooks):** Dynamic routing for Discord alerts with **Deep Link** support.
+    * *General:* Mission briefings (includes Host Name & Embark ID).
     * *Admin:* Recruit notifications.
     * *Debug:* System logs.
 * **Tactical Forecaster:** "Time Machine" lookup allows officers to check squad availability for future dates/times.
@@ -41,6 +42,7 @@ To deploy this yourself, run these SQL commands in your Supabase SQL Editor.
 create table profiles (
   id uuid references auth.users primary key,
   discord_name text,
+  display_name text, -- Custom override name
   avatar_url text,
   region text,
   play_style text,
