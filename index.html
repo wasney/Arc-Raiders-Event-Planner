@@ -144,6 +144,8 @@
         .badge-general { border-color: var(--success-color); color: var(--success-color); }
         .badge-admin { border-color: var(--locked-color); color: var(--locked-color); }
         .badge-debug { border-color: var(--admin-color); color: var(--admin-color); }
+        
+        .mission-countdown { font-size: 1rem; color: var(--success-color); font-weight: bold; background: rgba(0, 255, 65, 0.1); padding: 5px 10px; border: 1px solid var(--success-color); display: inline-block; margin-top: 10px; }
 
         @media (max-width: 768px) { 
             header { padding: 1rem; } 
@@ -227,6 +229,14 @@
                 <div class="form-group">
                     <label>LOCAL TIMEZONE</label>
                     <select id="p-timezone"></select>
+                </div>
+
+                <div class="form-group">
+                    <label>TIME FORMAT</label>
+                    <select id="p-time-format">
+                        <option value="24h">24-Hour (14:00)</option>
+                        <option value="12h">12-Hour (2:00 PM)</option>
+                    </select>
                 </div>
                 
                 <button type="submit" class="btn-primary">CREATE ID CARD</button>
@@ -347,12 +357,12 @@
     </main>
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
-        SYSTEM v22.16 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        SYSTEM v22.17 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
     <div id="scheduleModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>AVAILABILITY PROTOCOL</h3><button class="close-modal">[X]</button></div><form id="scheduleForm"><div id="daysContainer"></div><button type="submit" class="btn-primary" style="margin-top:1rem">UPDATE RECORD</button></form></div></div>
-    <div id="profileModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>EDIT ID CARD</h3><button class="close-modal">[X]</button></div><form id="editProfileForm"><div class="form-group"><div class="label-row"><label>DISPLAY NAME (OPTIONAL)</label><button type="button" class="help-btn" data-key="displayname">?</button></div><input id="ep-display-name" placeholder="Leave blank to use Discord Username"></div><div class="form-group"><div class="label-row"><label>EMBARK ID (OPTIONAL)</label><button type="button" class="help-btn" data-key="embark">?</button></div><input id="ep-embark-id" placeholder="Name#1234"></div><div class="form-group"><div class="label-row"><label>COMBAT PREFERENCE</label><button type="button" class="help-btn" data-key="playstyle">?</button></div><select id="ep-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div><div class="form-group"><label>DEPLOYMENT REGION</label><select id="ep-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option><option value="OTHER">GLOBAL / OTHER</option></select></div><div class="form-group"><label>LOCAL TIMEZONE</label><select id="ep-timezone"></select></div><div class="checkbox-grid" style="margin-top:20px;"><div class="checkbox-item"><input type="checkbox" id="ep-notify"> RECEIVE TACTICAL ALERTS</div></div><button type="submit" class="btn-primary">SAVE CHANGES</button></form></div></div>
+    <div id="profileModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>EDIT ID CARD</h3><button class="close-modal">[X]</button></div><form id="editProfileForm"><div class="form-group"><div class="label-row"><label>DISPLAY NAME (OPTIONAL)</label><button type="button" class="help-btn" data-key="displayname">?</button></div><input id="ep-display-name" placeholder="Leave blank to use Discord Username"></div><div class="form-group"><div class="label-row"><label>EMBARK ID (OPTIONAL)</label><button type="button" class="help-btn" data-key="embark">?</button></div><input id="ep-embark-id" placeholder="Name#1234"></div><div class="form-group"><div class="label-row"><label>COMBAT PREFERENCE</label><button type="button" class="help-btn" data-key="playstyle">?</button></div><select id="ep-style"><option value="PvP">PvP (HOSTILE)</option><option value="PvE">PvE (ENVIRONMENT)</option><option value="Hybrid">HYBRID</option></select></div><div class="form-group"><label>DEPLOYMENT REGION</label><select id="ep-region"><option value="NA">NORTH AMERICA</option><option value="EU">EUROPE</option><option value="ASIA">ASIA</option><option value="OTHER">GLOBAL / OTHER</option></select></div><div class="form-group"><label>LOCAL TIMEZONE</label><select id="ep-timezone"></select></div><div class="form-group"><label>TIME FORMAT</label><select id="ep-time-format"><option value="24h">24-Hour (14:00)</option><option value="12h">12-Hour (2:00 PM)</option></select></div><div class="checkbox-grid" style="margin-top:20px;"><div class="checkbox-item"><input type="checkbox" id="ep-notify"> RECEIVE TACTICAL ALERTS</div></div><button type="submit" class="btn-primary">SAVE CHANGES</button></form></div></div>
     <div id="eventModal" class="modal-overlay hidden"><div class="modal-content"><div class="modal-header"><h3>MISSION BRIEFING</h3><button class="close-modal">[X]</button></div><form id="eventForm"><div class="form-group"><label>OPERATION NAME</label><input id="e-title" required></div><div class="form-group"><label>MISSION TYPE</label><select id="e-type"><option value="Standard Raid">Standard Raid (30m)</option><option value="Locked Gate">Locked Gate (40m)</option><option value="Hidden Bunker">Hidden Bunker (30m)</option><option value="Matriarch">Matriarch Boss (30m)</option><option value="Harvester">Harvester (30m)</option></select></div><div class="form-group"><label>DETAILS</label><textarea id="e-desc" rows="3"></textarea></div><div class="form-group"><label>T-MINUS (TIME)</label><input id="e-time" type="datetime-local" required></div><div class="form-group"><label>MISSION TIMEZONE</label><select id="e-timezone"></select></div><div class="form-group"><label>THEATER</label><select id="e-region"><option>NA</option><option>EU</option><option>OTHER</option></select></div><div class="form-group"><label>CONDITIONS</label><div class="checkbox-grid"><div class="checkbox-item"><input type="checkbox" name="cond" value="Bird City"> Bird City</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Night Raid"> Night Raid</div><div class="checkbox-item"><input type="checkbox" name="cond" value="EM Storm"> EM Storm</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Lush Blooms"> Lush Blooms</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Husk Graveyard"> Husk Graveyard</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Uncovered Caches"> Uncovered Caches</div><div class="checkbox-item"><input type="checkbox" name="cond" value="Launch Tower"> Launch Tower Loot</div></div></div><button type="submit" class="btn-primary">INITIATE MISSION</button></form></div></div>
 
     <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(e=>console.log(e));});}</script>
@@ -372,7 +382,7 @@
         window.showHelp = function(key) { const data = HELP_DB[key]; if(data) { document.getElementById('infoTitle').innerHTML = data.title; document.getElementById('infoBody').innerHTML = data.text; document.getElementById('infoModal').classList.remove('hidden'); } };
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("🚀 ARC SYSTEM v22.16 [STABLE] ONLINE...");
+            console.log("🚀 ARC SYSTEM v22.17 [STABLE] ONLINE...");
             try { dayjs.extend(window.dayjs_plugin_utc); dayjs.extend(window.dayjs_plugin_timezone); dayjs.extend(window.dayjs_plugin_relativeTime); dayjs.extend(window.dayjs_plugin_weekday); } catch (e) { console.error("Lib Error", e); }
 
             const CONFIG = { url: 'https://olmaoftlbrookqwxvlvx.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sbWFvZnRsYnJvb2txd3h2bHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTI0MzQsImV4cCI6MjA4NTgyODQzNH0.D7iwaB1rQbQwNvQAlFkYsxW7G12zIQAHSlksFr3KxZo' };
@@ -554,6 +564,7 @@
                     document.getElementById('ep-embark-id').value = currentUserProfile.embark_id || ''; 
                     document.getElementById('ep-display-name').value = currentUserProfile.display_name || ''; 
                     document.getElementById('ep-notify').checked = currentUserProfile.notify_on_match !== false; 
+                    document.getElementById('ep-time-format').value = currentUserProfile.time_format || '24h';
                 }
                 document.getElementById('profileModal').classList.remove('hidden');
             });
@@ -724,7 +735,7 @@
             window.toggleWebhook = async (id, status) => { await supabaseClient.from('webhook_endpoints').update({ is_active: status }).eq('id', id); loadCommsArray(); };
             window.deleteWebhook = async (id) => { if(confirm('Delete Uplink?')) { await supabaseClient.from('webhook_endpoints').delete().eq('id', id); loadCommsArray(); }};
 
-            async function sendWebhook(type, title, desc, time, missionId, creatorName, creatorEmbark) {
+            async function sendWebhook(type, title, desc, time, missionId, creatorName, creatorEmbark, startTimeUtc) {
                 const { data } = await supabaseClient.from('webhook_endpoints').select('url').in('type', [type, 'debug']).eq('is_active', true);
                 if(!data) return;
                 
@@ -732,6 +743,11 @@
                 const appLink = `${window.location.origin}${window.location.pathname}?mission=${missionId}`;
                 const tag = `[${type.toUpperCase()}]`;
                 
+                // DYNAMIC DISCORD TIMESTAMP
+                const unixTime = dayjs(startTimeUtc).unix();
+                // User asked for <t:TIMESTAMP:t>, but we'll also include Date context for clarity in Discord
+                const discordTime = `<t:${unixTime}:f> (<t:${unixTime}:R>)`; 
+
                 // EMBED CONSTRUCTION
                 const payload = { 
                     content: `🚨 **NEW MISSION ALERT ${tag}**`, 
@@ -740,7 +756,7 @@
                         description: desc, 
                         color: 16733440, 
                         fields: [
-                            { name: "Time", value: time, inline: true }, 
+                            { name: "Time", value: discordTime, inline: true }, 
                             { name: "Host", value: `${creatorName} (${creatorEmbark || 'N/A'})`, inline: true },
                             { name: "Secure Link", value: `[View Mission Parameters](${appLink})`, inline: false }
                         ], 
@@ -803,7 +819,8 @@
                     const friendlyTime = dayjs(utc).format('YYYY-MM-DD HH:mm [UTC]'); 
                     // PASS HOST DETAILS TO WEBHOOK
                     const hostName = currentUserProfile.display_name || currentUserProfile.discord_name;
-                    sendWebhook('general', document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime, data[0].id, hostName, currentUserProfile.embark_id); 
+                    // Updated call to include raw UTC for dynamic timestamp
+                    sendWebhook('general', document.getElementById('e-title').value, document.getElementById('e-desc').value, friendlyTime, data[0].id, hostName, currentUserProfile.embark_id, utc); 
                     calculateNotifications(data[0].id, data[0].title, utc); 
                     document.getElementById('eventModal').classList.add('hidden'); 
                     loadBoard(); 
@@ -832,7 +849,7 @@
                     const profileData = {
                         id: currentUser.id,
                         discord_name: currentUser.user_metadata?.full_name || currentUser.email,
-                        display_name: document.getElementById('p-display-name').value || null, // NEW FIELD
+                        display_name: document.getElementById('p-display-name').value || null, 
                         avatar_url: currentUser.user_metadata?.avatar_url || '',
                         embark_id: document.getElementById('p-embark-id').value || null,
                         play_style: document.getElementById('p-style').value,
@@ -840,7 +857,8 @@
                         timezone: document.getElementById('p-timezone').value,
                         status: APP_SETTINGS.auto_approve ? 'verified' : 'pending',
                         rank: 'soldier',
-                        notify_on_match: true
+                        notify_on_match: true,
+                        time_format: document.getElementById('p-time-format').value // SAVE PREF
                     };
                     
                     const { data, error } = await supabaseClient.from('profiles').upsert(profileData).select();
@@ -873,11 +891,12 @@
                     
                     const updateData = {
                         embark_id: document.getElementById('ep-embark-id').value || null,
-                        display_name: document.getElementById('ep-display-name').value || null, // NEW FIELD
+                        display_name: document.getElementById('ep-display-name').value || null,
                         play_style: document.getElementById('ep-style').value,
                         region: document.getElementById('ep-region').value,
                         timezone: document.getElementById('ep-timezone').value,
-                        notify_on_match: document.getElementById('ep-notify').checked
+                        notify_on_match: document.getElementById('ep-notify').checked,
+                        time_format: document.getElementById('ep-time-format').value // SAVE PREF
                     };
                     
                     const { error } = await supabaseClient.from('profiles').update(updateData).eq('id', currentUser.id).select();
@@ -991,6 +1010,10 @@
                 if(!events) { grid.innerHTML = 'No Ops.'; return; }
                 grid.innerHTML = '';
                 
+                // Determine User's Preferred Format
+                const timeFormat = currentUserProfile.time_format || '24h';
+                const dateFormatStr = timeFormat === '12h' ? 'MMM D, h:mm A' : 'MMM D, HH:mm';
+
                 events.forEach(ev => {
                     if(filterId && ev.id !== filterId) return;
                     if(!filterId && searchText && !ev.title.toLowerCase().includes(searchText) && !ev.mission_type.toLowerCase().includes(searchText)) return;
@@ -1000,9 +1023,39 @@
                     const isHost = ev.host_id === currentUser.id;
                     const canDelete = isHost || isAdmin || isOfficer; 
                     
-                    grid.innerHTML += `<div class="event-card">${canDelete ? `<button class="btn-admin-delete" onclick="window.delEvent('${ev.id}')">DEL</button>` : ''}<div class="event-title">${ev.title}</div><div class="mission-type">${ev.mission_type}</div><div style="margin:10px 0; font-weight:bold; font-size:1.2rem; color:var(--text-main)">${dayjs(ev.start_time).tz(userTimezone).format('MMM D, HH:mm')}</div><div style="color:var(--text-dim)">${ev.description}</div><div class="attendees-list">SQUAD [${attending.length}]: ${attending.map(s => `<span class="attendee-pill">${profilesMap[s.user_id]||'Agent'}</span>`).join('')}</div>${isSignedUp ? `<button class="btn-leave" onclick="window.leaveEvent('${ev.id}')">ABORT</button>` : `<button class="btn-join" onclick="window.joinEvent('${ev.id}')">JOIN</button>`}</div>`;
+                    grid.innerHTML += `<div class="event-card">${canDelete ? `<button class="btn-admin-delete" onclick="window.delEvent('${ev.id}')">DEL</button>` : ''}<div class="event-title">${ev.title}</div><div class="mission-type">${ev.mission_type}</div><div style="margin:10px 0; font-weight:bold; font-size:1.2rem; color:var(--text-main)">${dayjs(ev.start_time).tz(userTimezone).format(dateFormatStr)}</div><div class="mission-countdown" data-time="${ev.start_time}">Checking...</div><div style="color:var(--text-dim)">${ev.description}</div><div class="attendees-list">SQUAD [${attending.length}]: ${attending.map(s => `<span class="attendee-pill">${profilesMap[s.user_id]||'Agent'}</span>`).join('')}</div>${isSignedUp ? `<button class="btn-leave" onclick="window.leaveEvent('${ev.id}')">ABORT</button>` : `<button class="btn-join" onclick="window.joinEvent('${ev.id}')">JOIN</button>`}</div>`;
                 });
             }
+
+            // --- COUNTDOWN TIMER LOGIC ---
+            function updateCountdowns() {
+                const els = document.querySelectorAll('.mission-countdown');
+                const now = dayjs();
+                els.forEach(el => {
+                    const target = dayjs(el.dataset.time);
+                    const diff = target.diff(now);
+                    
+                    if (diff <= 0) {
+                        el.textContent = "MISSION ACTIVE / EXPIRED";
+                        el.style.color = "var(--danger-color)";
+                        el.style.borderColor = "var(--danger-color)";
+                        el.style.background = "rgba(255, 51, 51, 0.1)";
+                    } else {
+                        // Simple manual formatting to avoid extra plugins
+                        const totalSeconds = Math.floor(diff / 1000);
+                        const h = Math.floor(totalSeconds / 3600);
+                        const m = Math.floor((totalSeconds % 3600) / 60);
+                        const s = totalSeconds % 60;
+                        
+                        const hDisplay = h < 10 ? '0'+h : h;
+                        const mDisplay = m < 10 ? '0'+m : m;
+                        const sDisplay = s < 10 ? '0'+s : s;
+                        
+                        el.textContent = `T-MINUS: ${hDisplay}h ${mDisplay}m ${sDisplay}s`;
+                    }
+                });
+            }
+            setInterval(updateCountdowns, 1000);
 
             window.loadAdminTable = async () => {
                 if(!isAdmin && !isOfficer) return;
