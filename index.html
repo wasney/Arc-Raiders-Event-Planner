@@ -147,11 +147,126 @@
         
         .mission-countdown { font-size: 1rem; color: var(--success-color); font-weight: bold; background: rgba(0, 255, 65, 0.1); padding: 5px 10px; border: 1px solid var(--success-color); display: inline-block; margin-top: 10px; }
 
+        /* ── METAFORGE EVENT TICKER ── */
+        .metaforge-ticker-wrap { 
+            width: 100%; 
+            background: rgba(0,0,0,0.85); 
+            border-bottom: 2px solid #ff5500; 
+            border-top: 1px solid #333; 
+            overflow: hidden; 
+            position: relative; 
+            height: 38px;
+            display: flex;
+            align-items: center;
+        }
+        .metaforge-ticker-label { 
+            flex-shrink: 0; 
+            background: var(--accent-color); 
+            color: #000; 
+            font-weight: 900; 
+            font-size: 0.8rem; 
+            padding: 0 12px; 
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            letter-spacing: 1px; 
+            z-index: 2; 
+            white-space: nowrap;
+        }
+        .metaforge-ticker-track { 
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            height: 100%;
+        }
+        .metaforge-ticker-inner { 
+            display: flex; 
+            align-items: center; 
+            gap: 0; 
+            height: 100%;
+            white-space: nowrap; 
+            animation: ticker-scroll 60s linear infinite; 
+            will-change: transform;
+        }
+        .metaforge-ticker-inner:hover { animation-play-state: paused; }
+        @keyframes ticker-scroll { 
+            0%   { transform: translateX(0); } 
+            100% { transform: translateX(-50%); }
+        }
+        .ticker-event { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            padding: 0 20px; 
+            font-size: 0.8rem;
+            border-right: 1px solid #333;
+            height: 100%;
+            cursor: default;
+        }
+        .ticker-event-name { color: var(--text-main); font-weight: 700; }
+        .ticker-event-status { font-size: 0.75rem; padding: 1px 6px; border: 1px solid; border-radius: 2px; font-weight: bold; }
+        .ticker-status-active { color: var(--success-color); border-color: var(--success-color); background: rgba(0,255,65,0.1); }
+        .ticker-status-soon   { color: var(--locked-color); border-color: var(--locked-color); background: rgba(255,170,0,0.1); }
+        .ticker-status-later  { color: var(--text-dim);     border-color: #444; }
+        .ticker-event-time { color: var(--accent-color); font-size: 0.75rem; }
+        .ticker-separator { color: #444; padding: 0 8px; }
+
+        /* ── METAFORGE ROSTER EVENT FILTER ── */
+        .mf-event-filter { 
+            width: 100%; 
+            background: rgba(255,85,0,0.05); 
+            border: 1px solid var(--accent-color); 
+            padding: 12px 15px; 
+            margin-bottom: 0;
+        }
+        .mf-event-filter-title { 
+            color: var(--accent-color); 
+            font-weight: bold; 
+            font-size: 0.85rem; 
+            margin-bottom: 8px; 
+            letter-spacing: 1px; 
+        }
+        .mf-event-chips { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 6px; 
+        }
+        .mf-event-chip { 
+            background: #111; 
+            border: 1px solid #444; 
+            color: var(--text-dim); 
+            padding: 4px 10px; 
+            font-size: 0.78rem; 
+            cursor: pointer; 
+            font-family: 'Share Tech Mono', monospace; 
+            text-transform: uppercase; 
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .mf-event-chip:hover { border-color: var(--accent-color); color: var(--text-main); }
+        .mf-event-chip.active { border-color: var(--accent-color); color: var(--accent-color); background: rgba(255,85,0,0.15); }
+        .mf-chip-time { color: var(--text-dim); font-size: 0.7rem; }
+        .mf-chip-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success-color); display: inline-block; }
+        .mf-chip-dot.soon { background: var(--locked-color); }
+        .mf-chip-dot.later { background: #555; }
+        .mf-loading { color: var(--text-dim); font-size: 0.8rem; font-style: italic; }
+        
+        .mf-event-filter-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .mf-clear-btn { background: none; border: 1px solid #444; color: var(--text-dim); padding: 3px 8px; font-size: 0.75rem; display: none; }
+        .mf-clear-btn:hover { border-color: var(--danger-color); color: var(--danger-color); }
+
+        /* ── AVAILABLE AGENT HIGHLIGHT ── */
+        .member-card.mf-match { border-left-color: var(--accent-color) !important; box-shadow: 0 0 10px rgba(255,85,0,0.2); }
+        .mf-match-badge { display: inline-block; background: rgba(255,85,0,0.15); border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 0.75rem; padding: 2px 7px; margin-top: 6px; font-weight: bold; }
+
         @media (max-width: 768px) { 
             header { padding: 1rem; } 
             .grid-view { grid-template-columns: 1fr; }
             .webhook-item { flex-direction: column; align-items: flex-start; } 
             .webhook-item button { width: 100%; margin-top: 5px; }
+            .metaforge-ticker-label { font-size: 0.7rem; padding: 0 8px; }
         }
     </style>
 </head>
@@ -171,6 +286,15 @@
                 <li id="nav-admin-li" style="display:none"><a id="nav-admin" style="color:var(--admin-color); font-weight:bold; border-bottom:2px solid var(--admin-color);">COMMAND</a></li>
             </ul>
         </nav>
+        <!-- METAFORGE LIVE EVENT TICKER -->
+        <div class="metaforge-ticker-wrap" id="mfTickerWrap" style="display:none;">
+            <div class="metaforge-ticker-label">⚡ LIVE MAP EVENTS</div>
+            <div class="metaforge-ticker-track">
+                <div class="metaforge-ticker-inner" id="mfTickerInner">
+                    <span style="color:var(--text-dim); padding: 0 20px; font-size:0.8rem;">LOADING EVENT DATA...</span>
+                </div>
+            </div>
+        </div>
     </header>
 
     <main class="container">
@@ -288,6 +412,17 @@
 
         <section id="roster-section" class="hidden">
             <h2 style="border-bottom:2px solid var(--border-color); padding-bottom:10px;">// ACTIVE AGENTS</h2>
+            
+            <!-- METAFORGE MAP EVENT FILTER -->
+            <div class="mf-event-filter">
+                <div class="mf-event-filter-row">
+                    <div class="mf-event-filter-title">🗺 FILTER BY UPCOMING MAP EVENT — WHO'S AVAILABLE?</div>
+                    <button class="mf-clear-btn" id="mfClearFilter" onclick="window.mfClearEventFilter()">✕ CLEAR</button>
+                </div>
+                <div class="mf-event-chips" id="mfEventChips">
+                    <span class="mf-loading">Fetching Metaforge event schedule...</span>
+                </div>
+            </div>
             <div class="roster-toolbar" style="border-color: var(--cal-color); background: rgba(0, 217, 255, 0.05);">
                 <div style="width:100%; margin-bottom:10px; font-weight:bold; color:var(--cal-color);">:: FUTURE LOOKUP ::</div>
                 <div class="toolbar-group"><input type="datetime-local" id="roster-future-time"></div>
@@ -358,6 +493,7 @@
 
     <footer style="text-align:center; margin-top:50px; opacity:0.5; font-size:0.9rem;">
         SYSTEM v22.17 // <button id="resetAppBtn" style="background:none; border:none; color:var(--danger-color); text-decoration:underline; cursor:pointer; font-weight:bold;">FORCE RESET</button>
+        <br><span style="font-size:0.75rem;">Event data powered by <a href="https://metaforge.app/arc-raiders" target="_blank" style="color:var(--accent-color);">MetaForge</a></span>
     </footer>
 
     <div id="infoModal" class="modal-overlay hidden"><div class="modal-content" style="border-color:var(--info-color)"><div class="modal-header"><h3 id="infoTitle" style="color:var(--info-color)">INTEL</h3><button class="close-modal" style="color:var(--info-color)">[X]</button></div><div id="infoBody" style="line-height:1.6; color:var(--text-main);"></div><button class="close-modal btn-secondary" style="width:100%; margin-top:20px; border-color:var(--info-color); color:var(--info-color)">ACKNOWLEDGE</button></div></div>
@@ -1099,6 +1235,257 @@
             window.joinEvent = async (id) => { await supabaseClient.from('event_signups').insert({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.leaveEvent = async (id) => { await supabaseClient.from('event_signups').delete().match({event_id: id, user_id: currentUser.id}); loadBoard(); };
             window.delEvent = async (id) => { if(confirm('Delete?')) { await supabaseClient.from('events').delete().eq('id', id); loadBoard(); } };
+
+            // ══════════════════════════════════════════════════
+            // METAFORGE API INTEGRATION
+            // Data provided by metaforge.app/arc-raiders
+            // ══════════════════════════════════════════════════
+            const MF_API = 'https://metaforge.app/api/arc-raiders/events-schedule';
+            let mfEventsCache = null;
+            let mfSelectedEventTime = null; // UTC epoch ms of selected event window
+            let mfSelectedEventName = null;
+
+            async function fetchMetaforgeEvents() {
+                if (mfEventsCache) return mfEventsCache;
+                try {
+                    const res = await fetch(MF_API);
+                    if (!res.ok) throw new Error('MF API ' + res.status);
+                    const data = await res.json();
+                    mfEventsCache = data;
+                    return data;
+                } catch(e) {
+                    console.warn('Metaforge API fetch failed:', e);
+                    return null;
+                }
+            }
+
+            function mfGetEventStatus(nextOccurrence) {
+                if (!nextOccurrence) return { label: 'UNKNOWN', cls: 'later', dotCls: 'later' };
+                const now = Date.now();
+                const startMs = new Date(nextOccurrence.start).getTime();
+                const endMs   = new Date(nextOccurrence.end).getTime();
+                const diffMin = (startMs - now) / 60000;
+
+                if (now >= startMs && now < endMs) {
+                    return { label: 'ACTIVE', cls: 'ticker-status-active', dotCls: '' };
+                } else if (diffMin <= 15) {
+                    return { label: 'SOON', cls: 'ticker-status-soon', dotCls: 'soon' };
+                } else {
+                    const h = Math.floor(diffMin / 60);
+                    const m = Math.floor(diffMin % 60);
+                    const timeStr = h > 0 ? `${h}h ${m}m` : `${m}m`;
+                    return { label: `IN ${timeStr}`, cls: 'ticker-status-later', dotCls: 'later' };
+                }
+            }
+
+            function mfFormatCountdown(nextOccurrence) {
+                if (!nextOccurrence) return '';
+                const now = Date.now();
+                const startMs = new Date(nextOccurrence.start).getTime();
+                const endMs   = new Date(nextOccurrence.end).getTime();
+                if (now >= startMs && now < endMs) {
+                    const remaining = Math.floor((endMs - now) / 1000);
+                    const m = Math.floor(remaining / 60);
+                    const s = remaining % 60;
+                    return `ends in ${m}m ${s < 10 ? '0'+s : s}s`;
+                }
+                const diff = Math.floor((startMs - now) / 1000);
+                if (diff < 0) return 'ended';
+                const h = Math.floor(diff / 3600);
+                const m = Math.floor((diff % 3600) / 60);
+                const s = diff % 60;
+                if (h > 0) return `in ${h}h ${m}m`;
+                if (m > 0) return `in ${m}m ${s < 10 ? '0'+s : s}s`;
+                return `in ${s}s`;
+            }
+
+            async function initMetaforgeTicker() {
+                const data = await fetchMetaforgeEvents();
+                const wrap = document.getElementById('mfTickerWrap');
+                const inner = document.getElementById('mfTickerInner');
+                if (!data || !data.length) {
+                    wrap.style.display = 'none';
+                    return;
+                }
+
+                wrap.style.display = 'flex';
+
+                function buildTicker() {
+                    // Sort: active first, then soonest
+                    const sorted = [...data].sort((a, b) => {
+                        const aStart = a.nextOccurrence ? new Date(a.nextOccurrence.start).getTime() : Infinity;
+                        const bStart = b.nextOccurrence ? new Date(b.nextOccurrence.start).getTime() : Infinity;
+                        const now = Date.now();
+                        const aActive = a.nextOccurrence && now >= aStart && now < new Date(a.nextOccurrence.end).getTime();
+                        const bActive = b.nextOccurrence && now >= bStart && now < new Date(b.nextOccurrence.end).getTime();
+                        if (aActive && !bActive) return -1;
+                        if (!aActive && bActive) return 1;
+                        return aStart - bStart;
+                    });
+
+                    const items = sorted.map(ev => {
+                        const { label, cls } = mfGetEventStatus(ev.nextOccurrence);
+                        const timeStr = mfFormatCountdown(ev.nextOccurrence);
+                        return `<span class="ticker-event" title="${ev.description || ev.name}">
+                            <span class="ticker-event-name">${ev.name}</span>
+                            <span class="ticker-event-status ${cls}">${label}</span>
+                            ${timeStr ? `<span class="ticker-event-time">${timeStr}</span>` : ''}
+                        </span>`;
+                    }).join('<span class="ticker-separator">///</span>');
+
+                    // Duplicate for seamless infinite scroll
+                    inner.innerHTML = items + '<span class="ticker-separator" style="padding:0 30px;"></span>' + items;
+
+                    // Adjust animation speed based on content width
+                    const totalW = inner.scrollWidth / 2;
+                    const speed = Math.max(40, totalW / 6); // ~6px/sec
+                    inner.style.animationDuration = speed + 's';
+                }
+
+                buildTicker();
+                // Refresh ticker every 60 seconds
+                setInterval(() => { mfEventsCache = null; fetchMetaforgeEvents().then(d => { if(d) { mfEventsCache = d; buildTicker(); } }); }, 60000);
+                // Update live countdowns every 10s without refetch
+                setInterval(buildTicker, 10000);
+            }
+
+            async function initMetaforgeRosterFilter() {
+                const chipsEl = document.getElementById('mfEventChips');
+                const data = await fetchMetaforgeEvents();
+                if (!data || !data.length) {
+                    chipsEl.innerHTML = '<span class="mf-loading" style="color:var(--danger-color);">Event data unavailable</span>';
+                    return;
+                }
+
+                function buildChips() {
+                    const sorted = [...data].sort((a, b) => {
+                        const aStart = a.nextOccurrence ? new Date(a.nextOccurrence.start).getTime() : Infinity;
+                        const bStart = b.nextOccurrence ? new Date(b.nextOccurrence.start).getTime() : Infinity;
+                        return aStart - bStart;
+                    });
+
+                    chipsEl.innerHTML = '';
+                    sorted.forEach(ev => {
+                        const { label, dotCls } = mfGetEventStatus(ev.nextOccurrence);
+                        const timeStr = ev.nextOccurrence ? mfFormatCountdown(ev.nextOccurrence) : '';
+                        const startMs = ev.nextOccurrence ? new Date(ev.nextOccurrence.start).getTime() : null;
+                        const endMs   = ev.nextOccurrence ? new Date(ev.nextOccurrence.end).getTime() : null;
+
+                        const chip = document.createElement('button');
+                        chip.className = 'mf-event-chip' + (mfSelectedEventName === ev.name ? ' active' : '');
+                        chip.innerHTML = `<span class="mf-chip-dot ${dotCls}"></span> ${ev.name} <span class="mf-chip-time">${timeStr}</span>`;
+                        chip.title = `Filter roster: available during ${ev.name}`;
+                        chip.onclick = () => {
+                            if (mfSelectedEventName === ev.name) {
+                                window.mfClearEventFilter();
+                                return;
+                            }
+                            mfSelectedEventName = ev.name;
+                            mfSelectedEventTime = startMs; // Use event start as the check time
+                            document.getElementById('mfClearFilter').style.display = 'inline-block';
+                            buildChips();
+                            // Set the future time picker to match event time and run the check
+                            if (startMs) {
+                                const localDt = dayjs(startMs).format('YYYY-MM-DDTHH:mm');
+                                document.getElementById('roster-future-time').value = localDt;
+                            }
+                            loadRoster();
+                        };
+                        chipsEl.appendChild(chip);
+                    });
+                }
+
+                buildChips();
+                // Refresh chips every 30s
+                setInterval(buildChips, 30000);
+            }
+
+            window.mfClearEventFilter = function() {
+                mfSelectedEventName = null;
+                mfSelectedEventTime = null;
+                document.getElementById('mfClearFilter').style.display = 'none';
+                document.getElementById('roster-future-time').value = '';
+                // Rebuild chips to remove active state
+                const chipsEl = document.getElementById('mfEventChips');
+                chipsEl.querySelectorAll('.mf-event-chip').forEach(c => c.classList.remove('active'));
+                loadRoster();
+            };
+
+            // Patch loadRoster to highlight MF-matched agents
+            const _origLoadRoster = loadRoster;
+
+            // We hook into the member-card rendering via a post-process
+            // The MF event filter piggybacks on the existing future-time check
+            // but adds a visual badge identifying WHY a user matches
+            const _origRosterGridUpdate = () => {
+                if (mfSelectedEventName) {
+                    document.querySelectorAll('.member-card').forEach(card => {
+                        // If the card is showing (not filtered out), mark it
+                        if (!card.classList.contains('mf-match')) {
+                            card.classList.add('mf-match');
+                            const badge = document.createElement('div');
+                            badge.className = 'mf-match-badge';
+                            badge.textContent = `✓ AVAILABLE: ${mfSelectedEventName}`;
+                            card.appendChild(badge);
+                        }
+                    });
+                }
+            };
+
+            // Override loadRoster to inject MF badge after render
+            const originalLoadRoster = loadRoster;
+            loadRoster = async function() {
+                await originalLoadRoster.apply(this, arguments);
+                if (mfSelectedEventName) {
+                    // Small delay so DOM is ready
+                    setTimeout(() => {
+                        document.querySelectorAll('#rosterGrid .member-card').forEach(card => {
+                            if (!card.querySelector('.mf-match-badge')) {
+                                card.classList.add('mf-match');
+                                const badge = document.createElement('div');
+                                badge.className = 'mf-match-badge';
+                                badge.textContent = `✓ AVAIL: ${mfSelectedEventName}`;
+                                card.appendChild(badge);
+                            }
+                        });
+                    }, 50);
+                }
+            };
+
+            // Init MetaForge features once user is verified
+            const _origNavTo = navTo;
+            navTo = function(pageId, filterId) {
+                _origNavTo.call(this, pageId, filterId);
+                if (pageId === 'roster' && isVerified) {
+                    initMetaforgeRosterFilter();
+                }
+            };
+            window.navTo = navTo;
+
+            // Auto-init ticker once user is verified (called from checkProfile's navTo)
+            // We also call it proactively when user logs in
+            const _checkProfileOrig = checkProfile;
+            // Ticker init is triggered after successful login — hook via the dashboard navTo path
+            // We'll init it inside the checkProfile success flow by monkey-patching the verified branch
+            // Instead, let's just call it when we set up the nav
+            document.addEventListener('mfUserVerified', () => {
+                initMetaforgeTicker();
+            });
+
+            // Also patch the verified navTo call to fire ticker
+            const __origNavTo = navTo;
+            navTo = function(pageId, filterId) {
+                __origNavTo.call(this, pageId, filterId);
+                if (pageId === 'dashboard' && isVerified) {
+                    // Fire ticker init once
+                    if (!document.getElementById('mfTickerWrap').dataset.init) {
+                        document.getElementById('mfTickerWrap').dataset.init = '1';
+                        initMetaforgeTicker();
+                    }
+                }
+            };
+            window.navTo = navTo;
+
         });
     </script>
 </body>
